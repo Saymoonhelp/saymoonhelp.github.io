@@ -89,6 +89,12 @@
       transform: scale(1.2) rotate(0deg);
     }
 
+    .moon-icon.gold-moon::after {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.6rem;
+      text-shadow: 0 0 8px gold;
+    }
+
     .small-moon {
       background: #dedef0;
       border-radius: 100px;
@@ -122,7 +128,7 @@
       color: #8e6bb0;
     }
 
-    /* ===== EMAIL S ANIMACÍ ===== */
+    /* ===== EMAIL V KULATÉM RÁMEČKU ===== */
     .user-badge {
       display: inline-flex;
       align-items: center;
@@ -131,18 +137,12 @@
       padding: 8px 20px;
       border: 1px solid rgba(58, 110, 165, 0.3);
       transition: all 0.3s ease;
-      animation: glow 2s infinite;
     }
 
     .user-badge:hover {
       background: rgba(58, 110, 165, 0.2);
-      box-shadow: 0 0 20px rgba(58, 110, 165, 0.6);
-      transform: scale(1.05);
-    }
-
-    @keyframes glow {
-      0%, 100% { box-shadow: 0 0 5px rgba(58, 110, 165, 0.3); }
-      50% { box-shadow: 0 0 15px rgba(58, 110, 165, 0.5); }
+      box-shadow: 0 0 15px rgba(58, 110, 165, 0.4);
+      transform: scale(1.02);
     }
 
     .user-badge span {
@@ -155,8 +155,6 @@
     .password-container {
       position: relative;
       width: 100%;
-      display: flex;
-      justify-content: center;
       margin-bottom: 20px;
     }
 
@@ -167,12 +165,6 @@
       border: 2px solid #3a6ea5;
       border-radius: 30px;
       font-size: 16px;
-      transition: all 0.3s;
-    }
-
-    .password-container input:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(58, 110, 165, 0.3);
     }
 
     .eye-button {
@@ -197,11 +189,6 @@
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
-      transition: all 0.2s;
-    }
-
-    .eye-button:hover svg {
-      stroke: #1e3a5f;
     }
 
     .eye-button:active {
@@ -223,16 +210,14 @@
 
     .btn-auth:hover {
       background: #1e3a5f;
-      transform: scale(1.02);
     }
 
     .btn-auth:active {
-      transform: scale(0.98);
-      background: #0a1a2a;
+      transform: scale(0.95);
     }
 
     .btn-auth.clicked {
-      animation: pulse 0.5s ease;
+      animation: pulse 0.3s ease;
     }
 
     @keyframes pulse {
@@ -242,14 +227,14 @@
     }
 
     /* ===== KARTY ŽÁDOSTÍ ===== */
-    .requests-grid, .votes-grid {
+    .requests-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 30px;
       margin-top: 40px;
     }
 
-    .request-card, .vote-card {
+    .request-card {
       background: #ffffff;
       border-radius: 30px;
       padding: 30px;
@@ -258,7 +243,7 @@
       transition: all 0.3s;
     }
 
-    .request-card:hover, .vote-card:hover {
+    .request-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 30px 50px rgba(58, 110, 165, 0.2);
     }
@@ -282,34 +267,18 @@
       margin-bottom: 10px;
     }
 
-    .request-title {
-      font-size: 1.2rem;
-      font-weight: 500;
-      margin: 10px 0;
-    }
-
-    .progress-container {
-      margin: 15px 0;
-    }
-
     .progress-bar-bg {
       height: 8px;
       background: #eaeaf0;
       border-radius: 20px;
       overflow: hidden;
+      margin: 15px 0;
     }
 
     .progress-fill {
       height: 8px;
       background: linear-gradient(90deg, #3a6ea5, #7f9fcf);
       border-radius: 20px;
-    }
-
-    .progress-stats {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-      color: #4b4b63;
     }
 
     .btn-small {
@@ -332,222 +301,6 @@
       color: white;
     }
 
-    /* ===== HLASOVÁNÍ ===== */
-    .vote-numbers {
-      background: #f7f7fd;
-      padding: 12px;
-      border-radius: 60px;
-      text-align: center;
-      margin: 15px 0;
-    }
-
-    .vote-buttons {
-      display: flex;
-      gap: 12px;
-    }
-
-    .vote-yes, .vote-no {
-      flex: 1;
-      padding: 12px;
-      border-radius: 40px;
-      border: 1px solid #3a6ea5;
-      background: white;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .vote-yes:hover {
-      background: #dff0df;
-      border-color: #2e7d32;
-    }
-
-    .vote-no:hover {
-      background: #ffe6e6;
-      border-color: #c62828;
-    }
-
-    /* ===== KROKY ===== */
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 30px;
-      margin: 40px 0;
-    }
-
-    .step-card {
-      background: #f8f8ff;
-      border-radius: 30px;
-      padding: 40px 30px;
-      text-align: center;
-      border: 1px solid #e0e0ff;
-    }
-
-    .step-number {
-      background: white;
-      width: 60px;
-      height: 60px;
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 2rem;
-      color: #3a6ea5;
-      border: 2px solid #3a6ea5;
-    }
-
-    .step-card h3 {
-      font-size: 1.8rem;
-      margin-bottom: 15px;
-      color: #1e3a5f;
-    }
-
-    .step-card p {
-      color: #5a5a70;
-    }
-
-    /* ===== DETAIL ===== */
-    .detail-box {
-      text-align: center;
-      margin: 60px 0 0;
-    }
-
-    .detail-content {
-      display: none;
-      background: #f5f5fa;
-      padding: 40px;
-      border-radius: 40px;
-      text-align: left;
-      max-width: 800px;
-      margin: 20px auto 0;
-      border: 1px solid #3a6ea5;
-    }
-
-    .detail-content h3 {
-      margin-bottom: 20px;
-      color: #1e3a5f;
-    }
-
-    .detail-content p {
-      margin-bottom: 15px;
-      font-size: 1.1rem;
-    }
-
-    /* ===== STATISTIKY ===== */
-    .stats-grid {
-      display: flex;
-      gap: 20px;
-      justify-content: space-around;
-      background: #fbfbff;
-      border-radius: 80px;
-      padding: 50px 30px;
-      border: 1px solid #e0e0ff;
-    }
-
-    .stat-number {
-      font-size: 3.5rem;
-      font-weight: 600;
-      background: linear-gradient(130deg, #1e3a5f, #3a6ea5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .stat-label {
-      color: #6b6b88;
-      font-size: 1.2rem;
-    }
-
-    /* ===== 4 DŮVODY ===== */
-    .reasons-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 25px;
-      margin-top: 40px;
-    }
-
-    .reason-item {
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 36px;
-      text-align: center;
-      border: 1px solid #e0e0ff;
-    }
-
-    .reason-icon {
-      font-size: 2.6rem;
-      margin-bottom: 20px;
-    }
-
-    .reason-item h4 {
-      font-size: 1.4rem;
-      margin-bottom: 10px;
-      color: #1e3a5f;
-    }
-
-    .reason-item p {
-      color: #5a5a78;
-    }
-
-    /* ===== NEWSLETTER ===== */
-    .newsletter {
-      background: #fafaff;
-      border-radius: 80px;
-      padding: 70px 40px;
-      text-align: center;
-      border: 1px solid #e0e0ff;
-    }
-
-    .newsletter h2 {
-      font-size: 2.4rem;
-      margin-bottom: 20px;
-      color: #1e3a5f;
-    }
-
-    .email-form {
-      display: flex;
-      max-width: 500px;
-      margin: 30px auto 0;
-      gap: 12px;
-    }
-
-    .email-input {
-      flex: 1;
-      padding: 18px 26px;
-      border-radius: 60px;
-      border: 2px solid #3a6ea5;
-      font-size: 1rem;
-    }
-
-    .privacy-note {
-      margin-top: 20px;
-      color: #7e7e9a;
-    }
-
-    /* ===== FAQ ===== */
-    .faq-grid {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .faq-item {
-      background: #ffffff;
-      border-radius: 44px;
-      padding: 28px 36px;
-      margin-bottom: 20px;
-      border: 1px solid #e0e0ff;
-    }
-
-    .faq-question {
-      font-weight: 600;
-      font-size: 1.3rem;
-      margin-bottom: 8px;
-      color: #1e3a5f;
-    }
-
-    .faq-answer {
-      color: #565673;
-    }
-
     /* ===== OSTATNÍ ===== */
     .hero {
       padding: 100px 0 80px;
@@ -565,19 +318,6 @@
       -webkit-text-fill-color: transparent;
     }
 
-    .hero p {
-      font-size: 1.4rem;
-      color: #5e5e6e;
-      max-width: 700px;
-      margin: 0 auto 40px;
-    }
-
-    .button-group {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-    }
-
     .btn {
       border: none;
       padding: 14px 32px;
@@ -586,8 +326,6 @@
       font-weight: 500;
       cursor: pointer;
       background: white;
-      transition: all 0.2s;
-      color: #1d1c1f;
       border: 1px solid #3a6ea5;
     }
 
@@ -597,18 +335,12 @@
       border: none;
     }
 
-    .btn-primary:hover {
-      background: #2f2f40;
-      transform: scale(1.02);
-    }
-
     section {
       padding: 90px 0;
     }
 
     .section-title {
       font-size: 2.6rem;
-      font-weight: 600;
       text-align: center;
       margin-bottom: 60px;
       background: linear-gradient(145deg, #1e3a5f, #3a6ea5);
@@ -621,23 +353,6 @@
       border-top: 1px solid #f0f0f8;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-    }
-
-    @media (max-width: 900px) {
-      .steps-grid, .reasons-grid {
-        grid-template-columns: 1fr;
-      }
-      .requests-grid {
-        grid-template-columns: 1fr;
-      }
-      .hero h1 {
-        font-size: 2.8rem;
-      }
-      .stats-grid {
-        flex-direction: column;
-        align-items: center;
-      }
     }
   </style>
 </head>
@@ -652,8 +367,6 @@
         <a href="#">Žádosti</a>
         <a href="#">Hlasování</a>
         <button id="showLoginBtn" style="background: none; border: 1px solid #3a6ea5; padding: 8px 20px; border-radius: 30px; color: #3a6ea5; cursor: pointer;">Přihlásit se</button>
-        
-        <!-- Email v kulatém rámečku s animací -->
         <span id="userInfo" style="display: none; align-items: center; gap: 10px;">
           <div class="user-badge">
             <span id="userEmail"></span>
@@ -667,14 +380,9 @@
   <!-- Modální okno -->
   <div id="authModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:1000; justify-content: center; align-items: center;">
     <div style="background: white; padding: 40px; border-radius: 40px; width: 90%; max-width: 400px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-        <h2 id="authTitle" style="font-size: 2rem; color: #1e3a5f;">Přihlásit se</h2>
-        <button id="closeModal" style="background: none; border: none; font-size: 30px; cursor: pointer;">×</button>
-      </div>
-      
-      <input type="email" id="email" placeholder="Email" style="width:100%; padding:15px; margin-bottom:20px; border:2px solid #3a6ea5; border-radius:30px; font-size:16px;">
-      
-      <!-- Oko -->
+      <h2 id="authTitle">Přihlásit se</h2>
+      <button id="closeModal" style="float:right; background:none; border:none; font-size:24px;">×</button>
+      <input type="email" id="email" placeholder="Email" style="width:100%; padding:15px; margin:20px 0; border:2px solid #3a6ea5; border-radius:30px;">
       <div class="password-container">
         <input type="password" id="password" placeholder="Heslo">
         <div class="eye-button" id="togglePassword">
@@ -685,247 +393,58 @@
           </svg>
         </div>
       </div>
-      
-      <!-- Tlačítko s animací -->
       <button id="authAction" class="btn-auth">Přihlásit se</button>
-      <p style="text-align:center; margin-top:20px;"><a href="#" id="switchAuth" style="color:#3a6ea5;">Nemáte účet? Registrujte se</a></p>
+      <p style="text-align:center;"><a href="#" id="switchAuth">Nemáte účet? Registrujte se</a></p>
     </div>
   </div>
 
   <main>
-    <!-- Hero -->
     <section class="hero">
-      <div class="container">
-        <h1>Pomoc, která si tě najde</h1>
-        <p>SayMoonHelp je loterie dobrých skutků. Pomáhej druhým, získej body a měj šanci získat pomoc, když ji nejvíc potřebuješ.</p>
-        <div class="button-group">
-          <button class="btn btn-primary">Zapojit se</button>
-          <button class="btn">Jak to funguje</button>
-        </div>
+      <h1>Pomoc, která si tě najde</h1>
+      <p>SayMoonHelp je loterie dobrých skutků.</p>
+      <div class="button-group">
+        <button class="btn btn-primary">Zapojit se</button>
+        <button class="btn">Jak to funguje</button>
       </div>
     </section>
 
-    <!-- 3 kroky -->
     <section>
-      <div class="container">
-        <h2 class="section-title">Jak to funguje</h2>
-        <div class="steps-grid">
-          <div class="step-card">
-            <div class="step-number">1</div>
-            <h3>Přispěj</h3>
-            <p>Pošli libovolnou částku na cizí žádost. 10 Kč = 1 bod pomoci.</p>
-          </div>
-          <div class="step-card">
-            <div class="step-number">2</div>
-            <h3>Získej body</h3>
-            <p>Čím víc pomáháš, tím víc bodů máš. Body = tvoje šance v loterii.</p>
-          </div>
-          <div class="step-card">
-            <div class="step-number">3</div>
-            <h3>Vyhraj pomoc</h3>
-            <p>Až někdo podá žádost, loterie vybere šťastlivce, který dostane vybrané peníze.</p>
-          </div>
+      <h2 class="section-title">Právě teď někdo potřebuje pomoc</h2>
+      <div class="requests-grid">
+        <div class="request-card">
+          <div class="request-number">01</div>
+          <div class="request-name">Jana Nováková</div>
+          <div class="request-location">Praha</div>
+          <div>Potřebuje 5 000 Kč na opravu auta</div>
+          <div class="progress-bar-bg"><div class="progress-fill" style="width:64%"></div></div>
+          <button class="btn-small">Pomoci</button>
         </div>
-        
-        <!-- Detail -->
-        <div class="detail-box">
-          <button id="detailBtn" class="btn">🔍 Jak to celé funguje?</button>
-          <div id="detailText" class="detail-content">
-            <h3>Loterie dobrých skutků 🌙</h3>
-            <p><strong>1. Přispěj:</strong> Pošli peníze na cizí žádost. Každých 10 Kč = 1 bod.</p>
-            <p><strong>2. Hlasuj:</strong> Každý člen může hlasovat 👍/👎. Když žádost získá 70 % hlasů „pro“, postupuje do loterie.</p>
-            <p><strong>3. Loterie:</strong> Systém náhodně vybere jednoho z těch, kteří kdy přispěli. Šance na výhru závisí na počtu bodů (čím víc jsi pomohl, tím větší šance).</p>
-            <p><strong>4. Výhra:</strong> Vyhrávající člen obdrží vybranou částku (minus 5–10 % na provoz platformy).</p>
-            <p><em>SayMoonHelp je transparentní – všechny transakce a hlasy jsou veřejné.</em></p>
-          </div>
+        <div class="request-card">
+          <div class="request-number">02</div>
+          <div class="request-name">Petr Svoboda</div>
+          <div class="request-location">Brno</div>
+          <div>Potřebuje 2 500 Kč na veterináře</div>
+          <div class="progress-bar-bg"><div class="progress-fill" style="width:72%"></div></div>
+          <button class="btn-small">Pomoci</button>
         </div>
-      </div>
-    </section>
-
-    <!-- Aktivní žádosti -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Právě teď někdo potřebuje pomoc</h2>
-        <div class="requests-grid">
-          <!-- Žádost 1 -->
-          <div class="request-card">
-            <div class="request-number">01</div>
-            <div class="request-name">Jana Nováková</div>
-            <div class="request-location">Praha</div>
-            <div class="request-title">Potřebuje 5 000 Kč na opravu auta</div>
-            <div class="progress-container">
-              <div class="progress-bar-bg">
-                <div class="progress-fill" style="width:64%"></div>
-              </div>
-              <div class="progress-stats">
-                <span>3 200 Kč</span>
-                <span>z 5 000 Kč</span>
-                <span>64%</span>
-              </div>
-            </div>
-            <button class="btn-small">Pomoci</button>
-          </div>
-          
-          <!-- Žádost 2 -->
-          <div class="request-card">
-            <div class="request-number">02</div>
-            <div class="request-name">Petr Svoboda</div>
-            <div class="request-location">Brno</div>
-            <div class="request-title">Potřebuje 2 500 Kč na veterináře</div>
-            <div class="progress-container">
-              <div class="progress-bar-bg">
-                <div class="progress-fill" style="width:72%"></div>
-              </div>
-              <div class="progress-stats">
-                <span>1 800 Kč</span>
-                <span>z 2 500 Kč</span>
-                <span>72%</span>
-              </div>
-            </div>
-            <button class="btn-small">Pomoci</button>
-          </div>
-          
-          <!-- Žádost 3 -->
-          <div class="request-card">
-            <div class="request-number">03</div>
-            <div class="request-name">Marie Veselá</div>
-            <div class="request-location">Ostrava</div>
-            <div class="request-title">Potřebuje 8 000 Kč na školní pomůcky</div>
-            <div class="progress-container">
-              <div class="progress-bar-bg">
-                <div class="progress-fill" style="width:56%"></div>
-              </div>
-              <div class="progress-stats">
-                <span>4 500 Kč</span>
-                <span>z 8 000 Kč</span>
-                <span>56%</span>
-              </div>
-            </div>
-            <button class="btn-small">Pomoci</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Hlasování -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Hlasujte, komu pomůžeme</h2>
-        <div class="votes-grid">
-          <div class="vote-card">
-            <div class="request-name">Tomáš Dvořák</div>
-            <div class="request-location">Plzeň</div>
-            <div class="request-title">Potřebuje 3 000 Kč na jízdenky do práce</div>
-            <p>Přišel jsem o práci, nová je za městem. Potřebuji dojezdit, než dostanu první výplatu.</p>
-            <div class="vote-numbers">👍 45 / 👎 12 (79% pro)</div>
-            <div class="vote-buttons">
-              <button class="vote-yes">👍 Ano</button>
-              <button class="vote-no">👎 Ne</button>
-            </div>
-          </div>
-          <div class="vote-card">
-            <div class="request-name">Lucie Horáková</div>
-            <div class="request-location">Liberec</div>
-            <div class="request-title">Potřebuje 12 000 Kč na opravu pračky</div>
-            <p>Jsem samoživitelka, pračka se rozbila a nemám na novou.</p>
-            <div class="vote-numbers">👍 23 / 👎 8 (74% pro)</div>
-            <div class="vote-buttons">
-              <button class="vote-yes">👍 Ano</button>
-              <button class="vote-no">👎 Ne</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Čísla -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">SayMoonHelp v číslech</h2>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <div class="stat-number">156 000 Kč</div>
-            <div class="stat-label">Vybráno na pomoc</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number">47</div>
-            <div class="stat-label">Lidí dostalo pomoc</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number">312</div>
-            <div class="stat-label">Aktivních členů</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Proč se zapojit -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Proč se zapojit</h2>
-        <div class="reasons-grid">
-          <div class="reason-item">
-            <div class="reason-icon">🤝</div>
-            <h4>Pomáháš konkrétním lidem</h4>
-            <p>Každá koruna jde na ověřenou žádost. Žádné anonymní sbírky.</p>
-          </div>
-          <div class="reason-item">
-            <div class="reason-icon">🎲</div>
-            <h4>Máš šanci na pomoc i ty</h4>
-            <p>Čím víc pomáháš, tím víc šancí máš v loterii.</p>
-          </div>
-          <div class="reason-item">
-            <div class="reason-icon">🗳️</div>
-            <h4>Rozhoduješ ty</h4>
-            <p>Hlasuješ, kdo pomoc dostane. Společně rozhodujeme fér.</p>
-          </div>
-          <div class="reason-item">
-            <div class="reason-icon">🔍</div>
-            <h4>Jsme transparentní</h4>
-            <p>Všechny transakce jsou veřejné a dohledatelné.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Newsletter -->
-    <section>
-      <div class="container newsletter">
-        <h2>Buďte první, až spustíme</h2>
-        <p>Zatím testujeme. Zanechte nám email a dáme vám vědět, jakmile bude možné se zapojit.</p>
-        <div class="email-form">
-          <input class="email-input" type="email" placeholder="váš@email.cz">
-          <button class="btn btn-primary" style="padding: 18px 32px;">Odeslat</button>
-        </div>
-        <div class="privacy-note">Žádný spam. Jen jedna zpráva, až budeme živí.</div>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Časté otázky</h2>
-        <div class="faq-grid">
-          <div class="faq-item">
-            <div class="faq-question">Kdo může žádat o pomoc?</div>
-            <div class="faq-answer">Každý registrovaný člen, který už alespoň jednou pomohl.</div>
-          </div>
-          <div class="faq-item">
-            <div class="faq-question">Jak funguje loterie?</div>
-            <div class="faq-answer">Každých 10 Kč darovaných = 1 bod. Při výběru náhodně losujeme s váhou podle bodů. Vyhrává jeden člen, který obdrží vybranou částku.</div>
-          </div>
+        <div class="request-card">
+          <div class="request-number">03</div>
+          <div class="request-name">Marie Veselá</div>
+          <div class="request-location">Ostrava</div>
+          <div>Potřebuje 8 000 Kč na školní pomůcky</div>
+          <div class="progress-bar-bg"><div class="progress-fill" style="width:56%"></div></div>
+          <button class="btn-small">Pomoci</button>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="container">
-    <div>© 2025 SayMoonHelp · průhledná pomoc</div>
+  <footer>
+    <div>© 2025 SayMoonHelp</div>
     <div class="small-moon" id="footerMoon">🌙 lunární design</div>
   </footer>
 
   <script>
-    // Firebase konfigurace
     const firebaseConfig = {
       apiKey: "AIzaSyA1aSGtwkbVp8yAL_I2P-6bDITHe58ALtA",
       authDomain: "saymoonhelp-af1e6.firebaseapp.com",
@@ -934,11 +453,75 @@
       messagingSenderId: "911248985825",
       appId: "1:911248985825:web:b602feab7eb8f4dbd9b1a0"
     };
-
     firebase.initializeApp(firebaseConfig);
 
-    document.addEventListener('DOMContentLoaded', function() {
-      
-      // ===== LUNA S ANIMACÍ =====
+    document.addEventListener('DOMContentLoaded', () => {
+      // Luna
       const moon = document.getElementById('mainMoon');
-      const footerMoon
+      const footerMoon = document.getElementById('footerMoon');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 100) {
+          moon.classList.add('gold-moon');
+          footerMoon.classList.add('gold-moon');
+        } else {
+          moon.classList.remove('gold-moon');
+          footerMoon.classList.remove('gold-moon');
+        }
+      });
+
+      // Oko
+      const eye = document.getElementById('togglePassword');
+      const password = document.getElementById('password');
+      const eyeLine = document.getElementById('eyeLine');
+      eye?.addEventListener('click', function() {
+        this.style.transform = 'translateY(-50%) scale(1.2)';
+        setTimeout(() => this.style.transform = 'translateY(-50%) scale(1)', 200);
+        const type = password.type === 'password' ? 'text' : 'password';
+        password.type = type;
+        eyeLine.style.display = type === 'text' ? 'none' : 'block';
+      });
+
+      // Registrace
+      const modal = document.getElementById('authModal');
+      document.getElementById('showLoginBtn').addEventListener('click', () => modal.style.display = 'flex');
+      document.getElementById('closeModal').addEventListener('click', () => modal.style.display = 'none');
+      
+      let isLogin = true;
+      document.getElementById('switchAuth').addEventListener('click', (e) => {
+        e.preventDefault();
+        isLogin = !isLogin;
+        document.getElementById('authTitle').innerText = isLogin ? 'Přihlásit se' : 'Registrace';
+        document.getElementById('authAction').innerText = isLogin ? 'Přihlásit se' : 'Registrovat se';
+        e.target.innerText = isLogin ? 'Nemáte účet? Registrujte se' : 'Máte účet? Přihlaste se';
+      });
+
+      document.getElementById('authAction').addEventListener('click', function() {
+        this.classList.add('clicked');
+        setTimeout(() => this.classList.remove('clicked'), 300);
+        const email = document.getElementById('email').value;
+        const pass = password.value;
+        if (!email || !pass) return alert('Vyplň email a heslo');
+        const auth = isLogin 
+          ? firebase.auth().signInWithEmailAndPassword(email, pass)
+          : firebase.auth().createUserWithEmailAndPassword(email, pass);
+        auth.then(() => modal.style.display = 'none').catch(e => alert(e.message));
+      });
+
+      firebase.auth().onAuthStateChanged(user => {
+        const info = document.getElementById('userInfo');
+        const btn = document.getElementById('showLoginBtn');
+        if (user) {
+          btn.style.display = 'none';
+          info.style.display = 'flex';
+          document.getElementById('userEmail').innerText = user.email;
+        } else {
+          btn.style.display = 'inline-block';
+          info.style.display = 'none';
+        }
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', () => firebase.auth().signOut());
+    });
+  </script>
+</body>
+</html>
