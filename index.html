@@ -58,35 +58,29 @@
       gap: 6px;
     }
   
-    /* АНИМАЦИЯ ЛУНЫ */
+    /* ===== ЛУНА ===== */
     .moon-icon {
       display: inline-block;
       font-size: 2.5rem;
       transition: all 0.5s ease;
     }
   
-    /* Синий градиент для луны */
-    .moon-blue {
+    /* Синий градиент для полумесяца (по умолчанию) */
+    .moon-icon.blue-moon {
       background: linear-gradient(135deg, #3a6ea5, #7f9fcf, #b0c4de);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-shadow: 0 0 10px rgba(58, 110, 165, 0.3);
+      transform: rotate(-10deg);
     }
   
-    /* Когда скроллим - полнолуние */
-    .moon-full {
-      transform: scale(1.1);
-      filter: drop-shadow(0 0 15px #ffd700);
-    }
-  
-    /* Фиксируем класс при скролле */
-    .moon-icon.scrolled {
-      transform: scale(1.2);
+    /* Золотое полнолуние при скролле */
+    .moon-icon.gold-moon {
       background: radial-gradient(circle at 30% 30%, #ffd700, #fdb813);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+      transform: scale(1.2) rotate(0deg);
     }
   
     nav {
@@ -588,13 +582,12 @@
   <header>
     <div class="container header-inner">
       <div class="logo">
-        <span class="moon-icon" id="moon">🌙</span> SayMoonHelp
+        <span class="moon-icon blue-moon" id="moon">🌙</span> SayMoonHelp
       </div>
       <nav>
         <a href="#">Jak to funguje</a>
         <a href="#">Žádosti</a>
         <a href="#">Hlasování</a>
-        <!-- Кнопки входа -->
         <button id="show-login" style="background: none; border: 1px solid #3a6ea5; padding: 8px 20px; border-radius: 30px; color: #3a6ea5; cursor: pointer;">Přihlásit se</button>
         <span id="user-info" style="display: none; align-items: center; gap: 10px;">
           <span id="user-email" style="color: #333;"></span>
@@ -613,11 +606,9 @@
         <button id="close-modal" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
       </div>
       
-      <!-- Форма -->
       <input type="email" id="email" placeholder="Email" style="width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 15px; font-size: 16px;">
       <input type="password" id="password" placeholder="Heslo" style="width: 100%; padding: 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 15px; font-size: 16px;">
       
-      <!-- Кнопка действия -->
       <button id="auth-action" style="width: 100%; padding: 15px; background: #3a6ea5; color: white; border: none; border-radius: 30px; font-size: 18px; font-weight: 500; margin-bottom: 10px; cursor: pointer;">Přihlásit se</button>
       
       <p style="text-align: center; margin: 15px 0;">
@@ -749,9 +740,9 @@
 
   <!-- JAVASCRIPT -->
   <script>
-    // ⚠️ ZDE DOPLŇ SVÁ FIREBASE DATA!
+    // FIREBASE CONFIG (DOPLŇ SVÉ ÚDAJE!)
     const firebaseConfig = {
-      apiKey: "AIzaSy...",          // TVŮJ API KEY
+      apiKey: "AIzaSy...",
       authDomain: "saymoonhelp.firebaseapp.com",
       projectId: "saymoonhelp",
       storageBucket: "saymoonhelp.appspot.com",
@@ -759,36 +750,32 @@
       appId: "1:123456789:web:abc123"
     };
 
-    // Inicializace Firebase
     firebase.initializeApp(firebaseConfig);
 
     document.addEventListener('DOMContentLoaded', function() {
       
-      // ===== AANIMACE LUNY PŘI SKROLLOVÁNÍ =====
+      // ===== АНИМАЦИЯ ЛУНЫ =====
       const moon = document.getElementById('moon');
       const footerMoon = document.getElementById('footer-moon');
       
+      // Начальное состояние - синий полумесяц
+      moon.classList.add('blue-moon');
+      
       window.addEventListener('scroll', function() {
         if (window.scrollY > 100) {
-          moon.classList.add('scrolled');
-          footerMoon.classList.add('scrolled');
-          moon.style.transform = 'scale(1.2)';
-          moon.style.background = 'radial-gradient(circle at 30% 30%, #ffd700, #fdb813)';
-          moon.style.webkitBackgroundClip = 'text';
-          moon.style.backgroundClip = 'text';
-          moon.style.color = 'transparent';
+          // При скролле - золотое полнолуние
+          moon.classList.remove('blue-moon');
+          moon.classList.add('gold-moon');
+          footerMoon.classList.add('gold-moon');
         } else {
-          moon.classList.remove('scrolled');
-          footerMoon.classList.remove('scrolled');
-          moon.style.transform = 'scale(1)';
-          moon.style.background = 'linear-gradient(135deg, #3a6ea5, #7f9fcf, #b0c4de)';
-          moon.style.webkitBackgroundClip = 'text';
-          moon.style.backgroundClip = 'text';
-          moon.style.color = 'transparent';
+          // Вверху - синий полумесяц
+          moon.classList.remove('gold-moon');
+          moon.classList.add('blue-moon');
+          footerMoon.classList.remove('gold-moon');
         }
       });
 
-      // ===== DETAILNÍ POPIS =====
+      // ===== ДЕТАЛЬНОЕ ОПИСАНИЕ =====
       const detailBtn = document.getElementById('show-detail');
       const detailContent = document.getElementById('detail-content');
       
@@ -801,3 +788,12 @@
           detailBtn.textContent = '🔍 Jak to celé funguje?';
         }
       });
+
+      // ===== РЕГИСТРАЦИЯ =====
+      const modal = document.getElementById('auth-modal');
+      const showLoginBtn = document.getElementById('show-login');
+      const closeModal = document.getElementById('close-modal');
+      const authTitle = document.getElementById('auth-title');
+      const authAction = document.getElementById('auth-action');
+      const switchAuth = document.getElementById('switch-auth');
+     
