@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SayMoonHelp – loterie dobrých skutků</title>
-
+  
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-
+  
   <style>
     * {
       margin: 0;
@@ -31,7 +31,6 @@
       padding: 0 24px;
     }
 
-    /* Hlavička */
     header {
       padding: 20px 0;
       border-bottom: 1px solid rgba(0,0,0,0.03);
@@ -57,7 +56,7 @@
       gap: 6px;
     }
 
-    /* ===== ZÁKLADNÍ LUNA (modrá s hvězdami) ===== */
+    /* ===== СИНЯЯ ЛУНА СО ЗВЁЗДАМИ ===== */
     .moon-icon {
       display: inline-block;
       font-size: 2.5rem;
@@ -70,23 +69,22 @@
       transform: rotate(-10deg);
     }
 
-    /* Hvězdičky na měsíci (pomocí pseudoelementu) */
+    /* Звёздочки на луне */
     .moon-icon::after {
       content: "★ ★ ★";
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      color: rgba(255, 255, 255, 0.7);
+      color: rgba(255, 255, 255, 0.8);
       font-size: 0.5rem;
       letter-spacing: 0.2rem;
       white-space: nowrap;
       pointer-events: none;
       text-shadow: 0 0 4px white;
-      opacity: 0.9;
     }
 
-    /* ===== ZLATÝ ÚPLNĚK PŘI SCROLLU ===== */
+    /* ЗОЛОТОЕ ПОЛНОЛУНИЕ ПРИ СКРОЛЛЕ */
     .moon-icon.gold-moon {
       background: radial-gradient(circle at 30% 30%, #ffd700, #fdb813, #ff8c00);
       -webkit-background-clip: text;
@@ -96,21 +94,11 @@
     }
 
     .moon-icon.gold-moon::after {
-      content: "★ ★ ★";
       color: rgba(255, 255, 255, 0.9);
       font-size: 0.6rem;
       text-shadow: 0 0 8px gold;
     }
 
-    /* Patičkový měsíc */
-    .small-moon {
-      background: #dedef0;
-      border-radius: 100px;
-      padding: 6px 14px;
-      font-size: 0.9rem;
-    }
-
-    /* Navigace */
     nav {
       display: flex;
       gap: 32px;
@@ -130,7 +118,6 @@
       color: #8e6bb0;
     }
 
-    /* Hrdina */
     .hero {
       padding: 100px 0 80px;
       text-align: center;
@@ -190,7 +177,6 @@
       box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15);
     }
 
-    /* Sekce */
     section {
       padding: 90px 0;
     }
@@ -205,7 +191,6 @@
       -webkit-text-fill-color: transparent;
     }
 
-    /* 3 kroky */
     .steps-grid {
       display: flex;
       gap: 30px;
@@ -234,7 +219,6 @@
       color: #4e4e75;
     }
 
-    /* Detailní popis */
     .detail-box {
       margin-top: 60px;
       text-align: center;
@@ -262,11 +246,6 @@
       font-size: 1.1rem;
     }
 
-    .detail-content strong {
-      color: #3a6ea5;
-    }
-
-    /* Žádosti */
     .requests-grid, .votes-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
@@ -318,10 +297,6 @@
       cursor: pointer;
     }
 
-    .vote-yes:hover { background: #dff0df; }
-    .vote-no:hover { background: #ffe6e6; }
-
-    /* Statistiky */
     .stats-grid {
       display: flex;
       gap: 20px;
@@ -352,12 +327,6 @@
       text-align: center;
     }
 
-    .reason-icon {
-      font-size: 2.6rem;
-      margin-bottom: 20px;
-    }
-
-    /* Newsletter */
     .newsletter {
       background: #fafaff;
       border-radius: 80px;
@@ -394,6 +363,12 @@
       align-items: center;
     }
 
+    .small-moon {
+      background: #dedef0;
+      border-radius: 100px;
+      padding: 6px 14px;
+    }
+
     @media (max-width: 900px) {
       .steps-grid { flex-direction: column; }
       .reasons-grid { grid-template-columns: repeat(2,1fr); }
@@ -420,7 +395,7 @@
     </div>
   </header>
 
-  <!-- Modální okno přihlášení / registrace -->
+  <!-- Модальное окно входа / регистрации -->
   <div id="authModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:1000; justify-content: center; align-items: center;">
     <div style="background: white; padding: 30px; border-radius: 30px; width: 90%; max-width: 400px;">
       <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -467,66 +442,125 @@
       </div>
     </section>
 
-    <!-- Žádosti, hlasování, statistiky, atd. (zůstává stejné) -->
-    <section>…</section>
+    <section>
+      <div class="container">
+        <h2 class="section-title">Právě teď někdo potřebuje pomoc</h2>
+        <div class="requests-grid">
+          <div class="request-card"><div class="request-name">Jana Nováková</div><div class="request-location">Praha</div><div class="request-title">Potřebuje 5 000 Kč na opravu auta</div><div class="progress-container"><div class="progress-bar-bg"><div class="progress-fill" style="width:64%"></div></div><div class="progress-stats"><span>3 200 Kč z 5 000 Kč</span><span>64%</span></div></div><button class="btn-small">Pomoci</button></div>
+          <div class="request-card"><div class="request-name">Petr Svoboda</div><div class="request-location">Brno</div><div class="request-title">Potřebuje 2 500 Kč na veterináře</div><div class="progress-container"><div class="progress-bar-bg"><div class="progress-fill" style="width:72%"></div></div><div class="progress-stats"><span>1 800 Kč z 2 500 Kč</span><span>72%</span></div></div><button class="btn-small">Pomoci</button></div>
+          <div class="request-card"><div class="request-name">Marie Veselá</div><div class="request-location">Ostrava</div><div class="request-title">Potřebuje 8 000 Kč na školní pomůcky</div><div class="progress-container"><div class="progress-bar-bg"><div class="progress-fill" style="width:56%"></div></div><div class="progress-stats"><span>4 500 Kč z 8 000 Kč</span><span>56%</span></div></div><button class="btn-small">Pomoci</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title">Hlasujte, komu pomůžeme</h2>
+        <div class="votes-grid">
+          <div class="vote-card"><div class="request-name">Tomáš Dvořák</div><div class="request-location">Plzeň</div><div class="request-title">Potřebuje 3 000 Kč na jízdenky do práce</div><p>Přišel jsem o práci, nová je za městem. Potřebuji dojezdit, než dostanu první výplatu.</p><div class="vote-numbers">👍 45 / 👎 12 (79% pro)</div><div class="vote-buttons"><button class="vote-yes">👍 Ano</button><button class="vote-no">👎 Ne</button></div></div>
+          <div class="vote-card"><div class="request-name">Lucie Horáková</div><div class="request-location">Liberec</div><div class="request-title">Potřebuje 12 000 Kč na opravu pračky</div><p>Jsem samoživitelka, pračka se rozbila a nemám na novou.</p><div class="vote-numbers">👍 23 / 👎 8 (74% pro)</div><div class="vote-buttons"><button class="vote-yes">👍 Ano</button><button class="vote-no">👎 Ne</button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title">SayMoonHelp v číslech</h2>
+        <div class="stats-grid">
+          <div class="stat-item"><div class="stat-number">156 000 Kč</div><div class="stat-label">Vybráno na pomoc</div></div>
+          <div class="stat-item"><div class="stat-number">47</div><div class="stat-label">Lidí dostalo pomoc</div></div>
+          <div class="stat-item"><div class="stat-number">312</div><div class="stat-label">Aktivních členů</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title">Proč se zapojit</h2>
+        <div class="reasons-grid">
+          <div class="reason-item"><div class="reason-icon">🤝</div><h4>Pomáháš konkrétním lidem</h4><p>Každá koruna jde na ověřenou žádost. Žádné anonymní sbírky.</p></div>
+          <div class="reason-item"><div class="reason-icon">🎲</div><h4>Máš šanci na pomoc i ty</h4><p>Čím víc pomáháš, tím víc šancí máš v loterii.</p></div>
+          <div class="reason-item"><div class="reason-icon">🗳️</div><h4>Rozhoduješ ty</h4><p>Hlasuješ, kdo pomoc dostane. Společně rozhodujeme fér.</p></div>
+          <div class="reason-item"><div class="reason-icon">🔍</div><h4>Jsme transparentní</h4><p>Všechny transakce jsou veřejné a dohledatelné.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container newsletter">
+        <h2>Buďte první, až spustíme</h2>
+        <p>Zatím testujeme. Zanechte nám email a dáme vám vědět, jakmile bude možné se zapojit.</p>
+        <div class="email-form">
+          <input class="email-input" type="email" placeholder="váš@email.cz">
+          <button class="btn btn-primary" style="padding: 18px 32px;">Odeslat</button>
+        </div>
+        <div class="privacy-note">Žádný spam. Jen jedna zpráva, až budeme živí.</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title">Časté otázky</h2>
+        <div class="faq-grid">
+          <div class="faq-item"><div class="faq-question">Kdo může žádat o pomoc?</div><div class="faq-answer">Každý registrovaný člen, který už alespoň jednou pomohl.</div></div>
+          <div class="faq-item"><div class="faq-question">Jak funguje loterie?</div><div class="faq-answer">Každých 10 Kč darovaných = 1 bod. Při výběru náhodně losujeme s váhou podle bodů. Vyhrává jeden člen, který obdrží vybranou částku.</div></div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="container">
-    <div>© 2025 SayMoonHelp</div>
+    <div>© 2025 SayMoonHelp · průhledná pomoc</div>
     <div class="small-moon" id="footerMoon">🌙 lunární design</div>
   </footer>
 
   <script>
-    // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+    // ===== ТВОИ НАСТОЯЩИЕ КЛЮЧИ FIREBASE =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyA1aSGtwkbVp8yAL_I2P-6bDITHe58ALtA",
+      authDomain: "saymoonhelp-af1e6.firebaseapp.com",
+      projectId: "saymoonhelp-af1e6",
+      storageBucket: "saymoonhelp-af1e6.firebasestorage.app",
+      messagingSenderId: "911248985825",
+      appId: "1:911248985825:web:b602feab7eb8f4dbd9b1a0",
+      measurementId: "G-SZ1QKQCYPC"
+    };
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyA1aSGtwkbVp8yAL_I2P-6bDITHe58ALtA",
-  authDomain: "saymoonhelp-af1e6.firebaseapp.com",
-  projectId: "saymoonhelp-af1e6",
-  storageBucket: "saymoonhelp-af1e6.firebasestorage.app",
-  messagingSenderId: "911248985825",
-  appId: "1:911248985825:web:b602feab7eb8f4dbd9b1a0",
-  measurementId: "G-SZ1QKQCYPC"
-};
+    // Запускаем Firebase
+    firebase.initializeApp(firebaseConfig);
+    console.log('Firebase готов ✅');
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function() {
+      
+      // ===== АНИМАЦИЯ ЛУНЫ ПРИ СКРОЛЛЕ =====
       const moon = document.getElementById('mainMoon');
       const footerMoon = document.getElementById('footerMoon');
-
-      // Skrolovací efekt měsíce
-      window.addEventListener('scroll', () => {
+      
+      window.addEventListener('scroll', function() {
         if (window.scrollY > 100) {
           moon.classList.add('gold-moon');
-          footerMoon?.classList.add('gold-moon');
+          if (footerMoon) footerMoon.classList.add('gold-moon');
         } else {
           moon.classList.remove('gold-moon');
-          footerMoon?.classList.remove('gold-moon');
+          if (footerMoon) footerMoon.classList.remove('gold-moon');
         }
       });
 
-      // Detailní popis
-      document.getElementById('detailBtn').addEventListener('click', function() {
-        const detail = document.getElementById('detailText');
-        if (detail.style.display === 'none' || detail.style.display === '') {
-          detail.style.display = 'block';
-          this.textContent = '🔍 Skrýt detail';
+      // ===== ДЕТАЛЬНОЕ ОПИСАНИЕ =====
+      const detailBtn = document.getElementById('detailBtn');
+      const detailText = document.getElementById('detailText');
+      
+      detailBtn.addEventListener('click', function() {
+        if (detailText.style.display === 'none' || detailText.style.display === '') {
+          detailText.style.display = 'block';
+          detailBtn.textContent = '🔍 Skrýt detail';
         } else {
-          detail.style.display = 'none';
-          this.textContent = '🔍 Jak to celé funguje?';
+          detailText.style.display = 'none';
+          detailBtn.textContent = '🔍 Jak to celé funguje?';
         }
       });
 
-      // ========== REGISTRACE / PŘIHLÁŠENÍ ==========
+      // ===== РЕГИСТРАЦИЯ И ВХОД =====
       const modal = document.getElementById('authModal');
       const showLoginBtn = document.getElementById('showLoginBtn');
       const closeModal = document.getElementById('closeModal');
@@ -543,34 +577,66 @@ const analytics = getAnalytics(app);
 
       showLoginBtn.addEventListener('click', () => modal.style.display = 'flex');
       closeModal.addEventListener('click', () => modal.style.display = 'none');
-      window.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
+      
+      window.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+      });
 
       switchAuth.addEventListener('click', (e) => {
         e.preventDefault();
         isLogin = !isLogin;
-        authTitle.innerText = isLogin ? 'Přihlásit se' : 'Registrace';
-        authAction.innerText = isLogin ? 'Přihlásit se' : 'Registrovat se';
-        switchAuth.innerText = isLogin ? 'Nemáte účet? Registrujte se' : 'Máte účet? Přihlaste se';
+        if (isLogin) {
+          authTitle.innerText = 'Přihlásit se';
+          authAction.innerText = 'Přihlásit se';
+          switchAuth.innerText = 'Nemáte účet? Registrujte se';
+        } else {
+          authTitle.innerText = 'Registrace';
+          authAction.innerText = 'Registrovat se';
+          switchAuth.innerText = 'Máte účet? Přihlaste se';
+        }
       });
 
       authAction.addEventListener('click', () => {
         const email = emailInput.value.trim();
         const pass = passwordInput.value.trim();
-        if (!email || !pass) return alert('Vyplň email a heslo');
-        if (!isLogin && pass.length < 6) return alert('Heslo min. 6 znaků');
+        
+        if (!email || !pass) {
+          alert('Vyplň email a heslo');
+          return;
+        }
+        
+        if (!isLogin && pass.length < 6) {
+          alert('Heslo musí mít alespoň 6 znaků');
+          return;
+        }
 
         if (isLogin) {
+          // ВХОД
           firebase.auth().signInWithEmailAndPassword(email, pass)
-            .then(() => modal.style.display = 'none')
-            .catch(err => alert('Chyba: ' + err.message));
+            .then(() => {
+              modal.style.display = 'none';
+              emailInput.value = '';
+              passwordInput.value = '';
+            })
+            .catch((error) => {
+              alert('Chyba přihlášení: ' + error.message);
+            });
         } else {
+          // РЕГИСТРАЦИЯ
           firebase.auth().createUserWithEmailAndPassword(email, pass)
-            .then(() => modal.style.display = 'none')
-            .catch(err => alert('Chyba: ' + err.message));
+            .then(() => {
+              modal.style.display = 'none';
+              emailInput.value = '';
+              passwordInput.value = '';
+            })
+            .catch((error) => {
+              alert('Chyba registrace: ' + error.message);
+            });
         }
       });
 
-      firebase.auth().onAuthStateChanged(user => {
+      // СЛЕДИМ ЗА СОСТОЯНИЕМ ПОЛЬЗОВАТЕЛЯ
+      firebase.auth().onAuthStateChanged((user) => {
         if (user) {
           showLoginBtn.style.display = 'none';
           userInfo.style.display = 'flex';
@@ -581,9 +647,12 @@ const analytics = getAnalytics(app);
         }
       });
 
-      logoutBtn.addEventListener('click', () => firebase.auth().signOut());
+      // ВЫХОД
+      logoutBtn.addEventListener('click', () => {
+        firebase.auth().signOut();
+      });
+
     });
   </script>
 </body>
 </html>
-
