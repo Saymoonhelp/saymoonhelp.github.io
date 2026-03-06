@@ -343,43 +343,33 @@
 
     /* ===== OSTATNÍ ===== */
     .hero {
+      position: relative;
       padding: 100px 0 80px;
       text-align: center;
       background: radial-gradient(circle at 80% 30%, rgba(58,110,165,0.1) 0%, #fff 70%);
     }
 
-    /* ===== RÁMEČEK S HVĚZDIČKAMI ===== */
-    .hero-frame {
-      position: relative;
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 48px 40px 44px;
-      border: 2px solid rgba(58, 110, 165, 0.35);
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.6);
-      box-shadow: 0 8px 32px rgba(58, 110, 165, 0.12), inset 0 1px 0 rgba(255,255,255,0.8);
-    }
+    /* ===== HVĚZDIČKY NA POZADÍ HERO ===== */
 
-    .hero-frame .star {
+    .hero-stars {
       position: absolute;
-      font-size: 14px;
-      color: #3a6ea5;
+      inset: 0;
       pointer-events: none;
-      animation: star-twinkle 2.2s ease-in-out infinite;
+      overflow: hidden;
     }
 
-    .hero-frame .star:nth-child(1) { top: 12px; left: 16px; animation-delay: 0s; }
-    .hero-frame .star:nth-child(2) { top: 18px; left: 50%; margin-left: -7px; animation-delay: 0.4s; }
-    .hero-frame .star:nth-child(3) { top: 12px; right: 16px; animation-delay: 0.8s; }
-    .hero-frame .star:nth-child(4) { top: 50%; right: 12px; margin-top: -7px; animation-delay: 0.2s; }
-    .hero-frame .star:nth-child(5) { bottom: 18px; right: 20px; animation-delay: 0.6s; }
-    .hero-frame .star:nth-child(6) { bottom: 12px; left: 50%; margin-left: -7px; animation-delay: 1s; }
-    .hero-frame .star:nth-child(7) { bottom: 18px; left: 20px; animation-delay: 0.3s; }
-    .hero-frame .star:nth-child(8) { top: 50%; left: 12px; margin-top: -7px; animation-delay: 0.7s; }
+    .hero-stars .star-dot {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: #3a6ea5;
+      border-radius: 50%;
+      animation: star-twinkle-slow 5s ease-in-out infinite;
+    }
 
-    @keyframes star-twinkle {
-      0%, 100% { opacity: 0.2; }
-      50% { opacity: 1; }
+    @keyframes star-twinkle-slow {
+      0%, 100% { opacity: 0.15; }
+      50% { opacity: 0.85; }
     }
 
     .hero h1 {
@@ -390,11 +380,15 @@
       background: linear-gradient(135deg, #1e3a5f, #3a6ea5);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      position: relative;
+      z-index: 1;
     }
 
-    .hero-frame h1 { margin-top: 0; }
-    .hero-frame p { margin-bottom: 24px; color: #333; font-size: 1.2rem; }
-    .hero-frame .button-group { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .hero p,
+    .hero .button-group {
+      position: relative;
+      z-index: 1;
+    }
 
     .btn {
       border: none;
@@ -478,21 +472,12 @@
 
   <main>
     <section class="hero">
-      <div class="hero-frame">
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <h1>Pomoc, která si tě najde</h1>
-        <p>SayMoonHelp je loterie dobrých skutků.</p>
-        <div class="button-group">
-          <button class="btn btn-primary">Zapojit se</button>
-          <button class="btn">Jak to funguje</button>
-        </div>
+      <div class="hero-stars" id="heroStars" aria-hidden="true"></div>
+      <h1>Pomoc, která si tě najde</h1>
+      <p>SayMoonHelp je loterie dobrých skutků.</p>
+      <div class="button-group">
+        <button class="btn btn-primary">Zapojit se</button>
+        <button class="btn">Jak to funguje</button>
       </div>
     </section>
 
@@ -544,6 +529,20 @@
     firebase.initializeApp(firebaseConfig);
 
     document.addEventListener('DOMContentLoaded', () => {
+      // Hvězdičky na pozadí hero
+      const heroStars = document.getElementById('heroStars');
+      if (heroStars) {
+        const count = 55;
+        for (let i = 0; i < count; i++) {
+          const dot = document.createElement('span');
+          dot.className = 'star-dot';
+          dot.style.left = (5 + Math.random() * 90) + '%';
+          dot.style.top = (5 + Math.random() * 90) + '%';
+          dot.style.animationDelay = (Math.random() * 5) + 's';
+          heroStars.appendChild(dot);
+        }
+      }
+
       // Luna
       const moon = document.getElementById('mainMoon');
       const footerMoon = document.getElementById('footerMoon');
