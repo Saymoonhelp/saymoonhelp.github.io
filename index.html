@@ -533,10 +533,10 @@ nav {
         <span class="moon-icon" id="mainMoon">🌙</span> SayMoonHelp
       </div>
       <nav>
-        <a href="#">Jak to funguje</a>
-        <a href="#">Žádosti</a>
-        <a href="#">Hlasování</a>
-        <button id="showLoginBtn" style="background: none; border: 1px solid #3a6ea5; padding: 8px 20px; border-radius: 30px; color: #3a6ea5; cursor: pointer;">Přihlásit se</button>
+        <a href="#" class="menu-btn">Jak to funguje</a>
+<a href="#" class="menu-btn">Žádosti</a>
+<a href="#" class="menu-btn">Hlasování</a>
+<button id="showLoginBtn" class="menu-btn">Přihlásit se</button>
         <span id="userInfo" style="display: none; align-items: center; gap: 10px;">
           <div class="user-badge">
             <span id="userEmail"></span>
@@ -738,8 +738,8 @@ nav {
     <div>© 2025 SayMoonHelp · průhledná pomoc</div>
     <div class="small-moon" id="footerMoon">🌙 lunární design</div>
   </footer>
-
-  <script>
+  
+  <script> 
     const firebaseConfig = {
       apiKey: "AIzaSyA1aSGtwkbVp8yAL_I2P-6bDITHe58ALtA",
       authDomain: "saymoonhelp-af1e6.firebaseapp.com",
@@ -824,7 +824,20 @@ nav {
 
       document.getElementById('logoutBtn').addEventListener('click', () => firebase.auth().signOut());
     });
+    / Анимация для кнопок меню
+document.querySelectorAll('.menu-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    // Добавляем класс clicked
+    this.classList.add('clicked');
+    
+    // Убираем класс через 300ms
+    setTimeout(() => {
+      this.classList.remove('clicked');
+    }, 300);
+  });
+});
   </script>
 </body>
 </html>
+
 
