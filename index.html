@@ -111,21 +111,61 @@
     /* ===== NAVIGACE ===== */
     nav {
       display: flex;
-      gap: 32px;
+      gap: 12px;
       font-weight: 400;
       align-items: center;
       flex-wrap: wrap;
     }
 
-    nav a {
-      text-decoration: none;
-      color: #2c2c2e;
+    .nav-pill {
+      appearance: none;
+      border: 1px solid rgba(58, 110, 165, 0.35);
+      background: rgba(58, 110, 165, 0.08);
+      color: #1e3a5f;
+      border-radius: 999px;
+      padding: 10px 18px;
       font-size: 1rem;
-      transition: color 0.2s;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      transition:
+        background-color 160ms ease,
+        border-color 160ms ease,
+        color 160ms ease,
+        box-shadow 200ms ease,
+        transform 120ms ease;
     }
 
-    nav a:hover {
-      color: #8e6bb0;
+    .nav-pill:hover {
+      background: rgba(58, 110, 165, 0.14);
+      border-color: rgba(58, 110, 165, 0.5);
+    }
+
+    .nav-pill:active {
+      background: rgba(30, 58, 95, 0.22);
+      border-color: rgba(30, 58, 95, 0.65);
+      transform: scale(0.96);
+    }
+
+    .nav-pill:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(58, 110, 165, 0.25);
+    }
+
+    #logoutBtn.nav-pill {
+      border-color: rgba(29, 28, 31, 0.15);
+      background: rgba(29, 28, 31, 0.04);
+      color: #1d1c1f;
+    }
+
+    #logoutBtn.nav-pill:hover {
+      background: rgba(29, 28, 31, 0.08);
+      border-color: rgba(29, 28, 31, 0.22);
     }
 
     /* ===== EMAIL V KULATÉM RÁMEČKU ===== */
@@ -363,15 +403,15 @@
         <span class="moon-icon" id="mainMoon">🌙</span> SayMoonHelp
       </div>
       <nav>
-        <a href="#">Jak to funguje</a>
-        <a href="#">Žádosti</a>
-        <a href="#">Hlasování</a>
-        <button id="showLoginBtn" style="background: none; border: 1px solid #3a6ea5; padding: 8px 20px; border-radius: 30px; color: #3a6ea5; cursor: pointer;">Přihlásit se</button>
+        <a class="nav-pill" href="#">Jak to funguje</a>
+        <a class="nav-pill" href="#">Žádosti</a>
+        <a class="nav-pill" href="#">Hlasování</a>
+        <button id="showLoginBtn" class="nav-pill" type="button">Přihlásit se</button>
         <span id="userInfo" style="display: none; align-items: center; gap: 10px;">
           <div class="user-badge">
             <span id="userEmail"></span>
           </div>
-          <button id="logoutBtn" style="background: none; border: 1px solid #ddd; padding: 8px 20px; border-radius: 30px; cursor: pointer;">Odhlásit</button>
+          <button id="logoutBtn" class="nav-pill" type="button">Odhlásit</button>
         </span>
       </nav>
     </div>
@@ -485,7 +525,7 @@
       const modal = document.getElementById('authModal');
       document.getElementById('showLoginBtn').addEventListener('click', () => modal.style.display = 'flex');
       document.getElementById('closeModal').addEventListener('click', () => modal.style.display = 'none');
-      
+
       let isLogin = true;
       document.getElementById('switchAuth').addEventListener('click', (e) => {
         e.preventDefault();
