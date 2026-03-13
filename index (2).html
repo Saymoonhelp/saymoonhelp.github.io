@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SayMoonHelp – loterie dobrých skutků</title>
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #ffffff;
+      color: #1d1c1f;
+      line-height: 1.4;
+    }
+
+    /* dark mode */
+    body.dark {
+      background-color: #1d1c1f;
+      color: #f4f4f8;
+    }
+    body.dark header {
+      background-color: rgba(29,28,31,0.8);
+      border-bottom-color: rgba(255,255,255,0.03);
+    }
+    body.dark .request-card {
+      background: #2a2a2e;
+      border-color: #3a3a45;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    body.dark .btn {
+      background: #3a3a45;
+      color: #f4f4f8;
+      border-color: #5a5a6e;
+    }
+    body.dark .btn-primary {
+      background: #ffd700;
+      color: #1d1c1f;
+    }
+
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Hlavička */
+    header {
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+      backdrop-filter: blur(8px);
+      background-color: rgba(255,255,255,0.8);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ===== LUNA S ANIMACÍ ===== */
+    .moon-icon {
+      display: inline-block;
+      font-size: 2.5rem;
+      transition: all 0.5s ease;
+      background: linear-gradient(135deg, #1e3a5f, #3a6ea5, #5f9ea0);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      position: relative;
+      transform: rotate(-10deg);
+    }
+
+    .moon-icon::after {
+      content: "★ ★ ★";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.5rem;
+      letter-spacing: 0.2rem;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .moon-icon.gold-moon {
+      background: radial-gradient(circle at 30% 30%, #ffd700, #fdb813, #ff8c00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      transform: scale(1.2) rotate(0deg);
+    }
+
+    .moon-icon.gold-moon::after {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.6rem;
+      text-shadow: 0 0 8px gold;
+    }
+
+    .small-moon {
+      background: #dedef0;
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      transition: all 0.5s ease;
+    }
+
+    .small-moon.gold-moon {
+      background: radial-gradient(circle at 30% 30%, #ffd700, #fdb813);
+      color: white;
+    }
+
+    /* ===== NAVIGACE ===== */
+    nav {
+      display: flex;
+      gap: 12px;
+      font-weight: 400;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-pill {
+      appearance: none;
+      border: 1px solid rgba(58, 110, 165, 0.35);
+      background: rgba(58, 110, 165, 0.08);
+      color: #1e3a5f;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      transition:
+        background-color 160ms ease,
+        border-color 160ms ease,
+        color 160ms ease,
+        box-shadow 200ms ease,
+        transform 120ms ease;
+    }
+
+    .nav-pill:hover {
+      background: rgba(58, 110, 165, 0.14);
+      border-color: rgba(58, 110, 165, 0.5);
+    }
+
+    .nav-pill:active {
+      background: rgba(30, 58, 95, 0.22);
+      border-color: rgba(30, 58, 95, 0.65);
+      transform: scale(0.96);
+    }
+
+    .nav-pill:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(58, 110, 165, 0.25);
+    }
+
+    #logoutBtn.nav-pill {
+      border-color: rgba(29, 28, 31, 0.15);
+      background: rgba(29, 28, 31, 0.04);
+      color: #1d1c1f;
+    }
+
+    #logoutBtn.nav-pill:hover {
+      background: rgba(29, 28, 31, 0.08);
+      border-color: rgba(29, 28, 31, 0.22);
+    }
+
+    /* ===== EMAIL V KULATÉM RÁMEČKU ===== */
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(58, 110, 165, 0.1);
+      border-radius: 40px;
+      padding: 8px 20px;
+      border: 1px solid rgba(58, 110, 165, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .user-badge:hover {
+      background: rgba(58, 110, 165, 0.2);
+      box-shadow: 0 0 15px rgba(58, 110, 165, 0.4);
+      transform: scale(1.02);
+    }
+
+    .user-badge span {
+      color: #1e3a5f;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    /* ===== OKO V APPLE STYLU ===== */
+    .password-container {
+      position: relative;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .password-container input {
+      width: 100%;
+      padding: 15px;
+      padding-right: 60px;
+      border: 2px solid #3a6ea5;
+      border-radius: 30px;
+      font-size: 16px;
+    }
+
+    .eye-button {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+
+    .eye-button svg {
+      width: 30px;
+      height: 30px;
+      fill: none;
+      stroke: #3a6ea5;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .eye-button:active {
+      transform: translateY(-50%) scale(1.2);
+    }
+
+    /* ===== TLAČÍTKO S ANIMACÍ ===== */
+    .btn-auth {
+      width: 100%;
+      padding: 15px;
+      background: #3a6ea5;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-auth:hover {
+      background: #1e3a5f;
+    }
+
+    .btn-auth:active {
+      transform: scale(0.95);
+    }
+
+    .btn-auth.clicked {
+      animation: pulse 0.3s ease;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* ===== KARTY ŽÁDOSTÍ ===== */
+    .requests-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .request-card {
+      background: #ffffff;
+      border-radius: 30px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(58, 110, 165, 0.1);
+      border: 1px solid #e0e0ff;
+      transition: all 0.3s;
+    }
+
+    .request-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 30px 50px rgba(58, 110, 165, 0.2);
+    }
+
+    .request-number {
+      font-size: 1.2rem;
+      color: #3a6ea5;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .request-name {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #1e3a5f;
+    }
+
+    .request-location {
+      color: #666;
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+
+    .progress-bar-bg {
+      height: 8px;
+      background: #eaeaf0;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+
+    .progress-fill {
+      height: 8px;
+      background: linear-gradient(90deg, #3a6ea5, #7f9fcf);
+      border-radius: 20px;
+    }
+
+    .btn-small {
+      background: #f4f4fa;
+      border: none;
+      border-radius: 40px;
+      padding: 15px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: #1e3a5f;
+      border: 1px solid #3a6ea5;
+      transition: all 0.3s;
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .btn-small:hover {
+      background: #3a6ea5;
+      color: white;
+    }
+
+    /* ===== OSTATNÍ ===== */
+    .hero {
+      position: relative;
+      padding: 100px 0 80px;
+      text-align: center;
+      background: radial-gradient(circle at 80% 30%, rgba(58,110,165,0.1) 0%, #fff 70%);
+    }
+
+    /* ===== HVĚZDIČKY NA POZADÍ HERO ===== */
+
+    .hero-stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .hero-stars .star-dot {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: #3a6ea5;
+      border-radius: 50%;
+      animation: star-twinkle-slow 5s ease-in-out infinite;
+    }
+
+    @keyframes star-twinkle-slow {
+      0%, 100% { opacity: 0.15; }
+      50% { opacity: 0.85; }
+    }
+
+    .hero h1 {
+      font-size: 3.8rem;
+      font-weight: 600;
+      max-width: 800px;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, #1e3a5f, #3a6ea5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero p,
+    .hero .button-group {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn {
+      border: none;
+      padding: 14px 32px;
+      border-radius: 40px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: white;
+      border: 1px solid #3a6ea5;
+    }
+
+    .btn-primary {
+      background: #1d1c1f;
+      color: white;
+      border: none;
+    }
+
+    section {
+      padding: 90px 0;
+    }
+
+    .section-title {
+      font-size: 2.6rem;
+      text-align: center;
+      margin-bottom: 60px;
+      background: linear-gradient(145deg, #1e3a5f, #3a6ea5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid #f0f0f8;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <div class="logo">
+        <span class="moon-icon" id="mainMoon">🌙</span> SayMoonHelp
+      </div>
+      <nav>
+        <a class="nav-pill" href="#">Jak to funguje</a>
+        <a class="nav-pill" href="#">Žádosti</a>
+        <a class="nav-pill" href="#">Hlasování</a>
+        <button id="showLoginBtn" class="nav-pill" type="button">Přihlásit se</button>
+        <span id="userInfo" style="display: none; align-items: center; gap: 10px;">
+          <div class="user-badge">
+            <span id="userEmail"></span>
+          </div>
+          <button id="logoutBtn" class="nav-pill" type="button">Odhlásit</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Modální okno -->
+  <div id="authModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:1000; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 40px; border-radius: 40px; width: 90%; max-width: 400px;">
+      <h2 id="authTitle">Přihlásit se</h2>
+      <button id="closeModal" style="float:right; background:none; border:none; font-size:24px;">×</button>
+      <input type="email" id="email" placeholder="Email" style="width:100%; padding:15px; margin:20px 0; border:2px solid #3a6ea5; border-radius:30px;">
+      <div class="password-container">
+        <input type="password" id="password" placeholder="Heslo">
+        <div class="eye-button" id="togglePassword">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3" fill="#3a6ea5"/>
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" stroke="#3a6ea5" fill="none"/>
+            <line x1="3" y1="4" x2="21" y2="20" stroke="#3a6ea5" stroke-width="2" id="eyeLine"/>
+          </svg>
+        </div>
+      </div>
+      <button id="authAction" class="btn-auth">Přihlásit se</button>
+      <p style="text-align:center;"><a href="#" id="switchAuth">Nemáte účet? Registrujte se</a></p>
+    </div>
+  </div>
+
+  <main>
+    <section class="hero">
+      <div class="hero-stars" id="heroStars" aria-hidden="true"></div>
+      <h1>Pomoc, která si tě najde</h1>
+      <p>SayMoonHelp je loterie dobrých skutků.</p>
+      <div class="button-group">
+        <button class="btn btn-primary" id="darkToggle" title="Přepnout tmavý režim">🌙/☀️</button>
+        <button class="btn">Jak to funguje</button>
+      </div>
+    </section>
+
+    <!-- form pro vytvoření žádosti -->
+    <section id="requestFormSection" style="display:none;">
+      <h2 class="section-title">Přidej svou žádost</h2>
+      <div style="max-width:600px;margin:0 auto;">
+        <input id="reqName" type="text" placeholder="Jméno" style="width:100%;padding:15px;margin:10px 0;border:2px solid #3a6ea5;border-radius:30px;">
+        <input id="reqLocation" type="text" placeholder="Místo" style="width:100%;padding:15px;margin:10px 0;border:2px solid #3a6ea5;border-radius:30px;">
+        <input id="reqAmount" type="number" placeholder="Potřebná částka (Kč)" style="width:100%;padding:15px;margin:10px 0;border:2px solid #3a6ea5;border-radius:30px;">
+        <button id="submitRequest" class="btn-primary btn" style="width:100%;">Odeslat žádost</button>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Právě teď někdo potřebuje pomoc</h2>
+      <div class="requests-grid" id="requestsGrid">
+        <!-- prvních pár položek jsou nahrazeny dynamickým načítáním -->
+      <div class="request-card" style="display:none;"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>© 2025 SayMoonHelp</div>
+    <div class="small-moon" id="footerMoon">🌙 lunární design</div>
+  </footer>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA1aSGtwkbVp8yAL_I2P-6bDITHe58ALtA",
+      authDomain: "saymoonhelp-af1e6.firebaseapp.com",
+      projectId: "saymoonhelp-af1e6",
+      storageBucket: "saymoonhelp-af1e6.firebasestorage.app",
+      messagingSenderId: "911248985825",
+      appId: "1:911248985825:web:b602feab7eb8f4dbd9b1a0"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function renderRequest(doc, index) {
+      const data = doc.data();
+      const card = document.createElement('div');
+      card.className = 'request-card';
+      card.innerHTML = `
+        <div class="request-number">${index.toString().padStart(2,'0')}</div>
+        <div class="request-name">${data.name}</div>
+        <div class="request-location">${data.location}</div>
+        <div>${data.description}</div>
+        <div class="progress-bar-bg"><div class="progress-fill" style="width:${data.progress||0}%"></div></div>
+        <button class="btn-small" data-id="${doc.id}">Pomoci</button>
+      `;
+      return card;
+    }
+
+    function loadRequests() {
+      const grid = document.getElementById('requestsGrid');
+      grid.innerHTML = '';
+      db.collection('requests').orderBy('createdAt','desc').get().then(snapshot => {
+        let idx = 1;
+        snapshot.forEach(doc => {
+          grid.appendChild(renderRequest(doc, idx++));
+        });
+      });
+    }
+
+    function bindActions() {
+      document.body.addEventListener('click', e => {
+        if (e.target.matches('#submitRequest')) {
+          const name = document.getElementById('reqName').value;
+          const location = document.getElementById('reqLocation').value;
+          const amount = document.getElementById('reqAmount').value;
+          if (!name || !location || !amount) return alert('Vyplň všechny údaje');
+          db.collection('requests').add({
+            name, location,
+            description: `Potřebuje ${amount} Kč`,
+            progress: 0,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          }).then(() => {
+            document.getElementById('reqName').value='';
+            document.getElementById('reqLocation').value='';
+            document.getElementById('reqAmount').value='';
+            loadRequests();
+          });
+        }
+        if (e.target.matches('.btn-small')) {
+          const id = e.target.getAttribute('data-id');
+          const ref = db.collection('requests').doc(id);
+          ref.get().then(d=>{
+            const prog = (d.data().progress||0)+10;
+            ref.update({progress:prog>100?100:prog}).then(loadRequests);
+          });
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Hvězdičky na pozadí hero
+      const heroStars = document.getElementById('heroStars');
+      loadRequests();
+      bindActions();
+      if (heroStars) {
+        const count = 55;
+        for (let i = 0; i < count; i++) {
+          const dot = document.createElement('span');
+          dot.className = 'star-dot';
+          dot.style.left = (5 + Math.random() * 90) + '%';
+          dot.style.top = (5 + Math.random() * 90) + '%';
+          dot.style.animationDelay = (Math.random() * 5) + 's';
+          heroStars.appendChild(dot);
+        }
+      }
+
+      // Luna
+      const moon = document.getElementById('mainMoon');
+      const footerMoon = document.getElementById('footerMoon');
+
+      // dark mode toggle
+      const darkToggle = document.getElementById('darkToggle');
+      darkToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+      });
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 100) {
+          moon.classList.add('gold-moon');
+          footerMoon.classList.add('gold-moon');
+        } else {
+          moon.classList.remove('gold-moon');
+          footerMoon.classList.remove('gold-moon');
+        }
+      });
+
+      // Oko
+      const eye = document.getElementById('togglePassword');
+      const password = document.getElementById('password');
+      const eyeLine = document.getElementById('eyeLine');
+      eye?.addEventListener('click', function() {
+        this.style.transform = 'translateY(-50%) scale(1.2)';
+        setTimeout(() => this.style.transform = 'translateY(-50%) scale(1)', 200);
+        const type = password.type === 'password' ? 'text' : 'password';
+        password.type = type;
+        eyeLine.style.display = type === 'text' ? 'none' : 'block';
+      });
+
+      // Registrace
+      const modal = document.getElementById('authModal');
+      document.getElementById('showLoginBtn').addEventListener('click', () => modal.style.display = 'flex');
+      document.getElementById('closeModal').addEventListener('click', () => modal.style.display = 'none');
+
+      let isLogin = true;
+      document.getElementById('switchAuth').addEventListener('click', (e) => {
+        e.preventDefault();
+        isLogin = !isLogin;
+        document.getElementById('authTitle').innerText = isLogin ? 'Přihlásit se' : 'Registrace';
+        document.getElementById('authAction').innerText = isLogin ? 'Přihlásit se' : 'Registrovat se';
+        e.target.innerText = isLogin ? 'Nemáte účet? Registrujte se' : 'Máte účet? Přihlaste se';
+      });
+
+      document.getElementById('authAction').addEventListener('click', function() {
+        this.classList.add('clicked');
+        setTimeout(() => this.classList.remove('clicked'), 300);
+        const email = document.getElementById('email').value;
+        const pass = password.value;
+        if (!email || !pass) return alert('Vyplň email a heslo');
+        const auth = isLogin 
+          ? firebase.auth().signInWithEmailAndPassword(email, pass)
+          : firebase.auth().createUserWithEmailAndPassword(email, pass);
+        auth.then(() => modal.style.display = 'none').catch(e => alert(e.message));
+      });
+
+      firebase.auth().onAuthStateChanged(user => {
+        const info = document.getElementById('userInfo');
+        const btn = document.getElementById('showLoginBtn');
+        const formSection = document.getElementById('requestFormSection');
+        if (user) {
+          btn.style.display = 'none';
+          info.style.display = 'flex';
+          document.getElementById('userEmail').innerText = user.email;
+          formSection.style.display = 'block';
+        } else {
+          btn.style.display = 'inline-block';
+          info.style.display = 'none';
+          formSection.style.display = 'none';
+        }
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', () => firebase.auth().signOut());
+    });
+  </script>
+</body>
+</html>
