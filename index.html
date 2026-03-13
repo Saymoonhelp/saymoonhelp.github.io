@@ -111,15 +111,37 @@
       flex-wrap: wrap;
     }
 
-    nav a {
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       text-decoration: none;
-      color: #2c2c2e;
+      background: none;
+      border: 1px solid #3a6ea5;
+      padding: 8px 20px;
+      border-radius: 30px;
+      color: #3a6ea5;
       font-size: 1rem;
-      transition: color 0.2s;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease, color 0.2s ease;
     }
 
-    nav a:hover {
-      color: #8e6bb0;
+    .nav-btn:hover {
+      background: rgba(58, 110, 165, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .nav-btn:active {
+      transform: translateY(0);
+    }
+
+    .nav-btn--secondary {
+      border-color: rgba(0,0,0,0.25);
+      color: #333;
+    }
+
+    .nav-btn--secondary:hover {
+      background: rgba(0,0,0,0.08);
     }
 
     /* ===== EMAIL ===== */
@@ -543,15 +565,15 @@
         <span class="moon-icon" id="mainMoon">🌙</span> SayMoonHelp
       </div>
       <nav>
-        <a href="#">Jak to funguje</a>
-        <a href="#">Žádosti</a>
-        <a href="#">Hlasování</a>
-        <button id="showLoginBtn" style="background: none; border: 1px solid #3a6ea5; padding: 8px 20px; border-radius: 30px; color: #3a6ea5; cursor: pointer;">Přihlásit se</button>
+        <a href="#" class="nav-btn">Jak to funguje</a>
+        <a href="#" class="nav-btn">Žádosti</a>
+        <a href="#" class="nav-btn">Hlasování</a>
+        <button id="showLoginBtn" class="nav-btn">Přihlásit se</button>
         <span id="userInfo" style="display: none; align-items: center; gap: 10px;">
           <div class="user-badge">
             <span id="userEmail"></span>
           </div>
-          <button id="logoutBtn" style="background: none; border: 1px solid #ddd; padding: 8px 20px; border-radius: 30px; cursor: pointer;">Odhlásit</button>
+          <button id="logoutBtn" class="nav-btn nav-btn--secondary">Odhlásit</button>
         </span>
       </nav>
     </div>
@@ -574,7 +596,7 @@
         </div>
       </div>
       <button id="authAction" class="btn-auth">Přihlásit se</button>
-      <p style="text-align:center;"><a href="#" id="switchAuth">Nemáte účet? Registrujte se</a></p>
+      <p style="text-align:center;"><a href="#" class="nav-btn" id="switchAuth">Nemáte účet? Registrujte se</a></p>
     </div>
   </div>
 
@@ -837,227 +859,6 @@
   </script>
 </body>
 </html>
-      background: radial-gradient(circle at 30% 30%, #ffd700, #fdb813);
-      color: white;
-    }
-
-    /* ===== NAVIGACE ===== */
-    nav {
-      display: flex;
-      gap: 32px;
-      font-weight: 400;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    nav a {
-      text-decoration: none;
-      color: #2c2c2e;
-      font-size: 1rem;
-      transition: color 0.2s;
-    }
-
-    nav a:hover {
-      color: #8e6bb0;
-    }
-
-    /* ===== EMAIL ===== */
-    .user-badge {
-      display: inline-flex;
-      align-items: center;
-      background: rgba(58, 110, 165, 0.1);
-      border-radius: 40px;
-      padding: 8px 20px;
-      border: 1px solid rgba(58, 110, 165, 0.3);
-      transition: all 0.3s ease;
-    }
-
-    .user-badge:hover {
-      background: rgba(58, 110, 165, 0.2);
-      box-shadow: 0 0 15px rgba(58, 110, 165, 0.4);
-    }
-
-    .user-badge span {
-      color: #1e3a5f;
-      font-weight: 500;
-    }
-
-    /* ===== OKO ===== */
-    .password-container {
-      position: relative;
-      width: 100%;
-      margin-bottom: 20px;
-    }
-
-    .password-container input {
-      width: 100%;
-      padding: 15px;
-      padding-right: 60px;
-      border: 2px solid #3a6ea5;
-      border-radius: 30px;
-      font-size: 16px;
-    }
-
-    .eye-button {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s;
-    }
-
-    .eye-button svg {
-      width: 30px;
-      height: 30px;
-      fill: none;
-      stroke: #3a6ea5;
-      stroke-width: 2;
-    }
-
-    .eye-button:active {
-      transform: translateY(-50%) scale(1.2);
-    }
-
-    /* ===== TLAČÍTKO ===== */
-    .btn-auth {
-      width: 100%;
-      padding: 15px;
-      background: #3a6ea5;
-      color: white;
-      border: none;
-      border-radius: 30px;
-      font-size: 18px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .btn-auth:active {
-      transform: scale(0.95);
-    }
-
-    .btn-auth.clicked {
-      animation: pulse 0.3s ease;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-
-    /* ===== KROKY ===== */
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 30px;
-      margin: 40px 0;
-    }
-
-    .step-card {
-      background: #f8f8ff;
-      border-radius: 30px;
-      padding: 40px 30px;
-      text-align: center;
-      border: 1px solid #e0e0ff;
-    }
-
-    .step-number {
-      background: white;
-      width: 60px;
-      height: 60px;
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 2rem;
-      color: #3a6ea5;
-      border: 2px solid #3a6ea5;
-    }
-
-    /* ===== DETAIL ===== */
-    .detail-box {
-      text-align: center;
-      margin: 60px 0;
-    }
-
-    .detail-content {
-      display: none;
-      background: #f5f5fa;
-      padding: 40px;
-      border-radius: 40px;
-      text-align: left;
-      max-width: 800px;
-      margin: 20px auto 0;
-      border: 1px solid #3a6ea5;
-    }
-
-    /* ===== ŽÁDOSTI ===== */
-    .requests-grid, .votes-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-      margin-top: 40px;
-    }
-
-    .request-card, .vote-card {
-      background: #ffffff;
-      border-radius: 30px;
-      padding: 30px;
-      box-shadow: 0 20px 40px rgba(58, 110, 165, 0.1);
-      border: 1px solid #e0e0ff;
-      transition: all 0.3s;
-    }
-
-    .request-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 30px 50px rgba(58, 110, 165, 0.2);
-    }
-
-    .request-number {
-      font-size: 1.2rem;
-      color: #3a6ea5;
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
-
-    .request-name {
-      font-size: 1.6rem;
-      font-weight: 600;
-      color: #1e3a5f;
-    }
-
-    .request-location {
-      color: #666;
-      font-size: 1rem;
-      margin-bottom: 10px;
-    }
-
-    .progress-bar-bg {
-      height: 8px;
-      background: #eaeaf0;
-      border-radius: 20px;
-      overflow: hidden;
-      margin: 15px 0;
-    }
-
-    .progress-fill {
-      height: 8px;
-      background: linear-gradient(90deg, #3a6ea5, #7f9fcf);
-      border-radius: 20px;
-    }
-
-    .progress-stats {
-      display: flex;
-      justify-content: space-between;
-      margin: 10px 0;
-      color: #4b4b63;
     }
 
     .btn-small {
@@ -1253,15 +1054,15 @@
         <span class="moon-icon" id="mainMoon">🌙</span> SayMoonHelp
       </div>
       <nav>
-        <a href="#">Jak to funguje</a>
-        <a href="#">Žádosti</a>
-        <a href="#">Hlasování</a>
-        <button id="showLoginBtn" style="background: none; border: 1px solid #3a6ea5; padding: 8px 20px; border-radius: 30px; color: #3a6ea5; cursor: pointer;">Přihlásit se</button>
+        <a href="#" class="nav-btn">Jak to funguje</a>
+        <a href="#" class="nav-btn">Žádosti</a>
+        <a href="#" class="nav-btn">Hlasování</a>
+        <button id="showLoginBtn" class="nav-btn">Přihlásit se</button>
         <span id="userInfo" style="display: none; align-items: center; gap: 10px;">
           <div class="user-badge">
             <span id="userEmail"></span>
           </div>
-          <button id="logoutBtn" style="background: none; border: 1px solid #ddd; padding: 8px 20px; border-radius: 30px; cursor: pointer;">Odhlásit</button>
+          <button id="logoutBtn" class="nav-btn nav-btn--secondary">Odhlásit</button>
         </span>
       </nav>
     </div>
@@ -1284,7 +1085,7 @@
         </div>
       </div>
       <button id="authAction" class="btn-auth">Přihlásit se</button>
-      <p style="text-align:center;"><a href="#" id="switchAuth">Nemáte účet? Registrujte se</a></p>
+      <p style="text-align:center;"><a href="#" class="nav-btn" id="switchAuth">Nemáte účet? Registrujte se</a></p>
     </div>
   </div>
 
@@ -1547,3 +1348,4 @@
   </script>
 </body>
 </html>
+
