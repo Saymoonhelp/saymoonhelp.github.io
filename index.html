@@ -207,6 +207,8 @@
     @media (max-width: 700px) { .jak-features { grid-template-columns: 1fr; } }
     .section-intro { text-align: center; color: #5c6880; max-width: 760px; margin: -28px auto 40px; line-height: 1.8; }
     .dashboard-guest { background: linear-gradient(135deg, rgba(58,110,165,0.08), rgba(95,158,160,0.08)); border: 1px solid #dce7f4; border-radius: 36px; padding: 36px; text-align: center; }
+    #dashboardGuest { padding: 28px 32px 24px; }
+    #dashboardGuest p { margin-bottom: 16px !important; }
     .dashboard-grid, .activity-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
     .dashboard-card { background: #fff; border-radius: 30px; padding: 30px; box-shadow: 0 20px 40px rgba(58,110,165,0.08); border: 1px solid #e0e0ff; transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
     .dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 20px 44px rgba(58,110,165,0.16); border-color: rgba(58,110,165,0.35); }
@@ -869,27 +871,21 @@
 <footer class="container">
   <div class="footer-copy">© 2026 SayMoonHelp · průhledná pomoc</div>
   <div class="footer-drawing" id="footerLunar" aria-label="dove drawing">
-    <svg viewBox="0 0 700 185" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-      <g fill="none" stroke="#1285bb" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M8 78 C95 55, 145 70, 190 120 C210 142, 231 155, 255 154" />
-        <path d="M252 153 C320 150, 382 136, 450 122 C520 108, 598 96, 692 113" />
-        <path d="M182 128 C168 112, 168 99, 183 92 C199 86, 210 101, 206 117 C203 131, 191 136, 182 128 Z" />
-        <path d="M321 131 C309 112, 300 92, 301 74 C303 53, 315 46, 327 61 C344 82, 354 103, 353 122" />
-        <path d="M338 133 C327 108, 324 88, 333 69 C341 52, 351 49, 359 64 C367 82, 369 104, 362 123" />
-        <path d="M355 130 C353 107, 356 87, 366 71 C374 57, 383 57, 389 71 C396 88, 396 107, 388 123" />
-        <path d="M317 132 C303 121, 286 112, 273 99 C256 83, 246 67, 252 57 C258 46, 272 49, 286 68 C299 84, 309 102, 316 121" />
-        <path d="M313 129 C291 109, 271 89, 263 73 C256 58, 259 49, 267 48 C276 48, 286 57, 297 74 C307 90, 314 108, 317 126" />
-        <path d="M351 126 C369 111, 392 104, 413 104 C434 105, 453 116, 466 135 C474 147, 492 152, 506 147" />
-        <path d="M398 113 C404 117, 404 125, 398 129 C392 132, 385 128, 384 121 C384 114, 391 110, 398 113 Z" />
-        <path d="M388 137 C402 138, 412 145, 416 157" />
-        <path d="M389 137 C377 153, 365 167, 356 173 C345 179, 333 178, 327 170 C322 162, 326 151, 338 142" />
-        <path d="M367 132 C359 149, 349 164, 341 172 C330 183, 317 184, 309 177 C302 169, 304 157, 316 146" />
-        <path d="M334 153 C324 165, 311 174, 299 176 C286 179, 276 173, 274 164 C272 154, 279 146, 294 142" />
-        <path d="M458 105 C466 93, 477 89, 487 92 C497 95, 500 105, 497 114 C492 125, 480 127, 471 121 C463 115, 461 111, 458 105 Z" />
-        <path d="M449 82 C454 69, 464 62, 474 64 C483 67, 487 76, 483 86 C479 97, 468 101, 459 96" />
-        <path d="M433 67 C435 55, 444 48, 454 49 C463 51, 468 60, 465 71 C462 81, 452 86, 443 83" />
-        <path d="M458 136 C468 134, 476 138, 479 146 C482 154, 476 162, 468 162 C458 161, 452 152, 455 143" />
-        <path d="M443 123 C450 121, 457 124, 460 131 C463 138, 458 146, 451 146 C443 146, 438 139, 440 131" />
+    <svg viewBox="0 0 760 190" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="#1285bb" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M24 116 C88 98, 144 90, 198 96 C238 100, 272 114, 306 134" />
+        <path d="M308 134 C289 107, 281 84, 289 64 C296 47, 312 42, 327 53 C349 69, 362 95, 367 126" />
+        <path d="M317 138 C292 121, 270 99, 255 75 C243 56, 245 41, 260 37 C281 33, 305 53, 327 95" />
+        <path d="M339 136 C330 103, 335 74, 352 52 C366 35, 388 36, 400 56 C413 78, 412 106, 399 130" />
+        <path d="M399 130 C430 107, 459 97, 488 99 C526 101, 558 121, 582 155" />
+        <path d="M401 130 C422 144, 437 161, 449 181" />
+        <path d="M395 134 C384 151, 372 165, 357 175 C341 185, 322 184, 313 173 C305 163, 309 149, 327 137" />
+        <path d="M430 98 C440 84, 455 77, 470 79 C487 81, 500 93, 503 109 C506 126, 495 141, 479 145 C462 149, 446 140, 438 126" />
+        <path d="M498 108 C527 98, 556 93, 588 95 C635 98, 680 113, 733 140" />
+        <path d="M486 93 C500 83, 516 78, 532 80" />
+        <path d="M467 117 C474 118, 480 123, 482 130" />
+        <path d="M602 140 C624 135, 643 140, 660 152" />
+        <path d="M624 150 C646 147, 664 153, 679 167" />
       </g>
     </svg>
   </div>
