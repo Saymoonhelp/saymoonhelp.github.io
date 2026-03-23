@@ -7,6 +7,13 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <style>
+    :root {
+      --button-bg: linear-gradient(135deg, rgba(30,58,95,0.86), rgba(58,110,165,0.86));
+      --button-border: rgba(47,95,153,0.8);
+      --button-text: #ffffff;
+      --button-shadow: 0 14px 30px rgba(58,110,165,0.22);
+      --button-shadow-hover: 0 18px 34px rgba(58,110,165,0.28);
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -102,17 +109,55 @@
     .logo-star:nth-child(3) { bottom: 4px; right: 0px; animation: starTwinkle2 3.1s ease-in-out infinite 0.5s; }
     .logo-star:nth-child(4) { top: 6px; left: 2px; animation: starTwinkle3 2.7s ease-in-out infinite 1s; }
 
-    nav { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
-    nav a { text-decoration: none; color: #2c2c2e; font-size: 1rem; transition: color 0.2s; }
-    nav a:hover { color: #8e6bb0; }
+    nav { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+    nav a { text-decoration: none; }
     .user-badge { background: rgba(58,110,165,0.1); border-radius: 40px; padding: 8px 20px; border: 1px solid rgba(58,110,165,0.3); }
     .user-badge span { color: #1e3a5f; font-weight: 500; }
     .password-container { position: relative; width: 100%; margin-bottom: 20px; }
     .password-container input { width: 100%; padding: 15px; padding-right: 60px; border: 2px solid #3a6ea5; border-radius: 30px; font-size: 16px; }
     .eye-button { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; }
     .eye-button svg { width: 30px; height: 30px; fill: none; stroke: #3a6ea5; stroke-width: 2; }
-    .btn-auth { width: 100%; padding: 15px; background: #3a6ea5; color: white; border: none; border-radius: 30px; font-size: 18px; cursor: pointer; transition: 0.2s; }
-    .btn-auth:active { transform: scale(0.98); }
+    @keyframes buttonPop {
+      0% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(1px) scale(0.97); }
+      100% { transform: translateY(0) scale(0.99); }
+    }
+    button, .btn, .btn-small, .vote-yes, .vote-no, .tab-btn, .btn-auth, .nav-link {
+      appearance: none;
+      border: 1px solid var(--button-border);
+      border-radius: 999px;
+      background: var(--button-bg);
+      color: var(--button-text);
+      box-shadow: var(--button-shadow);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      line-height: 1.1;
+      padding: 14px 28px;
+      text-decoration: none;
+      transition: transform 0.18s ease, box-shadow 0.22s ease, filter 0.22s ease, opacity 0.22s ease;
+    }
+    button:hover, .btn:hover, .btn-small:hover, .vote-yes:hover, .vote-no:hover, .tab-btn:hover, .btn-auth:hover, .nav-link:hover {
+      box-shadow: var(--button-shadow-hover);
+      filter: brightness(1.04);
+      transform: translateY(-1px);
+    }
+    button:active, .btn:active, .btn-small:active, .vote-yes:active, .vote-no:active, .tab-btn:active, .btn-auth:active, .nav-link:active {
+      animation: buttonPop 0.18s ease;
+      box-shadow: 0 10px 18px rgba(58,110,165,0.18);
+    }
+    button:disabled, .btn:disabled, .btn-small:disabled, .vote-yes:disabled, .vote-no:disabled, .tab-btn:disabled, .btn-auth:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .btn-auth { width: 100%; font-size: 1rem; }
     .steps-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 30px; margin: 40px 0; }
     .step-card { background: #f8f8ff; border-radius: 30px; padding: 40px 30px; text-align: center; border: 1px solid #e0e0ff; }
     .step-number { background: white; width: 60px; height: 60px; border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; color: #3a6ea5; border: 2px solid #3a6ea5; }
@@ -124,19 +169,16 @@
     .request-name { font-size: 1.6rem; font-weight: 600; color: #1e3a5f; }
     .progress-bar-bg { height: 8px; background: #eaeaf0; border-radius: 20px; overflow: hidden; margin: 15px 0; }
     .progress-fill { height: 8px; background: linear-gradient(90deg,#3a6ea5,#7f9fcf); border-radius: 20px; }
-    .btn-small { background: #f4f4fa; border: 1px solid #3a6ea5; border-radius: 40px; padding: 15px; width: 100%; margin-top: 15px; cursor: pointer; transition: 0.2s; }
-    .btn-small:hover { background: #3a6ea5; color: white; }
+    .btn-small { width: 100%; margin-top: 15px; }
     .vote-numbers { background: #f7f7fd; padding: 12px; border-radius: 60px; text-align: center; margin: 15px 0; }
     .vote-buttons { display: flex; gap: 12px; }
-    .vote-yes, .vote-no { flex: 1; padding: 12px; border-radius: 40px; border: 1px solid #3a6ea5; background: white; cursor: pointer; transition: 0.2s; }
-    .vote-yes:hover { background: #3a6ea5; color: white; }
-    .vote-no:hover { background: #e04444; color: white; border-color: #e04444; }
-    .vote-yes.voted { background: #3a6ea5; color: white; }
-    .vote-no.voted { background: #e04444; color: white; border-color: #e04444; }
-    nav a.nav-active { color: #3a6ea5; font-weight: 600; border-bottom: 2px solid #3a6ea5; padding-bottom: 2px; }
+    .vote-yes, .vote-no { flex: 1; }
+    .vote-yes.voted, .vote-no.voted { filter: brightness(1.08); box-shadow: 0 0 0 3px rgba(95,158,160,0.15), var(--button-shadow-hover); }
+    .nav-link.nav-active { filter: brightness(1.08); box-shadow: 0 0 0 3px rgba(58,110,165,0.15), var(--button-shadow-hover); }
+    .nav-secondary { color: var(--button-text); }
     .section-tabs { display: flex; gap: 12px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
-    .tab-btn { padding: 10px 24px; border-radius: 40px; border: 1px solid #e0e0ff; background: white; cursor: pointer; font-size: 0.95rem; transition: 0.2s; color: #2c2c2e; }
-    .tab-btn.active, .tab-btn:hover { background: #3a6ea5; color: white; border-color: #3a6ea5; }
+    .tab-btn { font-size: 0.95rem; }
+    .tab-btn.active { filter: brightness(1.06); box-shadow: 0 0 0 3px rgba(58,110,165,0.12), var(--button-shadow-hover); }
     .card-status { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 12px; }
     .status-voting { background: rgba(255,180,0,0.12); color: #b07800; }
     .status-approved { background: rgba(58,110,165,0.12); color: #1e3a5f; }
@@ -207,8 +249,8 @@
     #constellation-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
     .hero .container { position: relative; z-index: 1; }
     .hero h1 { font-size: 3.8rem; max-width: 800px; margin: 0 auto 20px; background: linear-gradient(135deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .btn { padding: 14px 32px; border-radius: 40px; font-size: 1.1rem; cursor: pointer; background: white; border: 1px solid #3a6ea5; }
-    .btn-primary { background: #1d1c1f; color: white; border: none; }
+    .btn { padding: 14px 32px; font-size: 1.05rem; }
+    .btn-primary { background: var(--button-bg); color: white; border: 1px solid var(--button-border); }
     section { padding: 90px 0; }
     .section-title { font-size: 2.6rem; text-align: center; margin-bottom: 60px; background: linear-gradient(145deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     footer { padding: 40px 0; border-top: 1px solid #f0f0f8; display: flex; justify-content: space-between; align-items: center; }
@@ -219,7 +261,7 @@
 <body>
 <header>
   <div class="container header-inner">
-    <div class="logo">
+    <a href="#" class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;">
       <span class="logo-moon-wrap">
         <span class="moon-icon" id="mainMoon">
           <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -231,16 +273,16 @@
         <span class="logo-star">·</span>
       </span>
       <span class="logo-text">SayMoonHelp</span>
-    </div>
+    </a>
     <nav>
       <a href="#how-it-works" class="nav-link">Jak to funguje</a>
       <a href="#zadosti" class="nav-link">Žádosti</a>
       <a href="#hlasovani" class="nav-link">Hlasování</a>
       <a href="#my-space" class="nav-link nav-secondary">Můj profil</a>
-      <button id="showLoginBtn" style="background:none; border:1px solid #3a6ea5; padding:8px 20px; border-radius:30px; color:#3a6ea5; cursor:pointer;">Přihlásit se</button>
+      <button id="showLoginBtn">Přihlásit se</button>
       <span id="userInfo" style="display:none; align-items:center; gap:10px;">
         <div class="user-badge"><span id="userEmail"></span></div>
-        <button id="logoutBtn" style="background:none; border:1px solid #ddd; padding:8px 20px; border-radius:30px; cursor:pointer;">Odhlásit</button>
+        <button id="logoutBtn">Odhlásit</button>
       </span>
     </nav>
   </div>
@@ -263,11 +305,12 @@
 </div>
 
 <main>
-  <section class="hero"><canvas id="constellation-canvas"></canvas><div class="container"><h1>Pomoc, která si tě najde</h1><p>SayMoonHelp je lunární loterie dobrých skutků — komunita vzájemné pomoci, kde každý příspěvek se jednou vrátí. Pomáhej druhým, získej body a měj šanci získat pomoc, když ji nejvíc potřebuješ.</p><div style="display:flex; gap:16px; justify-content:center; margin-top:30px;"><button class="btn btn-primary" onclick="document.getElementById('zadosti').scrollIntoView({behavior:'smooth'})">Zapojit se</button><button class="btn" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">Jak to funguje</button></div></div></section>
+  <section class="hero"><canvas id="constellation-canvas"></canvas><div class="container"><h1>Pomoc, která si tě najde</h1><div style="display:flex; gap:16px; justify-content:center; margin-top:30px;"><button class="btn btn-primary" onclick="document.getElementById('zadosti').scrollIntoView({behavior:'smooth'})">Zapojit se</button><button class="btn" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">Jak to funguje</button></div></div></section>
 
   <section id="how-it-works">
     <div class="container">
       <h2 class="section-title">Jak to funguje</h2>
+      <p class="section-intro">SayMoonHelp je lunární loterie dobrých skutků — komunita vzájemné pomoci, kde každý příspěvek se jednou vrátí. Pomáhej druhým, získej body a měj šanci získat pomoc, když ji nejvíc potřebuješ.</p>
       <div class="steps-grid">
         <div class="step-card"><div class="step-number">1</div><h3>Přispěj komunitě</h3><p>Pošli libovolnou částku na cizí žádost. 10 Kč = 1 bod pomoci, který se připíše na tvůj účet navždy.</p></div>
         <div class="step-card"><div class="step-number">2</div><h3>Hlasuj a rozhoduj</h3><p>Každý člen hlasuje 👍/👎. Žádost potřebuje 70 % hlasů „pro", aby postoupila do loterie.</p></div>
@@ -673,7 +716,7 @@
       if (currentUser) {
         btn.style.display = 'none';
         info.style.display = 'flex';
-        document.getElementById('userEmail').innerText = (profile.name || currentUser.email) + ' · ' + currentUser.email;
+        document.getElementById('userEmail').innerText = profile.name || currentUser.displayName || 'Můj profil';
       } else {
         btn.style.display = 'inline-block';
         info.style.display = 'none';
