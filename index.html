@@ -28,10 +28,6 @@
       z-index: 10;
     }
     .header-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-    @keyframes moonFloat {
-      0%, 100% { transform: translateY(0px) rotate(-12deg); }
-      50% { transform: translateY(-4px) rotate(-8deg); }
-    }
     @keyframes moonGlow {
       0%, 100% { filter: drop-shadow(0 0 3px rgba(180,215,255,0.45)) drop-shadow(0 0 8px rgba(100,160,230,0.15)); }
       50% { filter: drop-shadow(0 0 6px rgba(220,238,255,0.65)) drop-shadow(0 0 14px rgba(130,185,255,0.25)); }
@@ -56,6 +52,7 @@
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
     }
+    @keyframes logoTextShimmer {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
@@ -86,13 +83,6 @@
       vertical-align: middle;
       position: relative;
       top: 0;
-    }
-    .logo-moon-letter {
-      display: inline-flex;
-      align-items: center;
-      vertical-align: middle;
-      margin: 0 1px -3px 1px;
-      position: relative;
     }
     .logo-moon-wrap {
       position: relative;
@@ -250,6 +240,45 @@
     .nav-secondary { color: #3a6ea5; }
     .status-draft { background: rgba(130, 140, 160, 0.12); color: #5f6b78; }
     .claim-status { margin-top: 14px; padding: 14px 16px; border-radius: 18px; background: #f7fafe; border: 1px solid #dce7f4; color: #4f5f70; line-height: 1.6; }
+    @media (max-width: 980px) {
+      .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
+      nav {
+        width: 100%;
+        gap: 8px;
+      }
+      .logo {
+        font-size: 1.85rem;
+      }
+      .logo-moon-wrap {
+        width: 48px;
+        height: 48px;
+      }
+      .moon-icon svg {
+        width: 40px;
+        height: 40px;
+      }
+    }
+    @media (max-width: 640px) {
+      .container {
+        padding: 0 16px;
+      }
+      .logo {
+        font-size: 1.6rem;
+        gap: 8px;
+      }
+      nav {
+        row-gap: 8px;
+        column-gap: 8px;
+      }
+      .nav-pill,
+      .btn-login {
+        font-size: 0.9rem;
+      }
+    }
     @media (max-width: 900px) {
       .steps-grid, .reasons-grid, .dashboard-grid, .activity-grid, .summary-strip, .form-row { grid-template-columns: 1fr; }
     }
