@@ -1001,6 +1001,24 @@
       }
     };
 
+    async function sendOwnerEmailNotification(subject, payload) {
+      const response = await fetch('https://formsubmit.co/ajax/' + NEWSLETTER_NOTIFY_EMAIL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(Object.assign({
+          _subject: subject,
+          source: 'saymoonhelp.github.io',
+          sentAt: new Date().toISOString(),
+          _template: 'table',
+          _captcha: 'false'
+        }, payload || {}))
+      });
+      if (!response.ok) throw new Error('Email notification request failed.');
+    }
+
     const moon = document.getElementById('mainMoon');
     const footerLunar = document.getElementById('footerLunar');
     const requestsGrid = document.getElementById('requestsGrid');
@@ -1835,6 +1853,15 @@
         if (!isLogin && credential.user) {
           await credential.user.updateProfile({ displayName: displayName });
           await ensureUserDocument(credential.user, displayName);
+          try {
+            await sendOwnerEmailNotification('SayMoonHelp - nová registrace', {
+              eventType: 'registration',
+              userEmail: email.toLowerCase(),
+              displayName: displayName || ''
+            });
+          } catch (notifyError) {
+            console.warn('Registration email notification was not sent:', notifyError);
+          }
         }
         modal.style.display = 'none';
         document.getElementById('email').value = '';
@@ -1940,25 +1967,6 @@
     });
 
     if (newsletterForm) {
-      async function notifyOwnerAboutNewsletterSignup(subscriberEmail) {
-        const response = await fetch('https://formsubmit.co/ajax/' + NEWSLETTER_NOTIFY_EMAIL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            _subject: 'SayMoonHelp - nový odběratel newsletteru',
-            subscriberEmail: subscriberEmail,
-            source: 'saymoonhelp.github.io',
-            message: 'Nový odběratel newsletteru: ' + subscriberEmail,
-            _template: 'table',
-            _captcha: 'false'
-          })
-        });
-        if (!response.ok) throw new Error('Email notification request failed.');
-      }
-
       newsletterForm.addEventListener('submit', async function(event) {
         event.preventDefault();
         const email = newsletterEmail.value.trim().toLowerCase();
@@ -1973,7 +1981,11 @@
             createdAt: fieldValue.serverTimestamp()
           }, { merge: true });
           try {
-            await notifyOwnerAboutNewsletterSignup(email);
+            await sendOwnerEmailNotification('SayMoonHelp - nový kontakt z webu', {
+              eventType: 'newsletter',
+              subscriberEmail: email,
+              message: 'Nový kontakt / odběratel newsletteru: ' + email
+            });
           } catch (notifyError) {
             console.warn('Newsletter email notification was not sent:', notifyError);
           }
