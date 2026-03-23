@@ -13,29 +13,112 @@ service cloud.firestore {
       return isSignedIn() && request.auth.token.email == 'admin@saymoonhelp.com';
     }
 
+    function changedKeysOnly(allowedKeys) {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(allowedKeys);
+    }
+
+    function userCreateIsValid(userId) {
+      return isOwner(userId)
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.balance == 0
+        && request.resource.data.role == (isAdmin() ? 'admin' : 'member');
+    }
+
+    function userProfileUpdateIsValid() {
+      return changedKeysOnly(['displayName', 'name', 'city', 'about', 'avatar', 'claimDetails', 'updatedAt'])
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.balance == resource.data.balance
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.lastWin == resource.data.lastWin;
+    }
+
+    function userBalanceUpdateIsValid(userId) {
+      return isOwner(userId)
+        && changedKeysOnly(['balance', 'updatedAt'])
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.lastWin == resource.data.lastWin
+        && request.resource.data.balance is number
+        && request.resource.data.balance >= resource.data.balance;
+    }
+
+    function requestCreateIsValid() {
+      return isSignedIn()
+        && request.resource.data.authorId == request.auth.uid
+        && request.resource.data.status == 'active'
+        && request.resource.data.workflowStage == 'voting'
+        && request.resource.data.currentAmount == 0
+        && request.resource.data.votesYes == 0
+        && request.resource.data.votesNo == 0
+        && request.resource.data.amountNeeded is number
+        && request.resource.data.amountNeeded > 0;
+    }
+
+    function requestDonationUpdateIsValid() {
+      return changedKeysOnly(['currentAmount', 'updatedAt'])
+        && request.resource.data.currentAmount is number
+        && request.resource.data.currentAmount >= resource.data.currentAmount
+        && request.resource.data.authorId == resource.data.authorId
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.workflowStage == resource.data.workflowStage
+        && request.resource.data.votesYes == resource.data.votesYes
+        && request.resource.data.votesNo == resource.data.votesNo;
+    }
+
+    function requestVoteUpdateIsValid() {
+      let yesDelta = request.resource.data.votesYes - resource.data.votesYes;
+      let noDelta = request.resource.data.votesNo - resource.data.votesNo;
+      return changedKeysOnly(['votesYes', 'votesNo', 'workflowStage', 'updatedAt'])
+        && request.resource.data.authorId == resource.data.authorId
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.currentAmount == resource.data.currentAmount
+        && yesDelta >= 0
+        && noDelta >= 0
+        && yesDelta + noDelta == 1
+        && request.resource.data.workflowStage in ['voting', 'lottery_ready'];
+    }
+
+    function voteCreateIsValid() {
+      return isSignedIn()
+        && request.resource.data.voterId == request.auth.uid
+        && request.resource.data.side in ['yes', 'no'];
+    }
+
+    function donationCreateIsValid() {
+      return isSignedIn()
+        && request.resource.data.donorId == request.auth.uid
+        && request.resource.data.donorEmail == request.auth.token.email
+        && request.resource.data.amount is number
+        && request.resource.data.amount >= 10
+        && request.resource.data.amount % 10 == 0
+        && request.resource.data.points == request.resource.data.amount / 10;
+    }
+
     match /users/{userId} {
       allow read: if isSignedIn();
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId) || isAdmin();
+      allow create: if userCreateIsValid(userId);
+      allow update: if isAdmin() || userProfileUpdateIsValid() || userBalanceUpdateIsValid(userId);
       allow delete: if isAdmin();
     }
 
     match /requests/{requestId} {
       allow read: if true;
-      allow create: if isSignedIn();
-      allow update: if isSignedIn() || isAdmin();
+      allow create: if requestCreateIsValid();
+      allow update: if isAdmin() || requestDonationUpdateIsValid() || requestVoteUpdateIsValid();
       allow delete: if isAdmin();
     }
 
     match /votes/{voteId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn();
+      allow create: if voteCreateIsValid();
       allow update, delete: if isAdmin();
     }
 
     match /donations/{donationId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn();
+      allow create: if donationCreateIsValid();
       allow update, delete: if isAdmin();
     }
 
