@@ -215,6 +215,16 @@
     .summary-item { background: #f7fafe; border: 1px solid #dce7f4; border-radius: 24px; padding: 18px; }
     .summary-item strong { display: block; font-size: 1.5rem; color: #1e3a5f; margin-bottom: 6px; }
     .summary-item span { color: #7a8599; font-size: 0.92rem; line-height: 1.6; }
+    .winner-banner {
+      margin-top: 22px;
+      padding: 18px 22px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255,215,0,0.14), rgba(255,246,204,0.88));
+      border: 1px solid rgba(255,215,0,0.34);
+      color: #7f5a00;
+      line-height: 1.7;
+    }
+    .winner-banner strong { color: #8c6200; }
     .form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
     .form-field { margin-bottom: 16px; }
     .form-field label { display: block; margin-bottom: 8px; color: #1e3a5f; font-weight: 600; }
@@ -296,7 +306,7 @@
       .steps-grid, .reasons-grid, .dashboard-grid, .activity-grid, .summary-strip, .form-row { grid-template-columns: 1fr; }
     }
     .stats-grid { display: flex; gap: 20px; justify-content: space-around; background: #fbfbff; border-radius: 80px; padding: 50px 30px; border: 1px solid #e0e0ff; }
-    .stat-number { font-size: 3.5rem; font-weight: 600; background: linear-gradient(130deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-number { font-size: 3.5rem; font-weight: 600; background: linear-gradient(130deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
     .reasons-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 25px; margin-top: 40px; }
     .reason-item { background: #fff; padding: 30px; border-radius: 36px; text-align: center; border: 1px solid #e0e0ff; transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
     .reason-item:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 16px 40px rgba(58,110,165,0.15); border-color: rgba(58,110,165,0.38); }
@@ -319,7 +329,7 @@
     .hero { padding: 100px 0 80px; text-align: center; background: radial-gradient(circle at 80% 30%, rgba(58,110,165,0.1) 0%, #fff 70%); position: relative; overflow: hidden; }
     #constellation-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
     .hero .container { position: relative; z-index: 1; }
-    .hero h1 { font-size: 3.8rem; max-width: 800px; margin: 0 auto 20px; background: linear-gradient(135deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero h1 { font-size: 3.8rem; max-width: 800px; margin: 0 auto 20px; background: linear-gradient(135deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
     .hero-subtitle {
       max-width: 860px;
       margin: 0 auto;
@@ -423,7 +433,7 @@
       transform: translateY(0);
     }
     section { padding: 90px 0; }
-    .section-title { font-size: 2.6rem; text-align: center; margin-bottom: 60px; background: linear-gradient(145deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .section-title { font-size: 2.6rem; text-align: center; margin-bottom: 60px; background: linear-gradient(145deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
     .status-lottery-ready { background: rgba(92,196,122,0.14); color: #23753c; }
     .status-won { background: rgba(255,215,0,0.16); color: #9b6a00; }
     .status-rejected { background: rgba(224,68,68,0.12); color: #a43131; }
@@ -662,6 +672,7 @@
             <h3 style="color:#1e3a5f; margin-bottom:10px;">Přehled tvého účtu</h3>
             <p style="color:#56606d; line-height:1.7;">SayMoonHelp pracuje s důvěrou. Proto tady vždy vidíš svůj profil, svou žádost, historii hlasování i stav pro převzetí výhry na jednom místě.</p>
             <div class="summary-strip" id="profileSummary"></div>
+            <div id="winnerBanner" class="winner-banner" style="display:none;"></div>
             <div class="backup-tools">
               <button type="button" id="exportDataBtn" class="btn-logout">Stáhnout zálohu dat (.json)</button>
               <label for="importDataInput" class="btn-logout backup-import-label">Načíst zálohu dat
@@ -880,6 +891,7 @@
     const dashboardGuest = document.getElementById('dashboardGuest');
     const dashboardApp = document.getElementById('dashboardApp');
     const profileSummary = document.getElementById('profileSummary');
+    const winnerBanner = document.getElementById('winnerBanner');
     const myRequestsList = document.getElementById('myRequestsList');
     const myVotesList = document.getElementById('myVotesList');
     const myDonationsList = document.getElementById('myDonationsList');
@@ -1171,6 +1183,7 @@
       }).filter(Boolean);
       const claimDetails = profile.claimDetails || { phone: '', iban: '', note: '' };
       const wonRequest = ownRequests.find(function(request) { return request.status === 'won'; });
+      const lastWin = profile.lastWin || null;
 
       document.getElementById('profileName').value = profile.displayName || profile.name || '';
       document.getElementById('profileCity').value = profile.city || '';
@@ -1187,6 +1200,17 @@
         '<div class="summary-item"><strong>' + ownRequests.length + '</strong><span>Vlastní žádosti uložené ve Firestore. Každá se propisuje do veřejného seznamu v reálném čase.</span></div>',
         '<div class="summary-item"><strong>' + ownDonations.length + '</strong><span>Odeslané příspěvky. Historie níže ukazuje datum, částku i podpořenou žádost.</span></div>'
       ].join('');
+
+      if (wonRequest || lastWin) {
+        const amount = wonRequest ? Number(wonRequest.raised || wonRequest.target || 0) : Number(lastWin.amount || 0);
+        const title = wonRequest ? wonRequest.title : (lastWin.requestTitle || 'Tvoje výherní žádost');
+        const drawnAt = wonRequest ? wonRequest.wonAt : lastWin.createdAt;
+        winnerBanner.style.display = 'block';
+        winnerBanner.innerHTML = '<strong>Výhra v loterii:</strong> tvoje žádost <strong>' + escapeHtml(title) + '</strong> byla vylosována. Částka <strong>' + formatCurrency(amount) + '</strong> čeká na dokončení převzetí. Datum losování: <strong>' + escapeHtml(formatDateTime(drawnAt)) + '</strong>.';
+      } else {
+        winnerBanner.style.display = 'none';
+        winnerBanner.innerHTML = '';
+      }
 
       myRequestsList.innerHTML = ownRequests.length ? ownRequests.slice().reverse().map(function(request) {
         return '<div class="activity-item">' + getRequestStatusLabel(request) + '<h4>' + escapeHtml(request.title) + '</h4><p>' + escapeHtml(request.story) + '</p><div class="activity-meta">' + escapeHtml(request.number || '#000') + ' · ' + formatCurrency(request.target) + ' · ' + formatDate(request.createdAt) + '</div></div>';
@@ -1522,8 +1546,10 @@
           lastWin: {
             requestId: winner.id,
             lotteryId: lotteryRef.id,
+            requestTitle: request.title || winner.title,
             amount: amount,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            notified: true
           },
           updatedAt: fieldValue.serverTimestamp()
         }, { merge: true });
@@ -1891,439 +1917,6 @@
         star.style.color = scrolled ? '#ffd700' : '#3a6ea5';
       });
     });
-
-    renderAll();
-    function getProfile(user) {
-      return user ? state.profiles[user.uid] : null;
-    }
-
-    function ensureProfile(user, displayName) {
-      if (!user) return null;
-      const existing = state.profiles[user.uid] || {};
-      const fallbackName = displayName || user.displayName || existing.name || user.email.split('@')[0];
-      state.profiles[user.uid] = {
-        name: fallbackName,
-        city: existing.city || '',
-        about: existing.about || '',
-        points: typeof existing.points === 'number' ? existing.points : 5,
-        joinedAt: existing.joinedAt || Date.now(),
-        email: user.email,
-        updatedAt: Date.now()
-      };
-      saveState();
-      return state.profiles[user.uid];
-    }
-
-    function getAllRequests() {
-      return seedRequests.concat(state.requests).map(function(request) {
-        const tally = state.voteTallies[request.id];
-        return Object.assign({}, request, tally ? { yes: tally.yes, no: tally.no } : {});
-      });
-    }
-
-    function getVotePercentage(request) {
-      const yes = request.yes || 0;
-      const no = request.no || 0;
-      const total = yes + no;
-      return total ? Math.round((yes / total) * 100) : 0;
-    }
-
-    function getStatusLabel(status) {
-      if (status === 'active') return '<span class="card-status status-active">✅ Aktivní výběr</span>';
-      if (status === 'approved') return '<span class="card-status status-approved">🌙 Schváleno — čeká na loterii</span>';
-      if (status === 'draft') return '<span class="card-status status-draft">📝 Koncept</span>';
-      return '<span class="card-status status-voting">🗳️ Ve hlasování</span>';
-    }
-
-    function requestAction(request) {
-      if (request.status === 'active') return '<button class="btn-small" onclick="openAuthModal()">💙 Pomoci — přispět</button>';
-      if (request.status === 'approved') return '<button class="btn-small" onclick="smoothScroll(\'#my-space\')">🏆 Zobrazit stav výhry</button>';
-      return '<button class="btn-small" onclick="smoothScroll(\'#hlasovani\')">🗳️ Jít hlasovat</button>';
-    }
-
-    function renderRequests() {
-      const filtered = getAllRequests().filter(function(request) {
-        return activeRequestFilter === 'all' || request.status === activeRequestFilter;
-      });
-      if (!filtered.length) {
-        requestsGrid.innerHTML = '<div class="empty-state">V tomto filtru zatím není žádná žádost. Přihlas se a pošli první vlastní příběh komunity.</div>';
-        return;
-      }
-      requestsGrid.innerHTML = filtered.map(function(request) {
-        const cityLink = request.city ? '<a href="https://www.google.com/maps/search/' + encodeURIComponent(request.city + ', Česká republika') + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dotted rgba(58,110,165,0.5);cursor:pointer;">' + request.city + '</a>' : 'Neuvedeno';
-        const profileMeta = '📍 ' + cityLink + ' &nbsp;·&nbsp; 👤 ' + (request.memberLabel || 'Člen komunity') + ' &nbsp;·&nbsp; ⭐ ' + (request.points || 0) + ' bodů';
-        if (request.status === 'active') {
-          const progress = Math.min(100, Math.round(((request.raised || 0) / request.target) * 100));
-          return '<div class="request-card" data-status="' + request.status + '">' +
-            '<a class="request-number" href="#my-space" onclick="smoothScroll(\'my-space\')'  + '">' + request.number + '</a>' +
-            getStatusLabel(request.status) +
-            '<div class="request-name">' + request.name + '</div>' +
-            '<div class="request-title">' + request.title + '</div>' +
-            '<div class="request-meta">' + profileMeta + '</div>' +
-            '<div class="request-story">' + request.story + '</div>' +
-            '<div class="progress-bar-bg"><div class="progress-fill" style="width:' + progress + '%"></div></div>' +
-            '<div class="progress-stats"><span>' + (request.raised || 0).toLocaleString('cs-CZ') + ' Kč vybráno</span><span>cíl: ' + request.target.toLocaleString('cs-CZ') + ' Kč</span></div>' +
-            requestAction(request) +
-          '</div>';
-        }
-        const percent = getVotePercentage(request);
-        const stateText = request.status === 'approved' ? 'Schváleno:' : 'Hlasování:';
-        const accent = request.status === 'approved' ? '#1e3a5f' : (percent >= 70 ? '#3a6ea5' : '#b07800');
-        const suffix = request.status === 'approved' ? ' hlasů' : (percent >= 70 ? ' ✓' : '');
-        return '<div class="request-card" data-status="' + request.status + '">' +
-          '<a class="request-number" href="#my-space" onclick="smoothScroll(\'my-space\')'  + '">' + request.number + '</a>' +
-          getStatusLabel(request.status) +
-          '<div class="request-name">' + request.name + '</div>' +
-          '<div class="request-title">' + request.title + '</div>' +
-          '<div class="request-meta">' + profileMeta + '</div>' +
-          '<div class="request-story">' + request.story + '</div>' +
-          '<div class="vote-threshold"><span>' + stateText + '</span><div class="threshold-bar"><div class="threshold-fill" style="width:' + percent + '%"></div></div><span style="font-weight:600;color:' + accent + '">' + percent + '%' + suffix + '</span></div>' +
-          requestAction(request) +
-        '</div>';
-      }).join('');
-    }
-
-    function renderVotes() {
-      const votable = getAllRequests().filter(function(request) { return request.status === 'voting'; });
-      if (!votable.length) {
-        votesGrid.innerHTML = '<div class="empty-state">Právě není žádná žádost ve hlasování. Nové žádosti se objeví hned po odeslání z profilu člena.</div>';
-        return;
-      }
-      const currentVotes = currentUser && state.votesByUser[currentUser.uid] ? state.votesByUser[currentUser.uid] : {};
-      votesGrid.innerHTML = votable.map(function(request) {
-        const percent = getVotePercentage(request);
-        const totalYes = request.yes || 0;
-        const totalNo = request.no || 0;
-        const voted = currentVotes[request.id];
-        return '<div class="vote-card">' +
-          '<a class="request-number" href="#my-space" onclick="smoothScroll(\'my-space\')">' + request.number + '</a>' +
-          '<span class="card-status status-voting">🗳️ Probíhá hlasování</span>' +
-          '<div class="request-name">' + request.name + '</div>' +
-          '<div class="request-title">' + request.title + '</div>' +
-          '<div class="request-meta">📍 ' + (request.city ? '<a href="https://www.google.com/maps/search/' + encodeURIComponent(request.city + ', Česká republika') + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dotted rgba(58,110,165,0.5)">' + request.city + '</a>' : 'Neuvedeno') + ' &nbsp;·&nbsp; <span style="color:#e04444;font-weight:600">potřebuje ' + request.target.toLocaleString('cs-CZ') + ' Kč</span> &nbsp;·&nbsp; 👤 ' + (request.memberLabel || 'Člen komunity') + '</div>' +
-          '<div class="request-story">' + request.story + '</div>' +
-          '<div class="vote-threshold" style="margin:14px 0"><div class="threshold-bar" style="height:8px"><div class="threshold-fill" style="width:' + percent + '%"></div></div></div>' +
-          '<div class="vote-numbers">👍 ' + totalYes + ' Ano &nbsp;/&nbsp; 👎 ' + totalNo + ' Ne &nbsp;·&nbsp; <strong style="color:' + (percent >= 70 ? '#3a6ea5' : '#b07800') + '">' + percent + '%</strong> pro &nbsp;<span style="color:' + (percent >= 70 ? '#3a6ea5' : '#999') + ';font-size:0.85rem">' + (percent >= 70 ? '✓ Připraveno postoupit' : 'potřeba 70%') + '</span></div>' +
-          '<div class="vote-buttons" style="margin-top:14px">' +
-            '<button class="vote-yes' + (voted === 'yes' ? ' voted' : '') + '" onclick="castVote(\'' + request.id + '\',\'yes\')">👍 Ano, pomozme</button>' +
-            '<button class="vote-no' + (voted === 'no' ? ' voted' : '') + '" onclick="castVote(\'' + request.id + '\',\'no\')">👎 Ne</button>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-    }
-
-    function renderDashboard() {
-      if (!currentUser) {
-        dashboardGuest.style.display = 'block';
-        dashboardApp.style.display = 'none';
-        return;
-      }
-      dashboardGuest.style.display = 'none';
-      dashboardApp.style.display = 'block';
-
-      const profile = ensureProfile(currentUser);
-      const allRequests = getAllRequests();
-      const ownRequests = state.requests.filter(function(request) { return request.createdBy === currentUser.uid; });
-      const ownVotes = state.votesByUser[currentUser.uid] || {};
-      const votedEntries = Object.keys(ownVotes).map(function(requestId) {
-        const request = allRequests.find(function(item) { return item.id === requestId; });
-        return request ? { request: request, side: ownVotes[requestId] } : null;
-      }).filter(Boolean);
-      const approvedOwnRequest = ownRequests.find(function(request) { return request.status === 'approved'; });
-      const claim = state.claims[currentUser.uid] || { phone: '', iban: '', note: '' };
-
-      document.getElementById('profileName').value = profile.name || '';
-      document.getElementById('profileCity').value = profile.city || '';
-      document.getElementById('profileAbout').value = profile.about || '';
-      document.getElementById('claimPhone').value = claim.phone || '';
-      document.getElementById('claimIban').value = claim.iban || '';
-      document.getElementById('claimNote').value = claim.note || '';
-
-      profileSummary.innerHTML = [
-        '<div class="summary-item"><strong>' + (profile.points || 0) + '</strong><span>Body pomoci na účtu. Profil je způsobilý hlasovat a vstoupit do budoucího losování.</span></div>',
-        '<div class="summary-item"><strong>' + ownRequests.length + '</strong><span>Vlastní žádosti. Poslední žádost se po odeslání automaticky objeví v Žádostech i Hlasování.</span></div>',
-        '<div class="summary-item"><strong>' + votedEntries.length + '</strong><span>Odevzdané hlasy. Všechny tvé volby vidíš níže v osobní historii.</span></div>'
-      ].join('');
-
-      if (!ownRequests.length) {
-        myRequestsList.innerHTML = '<div class="empty-state">Ještě jsi neposlal žádnou žádost. Vyplň formulář „Podat novou žádost“ a objevíš se mezi ostatními členy.</div>';
-      } else {
-        myRequestsList.innerHTML = ownRequests.slice().reverse().map(function(request) {
-          const percent = getVotePercentage(request);
-          return '<div class="activity-item">' +
-            getStatusLabel(request.status) +
-            '<h4>' + request.title + '</h4>' +
-            '<p>' + request.story + '</p>' +
-            '<div class="activity-meta">' + request.number + ' · ' + request.target.toLocaleString('cs-CZ') + ' Kč · ' + percent + '% podpory komunity</div>' +
-          '</div>';
-        }).join('');
-      }
-
-      if (!votedEntries.length) {
-        myVotesList.innerHTML = '<div class="empty-state">Zatím jsi nehlasoval. Přejdi do sekce Hlasování a podpoř příběhy, které mají dostat šanci v loterii.</div>';
-      } else {
-        myVotesList.innerHTML = votedEntries.slice().reverse().map(function(entry) {
-          return '<div class="activity-item">' +
-            '<h4>' + entry.request.name + ' · ' + entry.request.title + '</h4>' +
-            '<p>Tvůj hlas: <strong style="color:' + (entry.side === 'yes' ? '#3a6ea5' : '#b07800') + '">' + (entry.side === 'yes' ? 'Ano' : 'Ne') + '</strong>. Aktuální podpora komunity je ' + getVotePercentage(entry.request) + '%.</p>' +
-            '<div class="activity-meta">' + entry.request.number + ' · ' + (entry.request.city || 'Neuvedeno') + '</div>' +
-          '</div>';
-        }).join('');
-      }
-
-      claimStatus.innerHTML = approvedOwnRequest
-        ? 'Tvoje žádost <strong>' + approvedOwnRequest.title + '</strong> je připravená pro další krok. Ulož kontaktní údaje a číslo účtu, aby bylo možné navázat předáním výhry po losování.'
-        : 'Údaje pro převzetí výhry si můžeš připravit už teď. Aktivují se ve chvíli, kdy tvoje žádost získá dost hlasů a postoupí do další fáze.';
-    }
-
-    function renderAll() {
-      renderRequests();
-      renderVotes();
-      renderDashboard();
-    }
-
-    function refreshUserHeader(profile) {
-      const info = document.getElementById('userInfo');
-      const btn = document.getElementById('showLoginBtn');
-      if (currentUser) {
-        btn.style.display = 'none';
-        info.style.display = 'flex';
-        document.getElementById('userEmail').innerText = (profile.name || currentUser.email) + ' · ' + currentUser.email;
-      } else {
-        btn.style.display = 'inline-block';
-        info.style.display = 'none';
-      }
-    }
-
-    window.addEventListener('scroll', () => {
-      const scrolled = window.scrollY > 100;
-      moon.classList.toggle('gold-moon', scrolled);
-      footerLunar.classList.toggle('gold', scrolled);
-      const stars = document.querySelectorAll('.logo-star');
-      stars.forEach(s => { s.style.color = scrolled ? '#ffd700' : '#3a6ea5'; });
-    });
-
-    const detailBtn = document.getElementById('detailBtn');
-    const detailText = document.getElementById('detailText');
-    if (detailBtn) detailBtn.onclick = () => {
-      const show = detailText.style.display === 'block';
-      detailText.style.display = show ? 'none' : 'block';
-      detailBtn.textContent = show ? '🔍 Jak to celé funguje?' : '🔍 Skrýt detail';
-    };
-
-    const eye = document.getElementById('togglePassword');
-    const pass = document.getElementById('password');
-    const eyeLine = document.getElementById('eyeLine');
-    const nameField = document.getElementById('displayName');
-    if (eye) eye.onclick = () => {
-      const type = pass.type === 'password' ? 'text' : 'password';
-      pass.type = type;
-      if (eyeLine) eyeLine.style.display = type === 'text' ? 'none' : 'block';
-    };
-
-    const modal = document.getElementById('authModal');
-  window.openAuthModal = () => modal.style.display = 'flex';
-  document.getElementById('showLoginBtn').onclick = () => modal.style.display = 'flex';
-    document.getElementById('closeModal').onclick = () => modal.style.display = 'none';
-    window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
-
-    let isLogin = true;
-    const switchAuth = document.getElementById('switchAuth');
-    const authTitle = document.getElementById('authTitle');
-    const authAction = document.getElementById('authAction');
-    if (switchAuth) switchAuth.onclick = (e) => {
-      e.preventDefault();
-      isLogin = !isLogin;
-      authTitle.innerText = isLogin ? 'Přihlásit se' : 'Registrace';
-      authAction.innerText = isLogin ? 'Přihlásit se' : 'Registrovat se';
-      switchAuth.innerText = isLogin ? 'Nemáte účet? Registrujte se' : 'Máte účet? Přihlaste se';
-      nameField.style.display = isLogin ? 'none' : 'block';
-    };
-    if (authAction) authAction.onclick = () => {
-      const email = document.getElementById('email').value;
-      const pwd = pass.value;
-      const displayName = nameField.value.trim();
-      if (!email || !pwd) return alert('Vyplň email a heslo');
-      if (!isLogin && !displayName) return alert('Vyplň také své jméno pro vytvoření profilu');
-      (isLogin ? firebase.auth().signInWithEmailAndPassword(email, pwd) : firebase.auth().createUserWithEmailAndPassword(email, pwd))
-        .then(function(credential) {
-          if (!isLogin && credential.user) {
-            return credential.user.updateProfile({ displayName: displayName }).then(function() {
-              ensureProfile(credential.user, displayName);
-            });
-          }
-          return null;
-        })
-        .then(() => {
-          modal.style.display = 'none';
-          document.getElementById('email').value = '';
-          pass.value = '';
-          nameField.value = '';
-        })
-        .catch(e => alert(e.message));
-    };
-
-    firebase.auth().onAuthStateChanged(user => {
-      currentUser = user;
-      if (user) {
-        const profile = ensureProfile(user);
-        refreshUserHeader(profile);
-      } else {
-        refreshUserHeader({});
-      }
-      renderAll();
-    });
-    document.getElementById('logoutBtn').onclick = () => firebase.auth().signOut();
-
-    profileForm.addEventListener('submit', function(event) {
-      event.preventDefault();
-      if (!currentUser) return alert('Nejdřív se přihlas.');
-      const profile = ensureProfile(currentUser);
-      profile.name = document.getElementById('profileName').value.trim() || profile.name;
-      profile.city = document.getElementById('profileCity').value.trim();
-      profile.about = document.getElementById('profileAbout').value.trim();
-      state.profiles[currentUser.uid] = profile;
-      saveState();
-      refreshUserHeader(profile);
-      renderAll();
-      alert('Profil byl uložen.');
-    });
-
-    requestForm.addEventListener('submit', function(event) {
-      event.preventDefault();
-      if (!currentUser) return alert('Nejdřív se přihlas.');
-      const profile = ensureProfile(currentUser);
-      if (!profile.city || !profile.name) return alert('Nejdřív doplň jméno a město ve svém profilu.');
-      const title = document.getElementById('requestTitle').value.trim();
-      const amount = Number(document.getElementById('requestAmount').value);
-      const story = document.getElementById('requestStory').value.trim();
-      if (!title || !amount || !story) return alert('Vyplň název, částku i popis situace.');
-      const nextNumber = String(state.nextRequestNumber).padStart(3, '0');
-      const request = {
-        id: 'user-' + currentUser.uid + '-' + Date.now(),
-        number: '#' + nextNumber,
-        name: profile.name,
-        city: profile.city,
-        memberLabel: monthsSince(profile.joinedAt),
-        points: profile.points,
-        title: title,
-        story: story,
-        target: amount,
-        raised: 0,
-        status: 'voting',
-        yes: 0,
-        no: 0,
-        createdBy: currentUser.uid,
-        createdAt: Date.now()
-      };
-      state.requests.push(request);
-      state.voteTallies[request.id] = { yes: 0, no: 0 };
-      state.nextRequestNumber += 1;
-      saveState();
-      requestForm.reset();
-      activeRequestFilter = 'all';
-      document.querySelectorAll('.tab-btn').forEach(function(button, index) {
-        button.classList.toggle('active', index === 0);
-      });
-      renderAll();
-      smoothScroll('#zadosti');
-      alert('Žádost byla odeslána a je vidět mezi ostatními.');
-    });
-
-    claimForm.addEventListener('submit', function(event) {
-      event.preventDefault();
-      if (!currentUser) return alert('Nejdřív se přihlas.');
-      state.claims[currentUser.uid] = {
-        phone: document.getElementById('claimPhone').value.trim(),
-        iban: document.getElementById('claimIban').value.trim(),
-        note: document.getElementById('claimNote').value.trim(),
-        updatedAt: Date.now()
-      };
-      saveState();
-      renderDashboard();
-      alert('Údaje pro převzetí výhry byly uloženy.');
-    });
-
-    if (exportDataBtn) {
-      exportDataBtn.addEventListener('click', function() {
-        const payload = getBackupPayload();
-        const json = JSON.stringify(payload, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const link = document.createElement('a');
-        const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'saymoonhelp-backup-' + stamp + '.json';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-      });
-    }
-
-    if (importDataInput) {
-      importDataInput.addEventListener('change', function(event) {
-        const file = event.target.files && event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(loadEvent) {
-          try {
-            const parsed = JSON.parse(String(loadEvent.target.result || '{}'));
-            applyImportedState(parsed);
-            alert('Záloha byla úspěšně načtena.');
-          } catch (error) {
-            alert('Nepodařilo se načíst zálohu: ' + error.message);
-          } finally {
-            importDataInput.value = '';
-          }
-        };
-        reader.onerror = function() {
-          alert('Soubor se nepodařilo přečíst.');
-          importDataInput.value = '';
-        };
-        reader.readAsText(file, 'utf-8');
-      });
-    }
-
-    window.castVote = function(requestId, side) {
-      if (!currentUser) {
-        openAuthModal();
-        return;
-      }
-      const profile = ensureProfile(currentUser);
-      if ((profile.points || 0) < 1) {
-        alert('Pro hlasování potřebuješ alespoň 1 bod pomoci.');
-        return;
-      }
-      state.votesByUser[currentUser.uid] = state.votesByUser[currentUser.uid] || {};
-      if (state.votesByUser[currentUser.uid][requestId]) {
-        alert('Pro tuto žádost už jsi hlasoval(a).');
-        return;
-      }
-      const request = getAllRequests().find(function(item) { return item.id === requestId; });
-      if (!request) return;
-      const tally = state.voteTallies[requestId] || { yes: request.yes || 0, no: request.no || 0 };
-      if (side === 'yes') tally.yes += 1; else tally.no += 1;
-      state.voteTallies[requestId] = tally;
-      state.votesByUser[currentUser.uid][requestId] = side;
-      const total = tally.yes + tally.no;
-      const percent = total ? Math.round((tally.yes / total) * 100) : 0;
-      const ownRequest = state.requests.find(function(item) { return item.id === requestId; });
-      if (ownRequest && total >= 5 && percent >= 70) ownRequest.status = 'approved';
-      saveState();
-      renderAll();
-    };
-
-    window.filterCards = function(status, btn) {
-      activeRequestFilter = status;
-      document.querySelectorAll('.tab-btn').forEach(function(button) { button.classList.remove('active'); });
-      if (btn) btn.classList.add('active');
-      renderRequests();
-    };
-
-    window.smoothScroll = function(id) {
-      var el = document.querySelector(id);
-      if (el) el.scrollIntoView({behavior: 'smooth'});
-    };
 
     renderAll();
   });
