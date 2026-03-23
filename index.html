@@ -373,6 +373,25 @@
       color: #5f6d83;
       line-height: 1.5;
     }
+    .newsletter-confirm {
+      display: none;
+      margin-top: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1f7a45;
+      background: rgba(31, 122, 69, 0.1);
+      border: 1px solid rgba(31, 122, 69, 0.28);
+      border-radius: 999px;
+      padding: 8px 14px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .newsletter-confirm.show {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
     @media (max-width: 760px) {
       .newsletter {
         padding: 42px 24px;
@@ -906,7 +925,7 @@
 
   <section class="page-section"><div class="container"><h2 class="section-title">Proč se zapojit</h2><div class="reasons-grid"><div class="reason-item"><div class="reason-icon">🤝</div><h4>Pomáháš konkrétním lidem</h4><p>Každá koruna jde na ověřenou žádost.</p></div><div class="reason-item"><div class="reason-icon">🎲</div><h4>Máš šanci na pomoc i ty</h4><p>Čím víc pomáháš, tím víc šancí máš.</p></div><div class="reason-item"><div class="reason-icon">🗳️</div><h4>Rozhoduješ ty</h4><p>Hlasuješ, kdo pomoc dostane.</p></div><div class="reason-item"><div class="reason-icon">🔍</div><h4>Jsme transparentní</h4><p>Všechny transakce jsou veřejné.</p></div></div></div></section>
 
-  <section class="page-section"><div class="container newsletter"><h2>Buďte první, až spustíme</h2><p>Zatím testujeme. Zanechte nám email a dáme vám vědět, jakmile bude možné se zapojit.</p><form id="newsletterForm" class="email-form"><input id="newsletterEmail" class="email-input" type="email" placeholder="váš@email.cz"><button id="newsletterSubmitBtn" class="btn btn-primary newsletter-submit" type="submit">Odeslat</button></form><div class="privacy-note">Žádný spam. Jen jedna zpráva, až budeme živí.</div></div></section>
+  <section class="page-section"><div class="container newsletter"><h2>Buďte první, až spustíme</h2><p>Zatím testujeme. Zanechte nám email a dáme vám vědět, jakmile bude možné se zapojit.</p><form id="newsletterForm" class="email-form"><input id="newsletterEmail" class="email-input" type="email" placeholder="váš@email.cz"><button id="newsletterSubmitBtn" class="btn btn-primary newsletter-submit" type="submit">Odeslat</button></form><div id="newsletterConfirm" class="newsletter-confirm" aria-live="polite">&#10003; Odesláno. Děkujeme za kontakt.</div><div class="privacy-note">Žádný spam. Jen jedna zpráva, až budeme živí.</div></div></section>
 
   <section class="page-section"><div class="container"><h2 class="section-title">Časté otázky</h2><div class="faq-grid"><div class="faq-item"><div class="faq-question">Kdo může žádat o pomoc?</div><div>Každý registrovaný člen, který už alespoň jednou pomohl.</div></div><div class="faq-item"><div class="faq-question">Jak funguje loterie?</div><div>10 Kč = 1 bod. Losujeme podle bodů. Vyhrává jeden člen.</div></div></div></div></section>
 </main>
@@ -1057,6 +1076,8 @@
     const toastContainer = document.getElementById('toastContainer');
     const newsletterForm = document.getElementById('newsletterForm');
     const newsletterEmail = document.getElementById('newsletterEmail');
+    const newsletterSubmitBtn = document.getElementById('newsletterSubmitBtn');
+    const newsletterConfirm = document.getElementById('newsletterConfirm');
     const profileAvatarPreview = document.getElementById('profileAvatarPreview');
     const avatarUploadInput = document.getElementById('avatarUploadInput');
     const avatarUploadWrap = document.getElementById('avatarUploadWrap');
@@ -1974,12 +1995,17 @@
           showToast('Zadej email pro odběr novinek.', 'error');
           return;
         }
+        if (newsletterConfirm) newsletterConfirm.classList.remove('show');
+        if (newsletterSubmitBtn) {
+          newsletterSubmitBtn.disabled = true;
+          newsletterSubmitBtn.textContent = 'Odesilam...';
+        }
         try {
-          await db.collection('subscribers').doc(email).set({
+          await db.collection('subscribers').add({
             email: email,
             source: 'website',
             createdAt: fieldValue.serverTimestamp()
-          }, { merge: true });
+          });
           try {
             await sendOwnerEmailNotification('SayMoonHelp - nový kontakt z webu', {
               eventType: 'newsletter',
@@ -1990,9 +2016,15 @@
             console.warn('Newsletter email notification was not sent:', notifyError);
           }
           newsletterForm.reset();
+          if (newsletterConfirm) newsletterConfirm.classList.add('show');
           showToast('Děkujeme, jsi přihlášen(a) k odběru.', 'info');
         } catch (error) {
           showToast(error.message, 'error');
+        } finally {
+          if (newsletterSubmitBtn) {
+            newsletterSubmitBtn.disabled = false;
+            newsletterSubmitBtn.textContent = 'Odeslat';
+          }
         }
       });
     }
