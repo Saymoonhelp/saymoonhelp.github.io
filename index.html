@@ -469,6 +469,29 @@
     footer { padding: 40px 0; border-top: 1px solid #f0f0f8; display: flex; justify-content: space-between; align-items: center; }
     .lunar-design { font-size: 0.9rem; color: #3a6ea5; transition: all 0.3s; }
     .lunar-design.gold { color: #ffd700; text-shadow: 0 0 4px rgba(255,215,0,0.5); }
+    .footer-drawing {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      padding: 4px 8px;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+    .footer-drawing svg {
+      display: block;
+      width: 140px;
+      height: 44px;
+    }
+    .footer-drawing.gold {
+      box-shadow: 0 0 14px rgba(255, 215, 0, 0.28);
+      transform: translateY(-1px);
+    }
+    @media (max-width: 640px) {
+      .footer-drawing svg {
+        width: 120px;
+        height: 38px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -839,7 +862,21 @@
 
 <footer class="container">
   <div>© 2025 SayMoonHelp · průhledná pomoc</div>
-  <div class="lunar-design" id="footerLunar">🌙 lunární design</div>
+  <div class="lunar-design footer-drawing" id="footerLunar" aria-label="lunární design">
+    <svg viewBox="0 0 280 88" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="moonGoldFooter" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffe98a"/>
+          <stop offset="55%" stop-color="#ffd700"/>
+          <stop offset="100%" stop-color="#cf9f00"/>
+        </linearGradient>
+      </defs>
+      <circle cx="34" cy="44" r="22" fill="url(#moonGoldFooter)"/>
+      <circle cx="44" cy="37" r="20" fill="#f8f9fc"/>
+      <text x="72" y="41" fill="#e0b900" font-size="28" font-weight="700" font-family="Inter, Segoe UI, sans-serif">lunární</text>
+      <text x="72" y="69" fill="#d3aa00" font-size="28" font-weight="700" font-family="Inter, Segoe UI, sans-serif">design</text>
+    </svg>
+  </div>
 </footer>
 
 <script>
