@@ -153,6 +153,45 @@
     .jak-feature h4 { color: #1e3a5f; font-size: 1.1rem; margin-bottom: 8px; }
     .jak-feature p { color: #555; font-size: 0.95rem; line-height: 1.6; }
     @media (max-width: 700px) { .jak-features { grid-template-columns: 1fr; } }
+    .section-intro { text-align: center; color: #555; max-width: 760px; margin: -28px auto 40px; line-height: 1.7; }
+    .dashboard-guest { background: linear-gradient(135deg, rgba(58,110,165,0.08), rgba(95,158,160,0.08)); border: 1px solid #dce7f4; border-radius: 36px; padding: 36px; text-align: center; }
+    .dashboard-grid, .activity-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+    .dashboard-card { background: #fff; border-radius: 30px; padding: 30px; box-shadow: 0 20px 40px rgba(58,110,165,0.08); border: 1px solid #e0e0ff; }
+    .dashboard-card.full-span { grid-column: 1 / -1; }
+    .summary-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 22px; }
+    .summary-item { background: #f7fafe; border: 1px solid #dce7f4; border-radius: 24px; padding: 18px; }
+    .summary-item strong { display: block; font-size: 1.5rem; color: #1e3a5f; margin-bottom: 6px; }
+    .summary-item span { color: #5b6470; font-size: 0.92rem; line-height: 1.5; }
+    .form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .form-field { margin-bottom: 16px; }
+    .form-field label { display: block; margin-bottom: 8px; color: #1e3a5f; font-weight: 600; }
+    .form-field input, .form-field textarea, .form-field select {
+      width: 100%;
+      border: 1px solid #cfe0f1;
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-size: 0.98rem;
+      font-family: inherit;
+      background: #fbfdff;
+    }
+    .form-field textarea { min-height: 120px; resize: vertical; }
+    .helper-note { color: #657080; font-size: 0.9rem; line-height: 1.6; margin-top: 10px; }
+    .inline-note { color: #657080; font-size: 0.88rem; }
+    .profile-chip { display: inline-flex; align-items: center; gap: 10px; padding: 9px 16px; border-radius: 30px; background: #f5f9ff; color: #1e3a5f; border: 1px solid #dce7f4; margin: 8px 8px 0 0; }
+    .activity-item { padding: 18px 0; border-bottom: 1px solid #eef3f9; }
+    .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .activity-item h4 { color: #1e3a5f; margin-bottom: 6px; }
+    .activity-item p { color: #56606d; line-height: 1.6; font-size: 0.95rem; }
+    .activity-meta { color: #718091; font-size: 0.87rem; margin-top: 8px; }
+    .empty-state { padding: 24px; background: #f9fbfd; border: 1px dashed #cfe0f1; border-radius: 24px; color: #6a7684; line-height: 1.6; }
+    .request-title { color: #1e3a5f; font-weight: 600; margin: 10px 0 8px; font-size: 1.05rem; }
+    .auth-name-field { display: none; }
+    .nav-secondary { color: #3a6ea5; }
+    .status-draft { background: rgba(130, 140, 160, 0.12); color: #5f6b78; }
+    .claim-status { margin-top: 14px; padding: 14px 16px; border-radius: 18px; background: #f7fafe; border: 1px solid #dce7f4; color: #4f5f70; line-height: 1.6; }
+    @media (max-width: 900px) {
+      .steps-grid, .reasons-grid, .dashboard-grid, .activity-grid, .summary-strip, .form-row { grid-template-columns: 1fr; }
+    }
     .stats-grid { display: flex; gap: 20px; justify-content: space-around; background: #fbfbff; border-radius: 80px; padding: 50px 30px; border: 1px solid #e0e0ff; }
     .stat-number { font-size: 3.5rem; font-weight: 600; background: linear-gradient(130deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .reasons-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 25px; margin-top: 40px; }
@@ -175,7 +214,6 @@
     footer { padding: 40px 0; border-top: 1px solid #f0f0f8; display: flex; justify-content: space-between; align-items: center; }
     .lunar-design { font-size: 0.9rem; color: #3a6ea5; transition: all 0.3s; }
     .lunar-design.gold { color: #ffd700; text-shadow: 0 0 4px rgba(255,215,0,0.5); }
-    @media (max-width: 900px) { .steps-grid, .reasons-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -198,6 +236,7 @@
       <a href="#how-it-works" class="nav-link">Jak to funguje</a>
       <a href="#zadosti" class="nav-link">Žádosti</a>
       <a href="#hlasovani" class="nav-link">Hlasování</a>
+      <a href="#my-space" class="nav-link nav-secondary">Můj profil</a>
       <button id="showLoginBtn" style="background:none; border:1px solid #3a6ea5; padding:8px 20px; border-radius:30px; color:#3a6ea5; cursor:pointer;">Přihlásit se</button>
       <span id="userInfo" style="display:none; align-items:center; gap:10px;">
         <div class="user-badge"><span id="userEmail"></span></div>
@@ -210,6 +249,7 @@
 <div id="authModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
   <div style="background:white; padding:40px; border-radius:40px; width:90%; max-width:400px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h2 id="authTitle">Přihlásit se</h2><button id="closeModal" style="background:none; border:none; font-size:24px; cursor:pointer;">×</button></div>
+    <input type="text" id="displayName" class="auth-name-field" placeholder="Jméno a příjmení" style="width:100%; padding:15px; margin:0 0 20px; border:2px solid #3a6ea5; border-radius:30px;">
     <input type="email" id="email" placeholder="Email" style="width:100%; padding:15px; margin:20px 0; border:2px solid #3a6ea5; border-radius:30px;">
     <div class="password-container">
       <input type="password" id="password" placeholder="Heslo">
@@ -245,62 +285,14 @@
   <section id="zadosti">
     <div class="container">
       <h2 class="section-title">Žádosti o pomoc</h2>
+      <p class="section-intro">Tady se zobrazují schválené i nově podané žádosti komunity. Po registraci a vyplnění profilu můžeš vytvořit vlastní žádost a hned ji uvidíš mezi ostatními.</p>
       <div class="section-tabs">
         <button class="tab-btn active" onclick="filterCards('all',this)">Všechny</button>
         <button class="tab-btn" onclick="filterCards('active',this)">✅ Aktivní výběr</button>
         <button class="tab-btn" onclick="filterCards('voting',this)">🗳️ Ve hlasování</button>
         <button class="tab-btn" onclick="filterCards('approved',this)">🌙 Schválené</button>
       </div>
-      <div class="requests-grid" id="requestsGrid">
-        <div class="request-card" data-status="active">
-          <span class="card-status status-active">✅ Aktivní výběr</span>
-          <div class="request-number">#001</div>
-          <div class="request-name">Jana Nováková</div>
-          <div class="request-meta">📍 Praha &nbsp;·&nbsp; 👤 Členka 8 měsíců &nbsp;·&nbsp; ⭐ 42 bodů</div>
-          <div class="request-story">Pracuji jako zdravotní sestra a auto je moje jediné spojení se zaměstnáním. Rozbila se převodovka — oprava stojí 5 000 Kč. Bez auta přijdu o práci. Děkuji každému, kdo pomůže.</div>
-          <div class="progress-bar-bg"><div class="progress-fill" style="width:64%"></div></div>
-          <div class="progress-stats"><span>3 200 Kč vybráno</span><span>cíl: 5 000 Kč</span></div>
-          <button class="btn-small" onclick="document.getElementById('showLoginBtn').click()">💙 Pomoci — přispět</button>
-        </div>
-        <div class="request-card" data-status="active">
-          <span class="card-status status-active">✅ Aktivní výběr</span>
-          <div class="request-number">#002</div>
-          <div class="request-name">Petr Svoboda</div>
-          <div class="request-meta">📍 Brno &nbsp;·&nbsp; 👤 Člen 5 měsíců &nbsp;·&nbsp; ⭐ 28 bodů</div>
-          <div class="request-story">Můj pes Bobík potřebuje operaci — diagnostikovali mu nádor. Veterinář říká, že bez zákroku do týdne je to vážné. Mám jeden příjem a vše jsem investoval do léčby. Prosím o pomoc.</div>
-          <div class="progress-bar-bg"><div class="progress-fill" style="width:72%"></div></div>
-          <div class="progress-stats"><span>1 800 Kč vybráno</span><span>cíl: 2 500 Kč</span></div>
-          <button class="btn-small" onclick="document.getElementById('showLoginBtn').click()">💙 Pomoci — přispět</button>
-        </div>
-        <div class="request-card" data-status="active">
-          <span class="card-status status-active">✅ Aktivní výběr</span>
-          <div class="request-number">#003</div>
-          <div class="request-name">Marie Veselá</div>
-          <div class="request-meta">📍 Ostrava &nbsp;·&nbsp; 👤 Členka 11 měsíců &nbsp;·&nbsp; ⭐ 67 bodů</div>
-          <div class="request-story">Jsem samoživitelka se dvěma dětmi. Nastupují do nové školy a potřebují pomůcky, uniformy a notebook. Přišla jsem o druhý příjem. Každá koruna pomůže.</div>
-          <div class="progress-bar-bg"><div class="progress-fill" style="width:56%"></div></div>
-          <div class="progress-stats"><span>4 500 Kč vybráno</span><span>cíl: 8 000 Kč</span></div>
-          <button class="btn-small" onclick="document.getElementById('showLoginBtn').click()">💙 Pomoci — přispět</button>
-        </div>
-        <div class="request-card" data-status="voting">
-          <span class="card-status status-voting">🗳️ Ve hlasování</span>
-          <div class="request-number">#004</div>
-          <div class="request-name">Tomáš Dvořák</div>
-          <div class="request-meta">📍 Plzeň &nbsp;·&nbsp; 👤 Člen 3 měsíce &nbsp;·&nbsp; ⭐ 15 bodů</div>
-          <div class="request-story">Přišel jsem o práci před měsícem. Nová je za městem, ale než dostanu první výplatu, nemám na jízdenky. Prosím o 3 000 Kč na měsíční jízdné.</div>
-          <div class="vote-threshold"><span>Hlasování:</span><div class="threshold-bar"><div class="threshold-fill" style="width:79%"></div></div><span style="font-weight:600;color:#3a6ea5">79% ✓</span></div>
-          <button class="btn-small" onclick="document.getElementById('hlasovani').scrollIntoView({behavior:'smooth'})">🗳️ Jít hlasovat</button>
-        </div>
-        <div class="request-card" data-status="approved">
-          <span class="card-status status-approved">🌙 Schváleno — čeká na loterii</span>
-          <div class="request-number">#005</div>
-          <div class="request-name">Lucie Horáková</div>
-          <div class="request-meta">📍 Liberec &nbsp;·&nbsp; 👤 Členka 14 měsíců &nbsp;·&nbsp; ⭐ 89 bodů</div>
-          <div class="request-story">Jsem samoživitelka, pračka se rozbila a oprava je dražší než nová. S malým dítětem bez pračky to nejde. Komunita schválila mou žádost — čekám na loterii. Děkuji všem!</div>
-          <div class="vote-threshold"><span>Schváleno:</span><div class="threshold-bar"><div class="threshold-fill" style="width:74%"></div></div><span style="font-weight:600;color:#1e3a5f">74% hlasů</span></div>
-          <button class="btn-small" disabled style="opacity:0.5;cursor:default">⏳ Čeká na loterii</button>
-        </div>
-      </div>
+      <div class="requests-grid" id="requestsGrid"></div>
     </div>
   </section>
 
@@ -308,45 +300,100 @@
     <div class="container">
       <h2 class="section-title">Hlasování komunity</h2>
       <p style="text-align:center;color:#555;max-width:700px;margin:-30px auto 50px;font-size:1.05rem;line-height:1.7;">Každá žádost musí získat alespoň <strong>70 % hlasů „Ano"</strong> od komunity, aby postoupila do loterie. Přihlášení členové mohou hlasovat jednou za každou žádost.</p>
-      <div class="votes-grid">
-        <div class="vote-card" id="vcard1">
-          <span class="card-status status-voting">🗳️ Probíhá hlasování</span>
-          <div class="request-name">Tomáš Dvořák</div>
-          <div class="request-meta">📍 Plzeň &nbsp;·&nbsp; potřebuje 3 000 Kč &nbsp;·&nbsp; 👤 člen 3 měsíce</div>
-          <div class="request-story">Přišel jsem o práci. Nová je za městem, ale než dostanu první výplatu, nemám na jízdenky. Jinak o tuto práci přijdu. Prosím o pomoc s jízdenkami na jeden měsíc.</div>
-          <div class="vote-threshold" style="margin:14px 0"><div class="threshold-bar" style="height:8px"><div class="threshold-fill" id="vbar1" style="width:79%"></div></div></div>
-          <div class="vote-numbers">👍 <span id="vy1">45</span> Ano &nbsp;/&nbsp; 👎 <span id="vn1">12</span> Ne &nbsp;·&nbsp; <strong id="vp1" style="color:#3a6ea5">79%</strong> pro &nbsp;<span style="color:#3a6ea5;font-size:0.85rem">✓ Blíží se!</span></div>
-          <div class="vote-buttons" style="margin-top:14px">
-            <button class="vote-yes" id="vyes1" onclick="castVote(1,'yes')">👍 Ano, pomozme mu</button>
-            <button class="vote-no" id="vno1btn" onclick="castVote(1,'no')">👎 Ne</button>
+      <div class="votes-grid" id="votesGrid"></div>
+      <p style="text-align:center;margin-top:40px;color:#888;font-size:0.9rem;">🔒 Pro hlasování musíš být přihlášen a mít alespoň 1 bod pomoci na účtu.</p>
+    </div>
+  </section>
+
+  <section id="my-space">
+    <div class="container">
+      <h2 class="section-title">Můj profil a žádost</h2>
+      <p class="section-intro">Tady si po registraci nastavíš profil, podáš vlastní žádost, uvidíš všechna svá hlasování a připravíš údaje pro převzetí výhry, jakmile tvoje žádost projde komunitou.</p>
+      <div id="dashboardGuest" class="dashboard-guest">
+        <h3 style="color:#1e3a5f; margin-bottom:12px;">Nejdřív se přihlas do komunity</h3>
+        <p style="max-width:620px; margin:0 auto 24px; color:#56606d; line-height:1.7;">Po přihlášení získáš vlastní profil, můžeš vyplnit svou situaci, podat žádost, hlasovat o ostatních a sledovat, jestli se tvoje žádost dostala do losování.</p>
+        <button class="btn btn-primary" onclick="openAuthModal()">Vytvořit profil / přihlásit se</button>
+      </div>
+      <div id="dashboardApp" style="display:none;">
+        <div class="dashboard-grid">
+          <div class="dashboard-card full-span">
+            <h3 style="color:#1e3a5f; margin-bottom:10px;">Přehled tvého účtu</h3>
+            <p style="color:#56606d; line-height:1.7;">SayMoonHelp pracuje s důvěrou. Proto tady vždy vidíš svůj profil, svou žádost, historii hlasování i stav pro převzetí výhry na jednom místě.</p>
+            <div class="summary-strip" id="profileSummary"></div>
           </div>
-        </div>
-        <div class="vote-card" id="vcard2">
-          <span class="card-status status-voting">🗳️ Probíhá hlasování</span>
-          <div class="request-name">Karolína Marková</div>
-          <div class="request-meta">📍 České Budějovice &nbsp;·&nbsp; potřebuje 4 500 Kč &nbsp;·&nbsp; 👤 členka 6 měsíců</div>
-          <div class="request-story">Mám diabetické dítě a inzulínová pumpa se porouchala. Pojišťovna uhradí náhradu až za 3 měsíce, ale dítě nemůže čekat. Potřebuji překlenout toto kritické období.</div>
-          <div class="vote-threshold" style="margin:14px 0"><div class="threshold-bar" style="height:8px"><div class="threshold-fill" id="vbar2" style="width:61%"></div></div></div>
-          <div class="vote-numbers">👍 <span id="vy2">38</span> Ano &nbsp;/&nbsp; 👎 <span id="vn2">24</span> Ne &nbsp;·&nbsp; <strong id="vp2" style="color:#b07800">61%</strong> pro &nbsp;<span style="color:#999;font-size:0.85rem">potřeba 70%</span></div>
-          <div class="vote-buttons" style="margin-top:14px">
-            <button class="vote-yes" id="vyes2" onclick="castVote(2,'yes')">👍 Ano, pomozme jí</button>
-            <button class="vote-no" id="vno2btn" onclick="castVote(2,'no')">👎 Ne</button>
+          <div class="dashboard-card">
+            <h3 style="color:#1e3a5f; margin-bottom:16px;">Profil člena</h3>
+            <form id="profileForm">
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="profileName">Jméno a příjmení</label>
+                  <input type="text" id="profileName" placeholder="Např. Jana Nováková">
+                </div>
+                <div class="form-field">
+                  <label for="profileCity">Město</label>
+                  <input type="text" id="profileCity" placeholder="Např. Praha">
+                </div>
+              </div>
+              <div class="form-field">
+                <label for="profileAbout">Krátce o sobě</label>
+                <textarea id="profileAbout" placeholder="Kdo jsi, čemu se věnuješ a proč chceš být součástí komunity?"></textarea>
+              </div>
+              <button type="submit" class="btn-auth">Uložit profil</button>
+            </form>
+            <div class="helper-note">Profil se uloží do tohoto prohlížeče a hned se promítne do sekcí Žádosti a Hlasování.</div>
           </div>
-        </div>
-        <div class="vote-card" id="vcard3">
-          <span class="card-status status-voting">🗳️ Probíhá hlasování</span>
-          <div class="request-name">Miroslav Kříž</div>
-          <div class="request-meta">📍 Olomouc &nbsp;·&nbsp; potřebuje 6 000 Kč &nbsp;·&nbsp; 👤 člen 2 měsíce</div>
-          <div class="request-story">Jsem řemeslník na volné noze. Zlomil se mi hlavní pracovní nástroj. Bez něj nemohu pracovat. Novou brusku potřebuji, abych uživil rodinu — vrátím se do práce do dvou dnů.</div>
-          <div class="vote-threshold" style="margin:14px 0"><div class="threshold-bar" style="height:8px"><div class="threshold-fill" id="vbar3" style="width:52%"></div></div></div>
-          <div class="vote-numbers">👍 <span id="vy3">29</span> Ano &nbsp;/&nbsp; 👎 <span id="vn3">27</span> Ne &nbsp;·&nbsp; <strong id="vp3" style="color:#b07800">52%</strong> pro &nbsp;<span style="color:#999;font-size:0.85rem">potřeba 70%</span></div>
-          <div class="vote-buttons" style="margin-top:14px">
-            <button class="vote-yes" id="vyes3" onclick="castVote(3,'yes')">👍 Ano, pomozme mu</button>
-            <button class="vote-no" id="vno3btn" onclick="castVote(3,'no')">👎 Ne</button>
+          <div class="dashboard-card">
+            <h3 style="color:#1e3a5f; margin-bottom:16px;">Podat novou žádost</h3>
+            <form id="requestForm">
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="requestTitle">Název žádosti</label>
+                  <input type="text" id="requestTitle" placeholder="Např. Oprava auta do práce">
+                </div>
+                <div class="form-field">
+                  <label for="requestAmount">Cílová částka (Kč)</label>
+                  <input type="number" id="requestAmount" min="100" step="100" placeholder="5000">
+                </div>
+              </div>
+              <div class="form-field">
+                <label for="requestStory">Popis situace</label>
+                <textarea id="requestStory" placeholder="Vysvětli svoji situaci, co potřebuješ a proč je to důležité právě teď."></textarea>
+              </div>
+              <button type="submit" class="btn-auth">Odeslat žádost do hlasování</button>
+            </form>
+            <div class="helper-note">Nová žádost se okamžitě objeví v Žádostech i v Hlasování jako profil reálného přihlášeného člena.</div>
+          </div>
+          <div class="dashboard-card">
+            <h3 style="color:#1e3a5f; margin-bottom:16px;">Převzetí výhry</h3>
+            <form id="claimForm">
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="claimPhone">Telefon</label>
+                  <input type="text" id="claimPhone" placeholder="+420 ...">
+                </div>
+                <div class="form-field">
+                  <label for="claimIban">IBAN / číslo účtu</label>
+                  <input type="text" id="claimIban" placeholder="CZ...">
+                </div>
+              </div>
+              <div class="form-field">
+                <label for="claimNote">Poznámka pro ověření</label>
+                <textarea id="claimNote" placeholder="Doplň kontaktní osobu, čas dostupnosti a cokoli důležitého pro předání výhry."></textarea>
+              </div>
+              <button type="submit" class="btn-auth">Uložit údaje pro převzetí</button>
+            </form>
+            <div id="claimStatus" class="claim-status"></div>
+          </div>
+          <div class="dashboard-card">
+            <h3 style="color:#1e3a5f; margin-bottom:16px;">Moje žádosti</h3>
+            <div id="myRequestsList"></div>
+          </div>
+          <div class="dashboard-card">
+            <h3 style="color:#1e3a5f; margin-bottom:16px;">Moje hlasování</h3>
+            <div id="myVotesList"></div>
           </div>
         </div>
       </div>
-      <p style="text-align:center;margin-top:40px;color:#888;font-size:0.9rem;">🔒 Pro hlasování musíš být přihlášen a mít alespoň 1 bod pomoci na účtu.</p>
     </div>
   </section>
 
@@ -376,8 +423,263 @@
   firebase.initializeApp(firebaseConfig);
 
   document.addEventListener('DOMContentLoaded', () => {
+    const STORAGE_KEY = 'saymoonhelp-app-v4';
+    const seedRequests = [
+      { id: 'seed-001', number: '#001', name: 'Jana Nováková', city: 'Praha', memberLabel: 'Členka 8 měsíců', points: 42, title: 'Oprava auta do práce', story: 'Pracuji jako zdravotní sestra a auto je moje jediné spojení se zaměstnáním. Rozbila se převodovka a oprava stojí 5 000 Kč. Bez auta přijdu o práci.', target: 5000, raised: 3200, status: 'active' },
+      { id: 'seed-002', number: '#002', name: 'Petr Svoboda', city: 'Brno', memberLabel: 'Člen 5 měsíců', points: 28, title: 'Operace pro psa Bobíka', story: 'Můj pes Bobík potřebuje akutní operaci. Veterinář potvrzuje, že bez zákroku do týdne je situace vážná. Všechny rezervy už jsem vložil do léčby.', target: 2500, raised: 1800, status: 'active' },
+      { id: 'seed-003', number: '#003', name: 'Marie Veselá', city: 'Ostrava', memberLabel: 'Členka 11 měsíců', points: 67, title: 'Pomůcky pro dvě děti do školy', story: 'Jsem samoživitelka se dvěma dětmi. Nastupují do nové školy a potřebují pomůcky, uniformy i notebook. Každá koruna pomůže udržet děti ve škole bez výpadku.', target: 8000, raised: 4500, status: 'active' },
+      { id: 'seed-004', number: '#004', name: 'Tomáš Dvořák', city: 'Plzeň', memberLabel: 'Člen 3 měsíce', points: 15, title: 'Měsíční jízdné do nové práce', story: 'Přišel jsem o práci před měsícem. Novou mám za městem, ale než dostanu první výplatu, nemám na jízdenky. Prosím o pomoc s překlenutím prvního měsíce.', target: 3000, raised: 0, status: 'voting', yes: 45, no: 12 },
+      { id: 'seed-005', number: '#005', name: 'Lucie Horáková', city: 'Liberec', memberLabel: 'Členka 14 měsíců', points: 89, title: 'Nová pračka pro samoživitelku', story: 'Jsem samoživitelka, pračka se rozbila a oprava je dražší než nová. Komunita moji situaci schválila a teď čekám na další losování.', target: 7000, raised: 0, status: 'approved', yes: 74, no: 26 },
+      { id: 'seed-006', number: '#006', name: 'Karolína Marková', city: 'České Budějovice', memberLabel: 'Členka 6 měsíců', points: 31, title: 'Dočasná náhrada inzulínové pumpy', story: 'Mám diabetické dítě a inzulínová pumpa se porouchala. Pojišťovna náhradu uhradí až za tři měsíce. Potřebuji překlenout kritické období.', target: 4500, raised: 0, status: 'voting', yes: 38, no: 24 },
+      { id: 'seed-007', number: '#007', name: 'Miroslav Kříž', city: 'Olomouc', memberLabel: 'Člen 2 měsíce', points: 12, title: 'Nové nářadí pro návrat do práce', story: 'Jsem řemeslník na volné noze. Zlomil se mi hlavní pracovní nástroj a bez něj nemohu pracovat. Potřebuji rychle koupit novou brusku, abych uživil rodinu.', target: 6000, raised: 0, status: 'voting', yes: 29, no: 27 }
+    ];
+    let activeRequestFilter = 'all';
+    let currentUser = null;
+
     const moon = document.getElementById('mainMoon');
     const footerLunar = document.getElementById('footerLunar');
+    const requestsGrid = document.getElementById('requestsGrid');
+    const votesGrid = document.getElementById('votesGrid');
+    const dashboardGuest = document.getElementById('dashboardGuest');
+    const dashboardApp = document.getElementById('dashboardApp');
+    const profileSummary = document.getElementById('profileSummary');
+    const myRequestsList = document.getElementById('myRequestsList');
+    const myVotesList = document.getElementById('myVotesList');
+    const claimStatus = document.getElementById('claimStatus');
+    const profileForm = document.getElementById('profileForm');
+    const requestForm = document.getElementById('requestForm');
+    const claimForm = document.getElementById('claimForm');
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return { profiles: {}, requests: [], votesByUser: {}, voteTallies: {}, claims: {}, nextRequestNumber: 8 };
+        const parsed = JSON.parse(raw);
+        return {
+          profiles: parsed.profiles || {},
+          requests: parsed.requests || [],
+          votesByUser: parsed.votesByUser || {},
+          voteTallies: parsed.voteTallies || {},
+          claims: parsed.claims || {},
+          nextRequestNumber: parsed.nextRequestNumber || 8
+        };
+      } catch (error) {
+        return { profiles: {}, requests: [], votesByUser: {}, voteTallies: {}, claims: {}, nextRequestNumber: 8 };
+      }
+    }
+
+    const state = loadState();
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function monthsSince(timestamp) {
+      if (!timestamp) return 'Člen nově';
+      const diff = Math.max(1, Math.round((Date.now() - timestamp) / (1000 * 60 * 60 * 24 * 30)));
+      return diff === 1 ? 'Člen 1 měsíc' : 'Člen ' + diff + ' měsíců';
+    }
+
+    function getProfile(user) {
+      return user ? state.profiles[user.uid] : null;
+    }
+
+    function ensureProfile(user, displayName) {
+      if (!user) return null;
+      const existing = state.profiles[user.uid] || {};
+      const fallbackName = displayName || user.displayName || existing.name || user.email.split('@')[0];
+      state.profiles[user.uid] = {
+        name: fallbackName,
+        city: existing.city || '',
+        about: existing.about || '',
+        points: typeof existing.points === 'number' ? existing.points : 5,
+        joinedAt: existing.joinedAt || Date.now(),
+        email: user.email,
+        updatedAt: Date.now()
+      };
+      saveState();
+      return state.profiles[user.uid];
+    }
+
+    function getAllRequests() {
+      return seedRequests.concat(state.requests).map(function(request) {
+        const tally = state.voteTallies[request.id];
+        return Object.assign({}, request, tally ? { yes: tally.yes, no: tally.no } : {});
+      });
+    }
+
+    function getVotePercentage(request) {
+      const yes = request.yes || 0;
+      const no = request.no || 0;
+      const total = yes + no;
+      return total ? Math.round((yes / total) * 100) : 0;
+    }
+
+    function getStatusLabel(status) {
+      if (status === 'active') return '<span class="card-status status-active">✅ Aktivní výběr</span>';
+      if (status === 'approved') return '<span class="card-status status-approved">🌙 Schváleno — čeká na loterii</span>';
+      if (status === 'draft') return '<span class="card-status status-draft">📝 Koncept</span>';
+      return '<span class="card-status status-voting">🗳️ Ve hlasování</span>';
+    }
+
+    function requestAction(request) {
+      if (request.status === 'active') return '<button class="btn-small" onclick="openAuthModal()">💙 Pomoci — přispět</button>';
+      if (request.status === 'approved') return '<button class="btn-small" onclick="smoothScroll(\'#my-space\')">🏆 Zobrazit stav výhry</button>';
+      return '<button class="btn-small" onclick="smoothScroll(\'#hlasovani\')">🗳️ Jít hlasovat</button>';
+    }
+
+    function renderRequests() {
+      const filtered = getAllRequests().filter(function(request) {
+        return activeRequestFilter === 'all' || request.status === activeRequestFilter;
+      });
+      if (!filtered.length) {
+        requestsGrid.innerHTML = '<div class="empty-state">V tomto filtru zatím není žádná žádost. Přihlas se a pošli první vlastní příběh komunity.</div>';
+        return;
+      }
+      requestsGrid.innerHTML = filtered.map(function(request) {
+        const profileMeta = '📍 ' + (request.city || 'Neuvedeno') + ' &nbsp;·&nbsp; 👤 ' + (request.memberLabel || 'Člen komunity') + ' &nbsp;·&nbsp; ⭐ ' + (request.points || 0) + ' bodů';
+        if (request.status === 'active') {
+          const progress = Math.min(100, Math.round(((request.raised || 0) / request.target) * 100));
+          return '<div class="request-card" data-status="' + request.status + '">' +
+            getStatusLabel(request.status) +
+            '<div class="request-number">' + request.number + '</div>' +
+            '<div class="request-name">' + request.name + '</div>' +
+            '<div class="request-title">' + request.title + '</div>' +
+            '<div class="request-meta">' + profileMeta + '</div>' +
+            '<div class="request-story">' + request.story + '</div>' +
+            '<div class="progress-bar-bg"><div class="progress-fill" style="width:' + progress + '%"></div></div>' +
+            '<div class="progress-stats"><span>' + (request.raised || 0).toLocaleString('cs-CZ') + ' Kč vybráno</span><span>cíl: ' + request.target.toLocaleString('cs-CZ') + ' Kč</span></div>' +
+            requestAction(request) +
+          '</div>';
+        }
+        const percent = getVotePercentage(request);
+        const stateText = request.status === 'approved' ? 'Schváleno:' : 'Hlasování:';
+        const accent = request.status === 'approved' ? '#1e3a5f' : (percent >= 70 ? '#3a6ea5' : '#b07800');
+        const suffix = request.status === 'approved' ? ' hlasů' : (percent >= 70 ? ' ✓' : '');
+        return '<div class="request-card" data-status="' + request.status + '">' +
+          getStatusLabel(request.status) +
+          '<div class="request-number">' + request.number + '</div>' +
+          '<div class="request-name">' + request.name + '</div>' +
+          '<div class="request-title">' + request.title + '</div>' +
+          '<div class="request-meta">' + profileMeta + '</div>' +
+          '<div class="request-story">' + request.story + '</div>' +
+          '<div class="vote-threshold"><span>' + stateText + '</span><div class="threshold-bar"><div class="threshold-fill" style="width:' + percent + '%"></div></div><span style="font-weight:600;color:' + accent + '">' + percent + '%' + suffix + '</span></div>' +
+          requestAction(request) +
+        '</div>';
+      }).join('');
+    }
+
+    function renderVotes() {
+      const votable = getAllRequests().filter(function(request) { return request.status === 'voting'; });
+      if (!votable.length) {
+        votesGrid.innerHTML = '<div class="empty-state">Právě není žádná žádost ve hlasování. Nové žádosti se objeví hned po odeslání z profilu člena.</div>';
+        return;
+      }
+      const currentVotes = currentUser && state.votesByUser[currentUser.uid] ? state.votesByUser[currentUser.uid] : {};
+      votesGrid.innerHTML = votable.map(function(request) {
+        const percent = getVotePercentage(request);
+        const totalYes = request.yes || 0;
+        const totalNo = request.no || 0;
+        const voted = currentVotes[request.id];
+        return '<div class="vote-card">' +
+          '<span class="card-status status-voting">🗳️ Probíhá hlasování</span>' +
+          '<div class="request-name">' + request.name + '</div>' +
+          '<div class="request-title">' + request.title + '</div>' +
+          '<div class="request-meta">📍 ' + (request.city || 'Neuvedeno') + ' &nbsp;·&nbsp; potřebuje ' + request.target.toLocaleString('cs-CZ') + ' Kč &nbsp;·&nbsp; 👤 ' + (request.memberLabel || 'Člen komunity') + '</div>' +
+          '<div class="request-story">' + request.story + '</div>' +
+          '<div class="vote-threshold" style="margin:14px 0"><div class="threshold-bar" style="height:8px"><div class="threshold-fill" style="width:' + percent + '%"></div></div></div>' +
+          '<div class="vote-numbers">👍 ' + totalYes + ' Ano &nbsp;/&nbsp; 👎 ' + totalNo + ' Ne &nbsp;·&nbsp; <strong style="color:' + (percent >= 70 ? '#3a6ea5' : '#b07800') + '">' + percent + '%</strong> pro &nbsp;<span style="color:' + (percent >= 70 ? '#3a6ea5' : '#999') + ';font-size:0.85rem">' + (percent >= 70 ? '✓ Připraveno postoupit' : 'potřeba 70%') + '</span></div>' +
+          '<div class="vote-buttons" style="margin-top:14px">' +
+            '<button class="vote-yes' + (voted === 'yes' ? ' voted' : '') + '" onclick="castVote(\'' + request.id + '\',\'yes\')">👍 Ano, pomozme</button>' +
+            '<button class="vote-no' + (voted === 'no' ? ' voted' : '') + '" onclick="castVote(\'' + request.id + '\',\'no\')">👎 Ne</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function renderDashboard() {
+      if (!currentUser) {
+        dashboardGuest.style.display = 'block';
+        dashboardApp.style.display = 'none';
+        return;
+      }
+      dashboardGuest.style.display = 'none';
+      dashboardApp.style.display = 'block';
+
+      const profile = ensureProfile(currentUser);
+      const allRequests = getAllRequests();
+      const ownRequests = state.requests.filter(function(request) { return request.createdBy === currentUser.uid; });
+      const ownVotes = state.votesByUser[currentUser.uid] || {};
+      const votedEntries = Object.keys(ownVotes).map(function(requestId) {
+        const request = allRequests.find(function(item) { return item.id === requestId; });
+        return request ? { request: request, side: ownVotes[requestId] } : null;
+      }).filter(Boolean);
+      const approvedOwnRequest = ownRequests.find(function(request) { return request.status === 'approved'; });
+      const claim = state.claims[currentUser.uid] || { phone: '', iban: '', note: '' };
+
+      document.getElementById('profileName').value = profile.name || '';
+      document.getElementById('profileCity').value = profile.city || '';
+      document.getElementById('profileAbout').value = profile.about || '';
+      document.getElementById('claimPhone').value = claim.phone || '';
+      document.getElementById('claimIban').value = claim.iban || '';
+      document.getElementById('claimNote').value = claim.note || '';
+
+      profileSummary.innerHTML = [
+        '<div class="summary-item"><strong>' + (profile.points || 0) + '</strong><span>Body pomoci na účtu. Profil je způsobilý hlasovat a vstoupit do budoucího losování.</span></div>',
+        '<div class="summary-item"><strong>' + ownRequests.length + '</strong><span>Vlastní žádosti. Poslední žádost se po odeslání automaticky objeví v Žádostech i Hlasování.</span></div>',
+        '<div class="summary-item"><strong>' + votedEntries.length + '</strong><span>Odevzdané hlasy. Všechny tvé volby vidíš níže v osobní historii.</span></div>'
+      ].join('');
+
+      if (!ownRequests.length) {
+        myRequestsList.innerHTML = '<div class="empty-state">Ještě jsi neposlal žádnou žádost. Vyplň formulář „Podat novou žádost“ a objevíš se mezi ostatními členy.</div>';
+      } else {
+        myRequestsList.innerHTML = ownRequests.slice().reverse().map(function(request) {
+          const percent = getVotePercentage(request);
+          return '<div class="activity-item">' +
+            getStatusLabel(request.status) +
+            '<h4>' + request.title + '</h4>' +
+            '<p>' + request.story + '</p>' +
+            '<div class="activity-meta">' + request.number + ' · ' + request.target.toLocaleString('cs-CZ') + ' Kč · ' + percent + '% podpory komunity</div>' +
+          '</div>';
+        }).join('');
+      }
+
+      if (!votedEntries.length) {
+        myVotesList.innerHTML = '<div class="empty-state">Zatím jsi nehlasoval. Přejdi do sekce Hlasování a podpoř příběhy, které mají dostat šanci v loterii.</div>';
+      } else {
+        myVotesList.innerHTML = votedEntries.slice().reverse().map(function(entry) {
+          return '<div class="activity-item">' +
+            '<h4>' + entry.request.name + ' · ' + entry.request.title + '</h4>' +
+            '<p>Tvůj hlas: <strong style="color:' + (entry.side === 'yes' ? '#3a6ea5' : '#b07800') + '">' + (entry.side === 'yes' ? 'Ano' : 'Ne') + '</strong>. Aktuální podpora komunity je ' + getVotePercentage(entry.request) + '%.</p>' +
+            '<div class="activity-meta">' + entry.request.number + ' · ' + (entry.request.city || 'Neuvedeno') + '</div>' +
+          '</div>';
+        }).join('');
+      }
+
+      claimStatus.innerHTML = approvedOwnRequest
+        ? 'Tvoje žádost <strong>' + approvedOwnRequest.title + '</strong> je připravená pro další krok. Ulož kontaktní údaje a číslo účtu, aby bylo možné navázat předáním výhry po losování.'
+        : 'Údaje pro převzetí výhry si můžeš připravit už teď. Aktivují se ve chvíli, kdy tvoje žádost získá dost hlasů a postoupí do další fáze.';
+    }
+
+    function renderAll() {
+      renderRequests();
+      renderVotes();
+      renderDashboard();
+    }
+
+    function refreshUserHeader(profile) {
+      const info = document.getElementById('userInfo');
+      const btn = document.getElementById('showLoginBtn');
+      if (currentUser) {
+        btn.style.display = 'none';
+        info.style.display = 'flex';
+        document.getElementById('userEmail').innerText = (profile.name || currentUser.email) + ' · ' + currentUser.email;
+      } else {
+        btn.style.display = 'inline-block';
+        info.style.display = 'none';
+      }
+    }
+
     window.addEventListener('scroll', () => {
       const scrolled = window.scrollY > 100;
       moon.classList.toggle('gold-moon', scrolled);
@@ -397,6 +699,7 @@
     const eye = document.getElementById('togglePassword');
     const pass = document.getElementById('password');
     const eyeLine = document.getElementById('eyeLine');
+    const nameField = document.getElementById('displayName');
     if (eye) eye.onclick = () => {
       const type = pass.type === 'password' ? 'text' : 'password';
       pass.type = type;
@@ -404,7 +707,8 @@
     };
 
     const modal = document.getElementById('authModal');
-    document.getElementById('showLoginBtn').onclick = () => modal.style.display = 'flex';
+  window.openAuthModal = () => modal.style.display = 'flex';
+  document.getElementById('showLoginBtn').onclick = () => modal.style.display = 'flex';
     document.getElementById('closeModal').onclick = () => modal.style.display = 'none';
     window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
 
@@ -418,29 +722,155 @@
       authTitle.innerText = isLogin ? 'Přihlásit se' : 'Registrace';
       authAction.innerText = isLogin ? 'Přihlásit se' : 'Registrovat se';
       switchAuth.innerText = isLogin ? 'Nemáte účet? Registrujte se' : 'Máte účet? Přihlaste se';
+      nameField.style.display = isLogin ? 'none' : 'block';
     };
     if (authAction) authAction.onclick = () => {
       const email = document.getElementById('email').value;
       const pwd = pass.value;
+      const displayName = nameField.value.trim();
       if (!email || !pwd) return alert('Vyplň email a heslo');
+      if (!isLogin && !displayName) return alert('Vyplň také své jméno pro vytvoření profilu');
       (isLogin ? firebase.auth().signInWithEmailAndPassword(email, pwd) : firebase.auth().createUserWithEmailAndPassword(email, pwd))
-        .then(() => modal.style.display = 'none')
+        .then(function(credential) {
+          if (!isLogin && credential.user) {
+            return credential.user.updateProfile({ displayName: displayName }).then(function() {
+              ensureProfile(credential.user, displayName);
+            });
+          }
+          return null;
+        })
+        .then(() => {
+          modal.style.display = 'none';
+          document.getElementById('email').value = '';
+          pass.value = '';
+          nameField.value = '';
+        })
         .catch(e => alert(e.message));
     };
 
     firebase.auth().onAuthStateChanged(user => {
-      const info = document.getElementById('userInfo');
-      const btn = document.getElementById('showLoginBtn');
+      currentUser = user;
       if (user) {
-        btn.style.display = 'none';
-        info.style.display = 'flex';
-        document.getElementById('userEmail').innerText = user.email;
+        const profile = ensureProfile(user);
+        refreshUserHeader(profile);
       } else {
-        btn.style.display = 'inline-block';
-        info.style.display = 'none';
+        refreshUserHeader({});
       }
+      renderAll();
     });
     document.getElementById('logoutBtn').onclick = () => firebase.auth().signOut();
+
+    profileForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      if (!currentUser) return alert('Nejdřív se přihlas.');
+      const profile = ensureProfile(currentUser);
+      profile.name = document.getElementById('profileName').value.trim() || profile.name;
+      profile.city = document.getElementById('profileCity').value.trim();
+      profile.about = document.getElementById('profileAbout').value.trim();
+      state.profiles[currentUser.uid] = profile;
+      saveState();
+      refreshUserHeader(profile);
+      renderAll();
+      alert('Profil byl uložen.');
+    });
+
+    requestForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      if (!currentUser) return alert('Nejdřív se přihlas.');
+      const profile = ensureProfile(currentUser);
+      if (!profile.city || !profile.name) return alert('Nejdřív doplň jméno a město ve svém profilu.');
+      const title = document.getElementById('requestTitle').value.trim();
+      const amount = Number(document.getElementById('requestAmount').value);
+      const story = document.getElementById('requestStory').value.trim();
+      if (!title || !amount || !story) return alert('Vyplň název, částku i popis situace.');
+      const nextNumber = String(state.nextRequestNumber).padStart(3, '0');
+      const request = {
+        id: 'user-' + currentUser.uid + '-' + Date.now(),
+        number: '#' + nextNumber,
+        name: profile.name,
+        city: profile.city,
+        memberLabel: monthsSince(profile.joinedAt),
+        points: profile.points,
+        title: title,
+        story: story,
+        target: amount,
+        raised: 0,
+        status: 'voting',
+        yes: 0,
+        no: 0,
+        createdBy: currentUser.uid,
+        createdAt: Date.now()
+      };
+      state.requests.push(request);
+      state.voteTallies[request.id] = { yes: 0, no: 0 };
+      state.nextRequestNumber += 1;
+      saveState();
+      requestForm.reset();
+      activeRequestFilter = 'all';
+      document.querySelectorAll('.tab-btn').forEach(function(button, index) {
+        button.classList.toggle('active', index === 0);
+      });
+      renderAll();
+      smoothScroll('#zadosti');
+      alert('Žádost byla odeslána a je vidět mezi ostatními.');
+    });
+
+    claimForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      if (!currentUser) return alert('Nejdřív se přihlas.');
+      state.claims[currentUser.uid] = {
+        phone: document.getElementById('claimPhone').value.trim(),
+        iban: document.getElementById('claimIban').value.trim(),
+        note: document.getElementById('claimNote').value.trim(),
+        updatedAt: Date.now()
+      };
+      saveState();
+      renderDashboard();
+      alert('Údaje pro převzetí výhry byly uloženy.');
+    });
+
+    window.castVote = function(requestId, side) {
+      if (!currentUser) {
+        openAuthModal();
+        return;
+      }
+      const profile = ensureProfile(currentUser);
+      if ((profile.points || 0) < 1) {
+        alert('Pro hlasování potřebuješ alespoň 1 bod pomoci.');
+        return;
+      }
+      state.votesByUser[currentUser.uid] = state.votesByUser[currentUser.uid] || {};
+      if (state.votesByUser[currentUser.uid][requestId]) {
+        alert('Pro tuto žádost už jsi hlasoval(a).');
+        return;
+      }
+      const request = getAllRequests().find(function(item) { return item.id === requestId; });
+      if (!request) return;
+      const tally = state.voteTallies[requestId] || { yes: request.yes || 0, no: request.no || 0 };
+      if (side === 'yes') tally.yes += 1; else tally.no += 1;
+      state.voteTallies[requestId] = tally;
+      state.votesByUser[currentUser.uid][requestId] = side;
+      const total = tally.yes + tally.no;
+      const percent = total ? Math.round((tally.yes / total) * 100) : 0;
+      const ownRequest = state.requests.find(function(item) { return item.id === requestId; });
+      if (ownRequest && total >= 5 && percent >= 70) ownRequest.status = 'approved';
+      saveState();
+      renderAll();
+    };
+
+    window.filterCards = function(status, btn) {
+      activeRequestFilter = status;
+      document.querySelectorAll('.tab-btn').forEach(function(button) { button.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+      renderRequests();
+    };
+
+    window.smoothScroll = function(id) {
+      var el = document.querySelector(id);
+      if (el) el.scrollIntoView({behavior: 'smooth'});
+    };
+
+    renderAll();
   });
 </script>
 <script>
@@ -520,71 +950,22 @@
   })();
 </script>
 <script>
-  // Smooth scroll helper
-  function smoothScroll(id) {
-    var el = document.querySelector(id);
-    if (el) el.scrollIntoView({behavior: 'smooth'});
-  }
-
-  // Nav active highlight on scroll
   document.addEventListener('DOMContentLoaded', function() {
-    var sections = ['how-it-works','zadosti','hlasovani'];
+    var sections = ['how-it-works', 'zadosti', 'hlasovani', 'my-space'];
     var navLinks = document.querySelectorAll('.nav-link');
     window.addEventListener('scroll', function() {
-      var scrollY = window.scrollY + 120;
+      var scrollY = window.scrollY + 140;
       sections.forEach(function(id) {
         var el = document.getElementById(id);
-        if (!el) return;
-        var link = document.querySelector('.nav-link[href="#'+id+'"]');
-        if (!link) return;
+        var link = document.querySelector('.nav-link[href="#' + id + '"]');
+        if (!el || !link) return;
         if (scrollY >= el.offsetTop && scrollY < el.offsetTop + el.offsetHeight) {
-          navLinks.forEach(function(l){ l.classList.remove('nav-active'); });
+          navLinks.forEach(function(item) { item.classList.remove('nav-active'); });
           link.classList.add('nav-active');
         }
       });
     });
   });
-
-  // Votes state
-  var votes = {
-    1: {yes:45, no:12, voted:null},
-    2: {yes:38, no:24, voted:null},
-    3: {yes:29, no:27, voted:null}
-  };
-
-  function castVote(id, side) {
-    var v = votes[id];
-    if (v.voted) { alert('Již jsi hlasoval(a) pro tuto žádost.'); return; }
-    if (side==='yes') v.yes++; else v.no++;
-    v.voted = side;
-    updateVoteUI(id);
-    document.getElementById('vyes'+id).classList.toggle('voted', side==='yes');
-    document.getElementById('vno'+id+'btn').classList.toggle('voted', side==='no');
-  }
-
-  function updateVoteUI(id) {
-    var v = votes[id];
-    var total = v.yes + v.no;
-    var pct = Math.round(v.yes / total * 100);
-    document.getElementById('vy'+id).textContent = v.yes;
-    document.getElementById('vn'+id).textContent = v.no;
-    document.getElementById('vp'+id).textContent = pct + '%';
-    document.getElementById('vbar'+id).style.width = pct + '%';
-    document.getElementById('vp'+id).style.color = pct >= 70 ? '#3a6ea5' : '#b07800';
-  }
-
-  // Filter request cards
-  function filterCards(status, btn) {
-    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
-    btn.classList.add('active');
-    document.querySelectorAll('#requestsGrid .request-card').forEach(function(card) {
-      if (status === 'all' || card.dataset.status === status) {
-        card.style.display = '';
-      } else {
-        card.style.display = 'none';
-      }
-    });
-  }
 </script>
 </body>
 </html>
