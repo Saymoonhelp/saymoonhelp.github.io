@@ -1374,6 +1374,8 @@
       }, function(error) {
         state.loading[key] = false;
         renderAll();
+        // Guests intentionally do not have access to some collections.
+        if (!state.currentUser && error && error.code === 'permission-denied') return;
         showToast('Chyba Firestore: ' + error.message, 'error');
       });
       state.unsubscribers.push(unsubscribe);
@@ -1382,28 +1384,28 @@
     function subscribeRealtime() {
       clearSubscriptions();
       state.loading.requests = true;
-      state.loading.users = true;
+      state.loading.users = Boolean(state.currentUser);
       state.loading.lotteries = true;
-      state.loading.donations = true;
+      state.loading.donations = Boolean(state.currentUser);
       state.loading.votes = Boolean(state.currentUser);
       subscribeQuery(db.collection('requests').orderBy('createdAt', 'desc'), 'requests', function(snapshot) {
         state.requests = snapshot.docs.map(docData);
       });
-      subscribeQuery(db.collection('users').orderBy('createdAt', 'desc'), 'users', function(snapshot) {
-        state.users = snapshot.docs.map(docData);
-        state.userMap = state.users.reduce(function(acc, user) {
-          acc[user.id] = user;
-          return acc;
-        }, {});
-        state.profile = state.currentUser ? state.userMap[state.currentUser.uid] || null : null;
-      });
       subscribeQuery(db.collection('lotteries').orderBy('createdAt', 'desc').limit(20), 'lotteries', function(snapshot) {
         state.lotteries = snapshot.docs.map(docData);
       });
-      subscribeQuery(db.collection('donations').orderBy('createdAt', 'desc').limit(300), 'donations', function(snapshot) {
-        state.donations = snapshot.docs.map(docData);
-      });
       if (state.currentUser) {
+        subscribeQuery(db.collection('users').orderBy('createdAt', 'desc'), 'users', function(snapshot) {
+          state.users = snapshot.docs.map(docData);
+          state.userMap = state.users.reduce(function(acc, user) {
+            acc[user.id] = user;
+            return acc;
+          }, {});
+          state.profile = state.userMap[state.currentUser.uid] || null;
+        });
+        subscribeQuery(db.collection('donations').orderBy('createdAt', 'desc').limit(300), 'donations', function(snapshot) {
+          state.donations = snapshot.docs.map(docData);
+        });
         subscribeQuery(db.collection('votes').where('voterId', '==', state.currentUser.uid), 'votes', function(snapshot) {
           state.userVotes = snapshot.docs.reduce(function(acc, doc) {
             const data = doc.data();
@@ -1412,7 +1414,13 @@
           }, {});
         });
       } else {
+        state.users = [];
+        state.userMap = {};
+        state.profile = null;
+        state.donations = [];
         state.userVotes = {};
+        state.loading.users = false;
+        state.loading.donations = false;
         state.loading.votes = false;
       }
       renderAll();
