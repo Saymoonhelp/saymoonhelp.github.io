@@ -688,9 +688,9 @@
               <div class="profile-identity-meta">
                 <strong id="profileEmailDisplay">—</strong>
                 <span id="profileBalanceDisplay">0 bodů pomoci</span>
-                <span>Avatar se ukládá do Firebase Storage a profil do Firestore.</span>
+                <span id="profileAvatarHint">Bezplatný režim: avatar zůstává výchozí, profil se ukládá do Firestore.</span>
               </div>
-              <label class="btn-logout backup-import-label" for="avatarUploadInput">Nahrát avatar
+              <label id="avatarUploadWrap" class="btn-logout backup-import-label" for="avatarUploadInput">Nahrát avatar
                 <input type="file" id="avatarUploadInput" class="hidden-input" accept="image/*">
               </label>
             </div>
@@ -856,9 +856,9 @@
   document.addEventListener('DOMContentLoaded', () => {
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const storage = firebase.storage();
     const fieldValue = firebase.firestore.FieldValue;
     const ADMIN_EMAILS = ['admin@saymoonhelp.com'];
+    const STORAGE_ENABLED = false;
 
     const state = {
       currentUser: null,
@@ -922,12 +922,19 @@
     const newsletterEmail = document.getElementById('newsletterEmail');
     const profileAvatarPreview = document.getElementById('profileAvatarPreview');
     const avatarUploadInput = document.getElementById('avatarUploadInput');
+    const avatarUploadWrap = document.getElementById('avatarUploadWrap');
+    const profileAvatarHint = document.getElementById('profileAvatarHint');
     const profileEmailDisplay = document.getElementById('profileEmailDisplay');
     const profileBalanceDisplay = document.getElementById('profileBalanceDisplay');
     const goToRequestsBtn = document.getElementById('goToRequestsBtn');
     const statDonated = document.getElementById('statDonated');
     const statWinners = document.getElementById('statWinners');
     const statMembers = document.getElementById('statMembers');
+
+    if (!STORAGE_ENABLED) {
+      if (avatarUploadWrap) avatarUploadWrap.style.display = 'none';
+      if (profileAvatarHint) profileAvatarHint.textContent = 'Bezplatný Spark režim: nahrání avatara je dočasně vypnuto, profil zůstává plně funkční.';
+    }
 
     function escapeHtml(value) {
       return String(value == null ? '' : value)
@@ -1827,11 +1834,12 @@
       });
     }
 
-    if (avatarUploadInput) {
+    if (STORAGE_ENABLED && avatarUploadInput) {
       avatarUploadInput.addEventListener('change', async function(event) {
         const file = event.target.files && event.target.files[0];
         if (!file || !state.currentUser) return;
         try {
+          const storage = firebase.storage();
           const avatarRef = storage.ref('avatars/' + state.currentUser.uid + '/' + Date.now() + '-' + file.name.replace(/\s+/g, '-'));
           await avatarRef.put(file);
           const url = await avatarRef.getDownloadURL();
