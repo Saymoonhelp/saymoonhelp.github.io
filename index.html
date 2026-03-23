@@ -2067,7 +2067,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     var navLinks = document.querySelectorAll('.nav-link');
-    var observedSections = Array.prototype.slice.call(document.querySelectorAll('main section[id], .hero'));
+    var observedSections = Array.prototype.slice.call(document.querySelectorAll('main section, .hero'));
     observedSections.forEach(function(section) {
       section.classList.add('page-section');
     });
