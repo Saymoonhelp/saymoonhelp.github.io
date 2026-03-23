@@ -4,14 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SayMoonHelp – loterie dobrých skutků</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #ffffff;
-      color: #1d1c1f;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f8f9fc;
+      color: #3a4358;
+      -webkit-font-smoothing: antialiased;
     }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
     header {
@@ -29,39 +33,43 @@
       50% { transform: translateY(-4px) rotate(-8deg); }
     }
     @keyframes moonGlow {
-      0%, 100% { filter: drop-shadow(0 0 5px rgba(58,110,165,0.6)) drop-shadow(0 0 10px rgba(30,58,95,0.3)); }
-      50% { filter: drop-shadow(0 0 10px rgba(58,110,165,0.9)) drop-shadow(0 0 20px rgba(95,158,160,0.5)); }
+      0%, 100% { filter: drop-shadow(0 0 3px rgba(180,215,255,0.45)) drop-shadow(0 0 8px rgba(100,160,230,0.15)); }
+      50% { filter: drop-shadow(0 0 6px rgba(220,238,255,0.65)) drop-shadow(0 0 14px rgba(130,185,255,0.25)); }
     }
     @keyframes moonGlowGold {
-      0%, 100% { filter: drop-shadow(0 0 6px rgba(255,200,0,0.7)) drop-shadow(0 0 14px rgba(255,160,0,0.4)); }
-      50% { filter: drop-shadow(0 0 14px rgba(255,215,0,1)) drop-shadow(0 0 28px rgba(255,140,0,0.6)); }
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(255,200,0,0.4)) drop-shadow(0 0 10px rgba(255,160,0,0.2)); }
+      50% { filter: drop-shadow(0 0 8px rgba(255,215,0,0.65)) drop-shadow(0 0 18px rgba(255,140,0,0.3)); }
     }
     @keyframes starTwinkle1 {
-      0%, 100% { opacity: 0.2; transform: scale(0.6) translate(0,0); }
-      50% { opacity: 1; transform: scale(1) translate(1px,-1px); }
+      0%, 100% { opacity: 0.25; transform: scale(0.75); }
+      50% { opacity: 0.7; transform: scale(1); }
     }
     @keyframes starTwinkle2 {
-      0%, 100% { opacity: 1; transform: scale(1) translate(0,0); }
-      50% { opacity: 0.3; transform: scale(0.5) translate(-1px,1px); }
+      0%, 100% { opacity: 0.6; transform: scale(0.9); }
+      50% { opacity: 0.2; transform: scale(0.65); }
     }
     @keyframes starTwinkle3 {
-      0%, 100% { opacity: 0.5; transform: scale(0.8); }
-      33% { opacity: 1; transform: scale(1.1); }
-      66% { opacity: 0.2; transform: scale(0.6); }
+      0%, 100% { opacity: 0.4; transform: scale(0.85); }
+      50% { opacity: 0.75; transform: scale(1); }
     }
-    @keyframes logoTextShimmer {
+    @keyframes moonRotate {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
     .logo {
-      font-size: 1.8rem;
-      font-weight: 600;
+      font-size: 2.2rem;
+      font-weight: 800;
       display: flex;
+      flex-direction: row;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       text-decoration: none;
       cursor: pointer;
+      line-height: 1;
     }
     .logo-text {
       background: linear-gradient(90deg, #1e3a5f, #3a6ea5, #5f9ea0, #3a6ea5, #1e3a5f);
@@ -69,42 +77,61 @@
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: logoTextShimmer 6s ease infinite;
-      letter-spacing: -0.02em;
+      animation: logoTextShimmer 10s ease infinite;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      text-shadow: none;
+      line-height: 1;
+      align-self: center;
+      vertical-align: middle;
+      position: relative;
+      top: 0;
+    }
+    .logo-moon-letter {
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 1px -3px 1px;
+      position: relative;
     }
     .logo-moon-wrap {
       position: relative;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 44px;
-      height: 44px;
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+      align-self: center;
+      vertical-align: middle;
     }
     .moon-icon {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      animation: moonFloat 4s ease-in-out infinite, moonGlow 3s ease-in-out infinite;
+      animation: moonGlow 5s ease-in-out infinite, moonRotate 18s linear infinite;
       position: relative;
       z-index: 1;
+      transform-origin: center center;
     }
     .moon-icon svg { display: block; }
-    .moon-icon .moon-crescent { fill: #2a5f9e; transition: fill 0.6s ease; }
-    .moon-icon.gold-moon { animation: moonFloat 4s ease-in-out infinite, moonGlowGold 3s ease-in-out infinite; }
-    .moon-icon.gold-moon .moon-crescent { fill: #ffd700; }
+    .moon-icon .moon-full     { transition: opacity 1.8s cubic-bezier(0.4,0,0.2,1); opacity: 1; }
+    .moon-icon .moon-crescent { transition: opacity 1.8s cubic-bezier(0.4,0,0.2,1); opacity: 0; }
+    .moon-icon.gold-moon { animation: moonGlowGold 5s ease-in-out infinite, moonRotate 18s linear infinite; }
+    .moon-icon.gold-moon .moon-full     { opacity: 0; }
+    .moon-icon.gold-moon .moon-crescent { opacity: 1; }
     .logo-star {
       position: absolute;
       font-size: 0.55rem;
       color: #3a6ea5;
       pointer-events: none;
     }
-    .logo-star:nth-child(2) { top: 2px; right: 2px; animation: starTwinkle1 2.4s ease-in-out infinite; }
-    .logo-star:nth-child(3) { bottom: 4px; right: 0px; animation: starTwinkle2 3.1s ease-in-out infinite 0.5s; }
-    .logo-star:nth-child(4) { top: 6px; left: 2px; animation: starTwinkle3 2.7s ease-in-out infinite 1s; }
+    .logo-star:nth-child(2) { top: 2px; right: 2px; animation: starTwinkle1 4s ease-in-out infinite; }
+    .logo-star:nth-child(3) { bottom: 4px; right: 0px; animation: starTwinkle2 5.5s ease-in-out infinite 1s; }
+    .logo-star:nth-child(4) { top: 6px; left: 2px; animation: starTwinkle3 4.8s ease-in-out infinite 2s; }
 
-    nav { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
-    nav a { text-decoration: none; color: #2c2c2e; font-size: 1rem; transition: color 0.2s; }
-    nav a:hover { color: #8e6bb0; }
+    nav { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    nav a { text-decoration: none; }
     .user-badge { background: rgba(58,110,165,0.1); border-radius: 40px; padding: 8px 20px; border: 1px solid rgba(58,110,165,0.3); }
     .user-badge span { color: #1e3a5f; font-weight: 500; }
     .password-container { position: relative; width: 100%; margin-bottom: 20px; }
@@ -114,14 +141,39 @@
     .btn-auth { width: 100%; padding: 15px; background: #3a6ea5; color: white; border: none; border-radius: 30px; font-size: 18px; cursor: pointer; transition: 0.2s; }
     .btn-auth:active { transform: scale(0.98); }
     .steps-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 30px; margin: 40px 0; }
-    .step-card { background: #f8f8ff; border-radius: 30px; padding: 40px 30px; text-align: center; border: 1px solid #e0e0ff; }
-    .step-number { background: white; width: 60px; height: 60px; border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; color: #3a6ea5; border: 2px solid #3a6ea5; }
+    .step-card { background: #f8f8ff; border-radius: 30px; padding: 40px 30px; text-align: center; border: 1px solid #e0e0ff; transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease; }
+    .step-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 16px 40px rgba(58,110,165,0.16); border-color: rgba(58,110,165,0.4); }
+    .step-number {
+      width: 64px; height: 64px; border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 1.6rem; font-weight: 800; color: #fff;
+      background: linear-gradient(135deg, #1e3a5f, #3a6ea5);
+      box-shadow: 0 6px 18px rgba(58,110,165,0.3);
+    }
     .detail-box { text-align: center; margin: 60px 0; }
     .detail-content { display: none; background: #f5f5fa; padding: 40px; border-radius: 40px; text-align: left; max-width: 800px; margin: 20px auto 0; border: 1px solid #3a6ea5; }
     .requests-grid, .votes-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 30px; margin-top: 40px; }
-    .request-card, .vote-card { background: #fff; border-radius: 30px; padding: 30px; box-shadow: 0 20px 40px rgba(58,110,165,0.1); border: 1px solid #e0e0ff; }
-    .request-number { font-size: 1.2rem; color: #3a6ea5; font-weight: 600; }
-    .request-name { font-size: 1.6rem; font-weight: 600; color: #1e3a5f; }
+    .request-card, .vote-card { background: #fff; border-radius: 30px; padding: 30px; box-shadow: 0 20px 40px rgba(58,110,165,0.1); border: 1px solid #e0e0ff; transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; position: relative; }
+    .request-card:hover, .vote-card:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 24px 50px rgba(58,110,165,0.2); border-color: rgba(58,110,165,0.4); }
+    .request-number {
+      position: absolute; top: 16px; right: 18px;
+      display: inline-flex; align-items: center;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
+      color: #3a6ea5;
+      background: rgba(58,110,165,0.1);
+      padding: 3px 10px; border-radius: 20px;
+      border: 1px solid rgba(58,110,165,0.2);
+      font-family: 'Inter', monospace;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+    .request-number:hover {
+      background: rgba(58,110,165,0.18);
+      color: #1e3a5f;
+    }
+    .request-name { font-size: 1.6rem; font-weight: 600; color: #2d4a6e; }
     .progress-bar-bg { height: 8px; background: #eaeaf0; border-radius: 20px; overflow: hidden; margin: 15px 0; }
     .progress-fill { height: 8px; background: linear-gradient(90deg,#3a6ea5,#7f9fcf); border-radius: 20px; }
     .btn-small { background: #f4f4fa; border: 1px solid #3a6ea5; border-radius: 40px; padding: 15px; width: 100%; margin-top: 15px; cursor: pointer; transition: 0.2s; }
@@ -133,7 +185,7 @@
     .vote-no:hover { background: #e04444; color: white; border-color: #e04444; }
     .vote-yes.voted { background: #3a6ea5; color: white; }
     .vote-no.voted { background: #e04444; color: white; border-color: #e04444; }
-    nav a.nav-active { color: #3a6ea5; font-weight: 600; border-bottom: 2px solid #3a6ea5; padding-bottom: 2px; }
+    nav a.nav-active { color: #3a6ea5; font-weight: 700; }
     .section-tabs { display: flex; gap: 12px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
     .tab-btn { padding: 10px 24px; border-radius: 40px; border: 1px solid #e0e0ff; background: white; cursor: pointer; font-size: 0.95rem; transition: 0.2s; color: #2c2c2e; }
     .tab-btn.active, .tab-btn:hover { background: #3a6ea5; color: white; border-color: #3a6ea5; }
@@ -141,27 +193,36 @@
     .status-voting { background: rgba(255,180,0,0.12); color: #b07800; }
     .status-approved { background: rgba(58,110,165,0.12); color: #1e3a5f; }
     .status-active { background: rgba(40,160,80,0.12); color: #1a7a3a; }
-    .request-meta { font-size: 0.88rem; color: #666; margin: 6px 0 4px; }
-    .request-story { font-size: 0.95rem; color: #444; margin: 10px 0 14px; line-height: 1.6; }
+    .request-meta { font-size: 0.88rem; color: #7a8599; margin: 6px 0 4px; }
+    .request-story { font-size: 0.95rem; color: #5c6880; margin: 10px 0 14px; line-height: 1.75; }
     .progress-stats { display: flex; justify-content: space-between; font-size: 0.85rem; color: #3a6ea5; font-weight: 500; margin-top: 4px; }
     .vote-threshold { display: flex; align-items: center; gap: 8px; margin: 10px 0; font-size: 0.85rem; color: #666; }
     .threshold-bar { flex: 1; height: 6px; background: #eaeaf0; border-radius: 10px; overflow: hidden; }
     .threshold-fill { height: 6px; background: linear-gradient(90deg,#3a6ea5,#5fc47a); border-radius: 10px; transition: width 0.5s; }
     .jak-features { display: grid; grid-template-columns: repeat(2,1fr); gap: 24px; margin-top: 40px; }
-    .jak-feature { background: #f8f8ff; border-radius: 24px; padding: 28px; border: 1px solid #e0e0ff; }
-    .jak-feature-icon { font-size: 2rem; margin-bottom: 12px; }
-    .jak-feature h4 { color: #1e3a5f; font-size: 1.1rem; margin-bottom: 8px; }
-    .jak-feature p { color: #555; font-size: 0.95rem; line-height: 1.6; }
+    .jak-feature { background: #f8f8ff; border-radius: 24px; padding: 28px; border: 1px solid #e0e0ff; transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
+    .jak-feature:hover { transform: translateY(-5px) scale(1.01); box-shadow: 0 14px 36px rgba(58,110,165,0.15); border-color: rgba(58,110,165,0.38); }
+    .jak-feature-icon {
+      font-size: 1.7rem; margin-bottom: 16px;
+      width: 58px; height: 58px; border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(58,110,165,0.12), rgba(95,158,160,0.08));
+      border: 1px solid rgba(58,110,165,0.18);
+      box-shadow: 0 4px 12px rgba(58,110,165,0.1);
+    }
+    .jak-feature h4 { color: #2d4a6e; font-size: 1.1rem; margin-bottom: 8px; }
+    .jak-feature p { color: #5c6880; font-size: 0.95rem; line-height: 1.7; }
     @media (max-width: 700px) { .jak-features { grid-template-columns: 1fr; } }
-    .section-intro { text-align: center; color: #555; max-width: 760px; margin: -28px auto 40px; line-height: 1.7; }
+    .section-intro { text-align: center; color: #5c6880; max-width: 760px; margin: -28px auto 40px; line-height: 1.8; }
     .dashboard-guest { background: linear-gradient(135deg, rgba(58,110,165,0.08), rgba(95,158,160,0.08)); border: 1px solid #dce7f4; border-radius: 36px; padding: 36px; text-align: center; }
     .dashboard-grid, .activity-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
-    .dashboard-card { background: #fff; border-radius: 30px; padding: 30px; box-shadow: 0 20px 40px rgba(58,110,165,0.08); border: 1px solid #e0e0ff; }
+    .dashboard-card { background: #fff; border-radius: 30px; padding: 30px; box-shadow: 0 20px 40px rgba(58,110,165,0.08); border: 1px solid #e0e0ff; transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
+    .dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 20px 44px rgba(58,110,165,0.16); border-color: rgba(58,110,165,0.35); }
     .dashboard-card.full-span { grid-column: 1 / -1; }
     .summary-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 22px; }
     .summary-item { background: #f7fafe; border: 1px solid #dce7f4; border-radius: 24px; padding: 18px; }
     .summary-item strong { display: block; font-size: 1.5rem; color: #1e3a5f; margin-bottom: 6px; }
-    .summary-item span { color: #5b6470; font-size: 0.92rem; line-height: 1.5; }
+    .summary-item span { color: #7a8599; font-size: 0.92rem; line-height: 1.6; }
     .form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
     .form-field { margin-bottom: 16px; }
     .form-field label { display: block; margin-bottom: 8px; color: #1e3a5f; font-weight: 600; }
@@ -175,15 +236,15 @@
       background: #fbfdff;
     }
     .form-field textarea { min-height: 120px; resize: vertical; }
-    .helper-note { color: #657080; font-size: 0.9rem; line-height: 1.6; margin-top: 10px; }
+    .helper-note { color: #8592a8; font-size: 0.9rem; line-height: 1.7; margin-top: 10px; }
     .inline-note { color: #657080; font-size: 0.88rem; }
     .profile-chip { display: inline-flex; align-items: center; gap: 10px; padding: 9px 16px; border-radius: 30px; background: #f5f9ff; color: #1e3a5f; border: 1px solid #dce7f4; margin: 8px 8px 0 0; }
     .activity-item { padding: 18px 0; border-bottom: 1px solid #eef3f9; }
     .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
     .activity-item h4 { color: #1e3a5f; margin-bottom: 6px; }
-    .activity-item p { color: #56606d; line-height: 1.6; font-size: 0.95rem; }
-    .activity-meta { color: #718091; font-size: 0.87rem; margin-top: 8px; }
-    .empty-state { padding: 24px; background: #f9fbfd; border: 1px dashed #cfe0f1; border-radius: 24px; color: #6a7684; line-height: 1.6; }
+    .activity-item p { color: #5c6880; line-height: 1.75; font-size: 0.95rem; }
+    .activity-meta { color: #8c99b0; font-size: 0.87rem; margin-top: 8px; }
+    .empty-state { padding: 24px; background: #f5f8fd; border: 1px dashed #cfe0f1; border-radius: 24px; color: #8592a8; line-height: 1.7; }
     .request-title { color: #1e3a5f; font-weight: 600; margin: 10px 0 8px; font-size: 1.05rem; }
     .auth-name-field { display: none; }
     .nav-secondary { color: #3a6ea5; }
@@ -195,20 +256,121 @@
     .stats-grid { display: flex; gap: 20px; justify-content: space-around; background: #fbfbff; border-radius: 80px; padding: 50px 30px; border: 1px solid #e0e0ff; }
     .stat-number { font-size: 3.5rem; font-weight: 600; background: linear-gradient(130deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .reasons-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 25px; margin-top: 40px; }
-    .reason-item { background: #fff; padding: 30px; border-radius: 36px; text-align: center; border: 1px solid #e0e0ff; }
-    .reason-icon { font-size: 2.6rem; margin-bottom: 20px; }
+    .reason-item { background: #fff; padding: 30px; border-radius: 36px; text-align: center; border: 1px solid #e0e0ff; transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
+    .reason-item:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 16px 40px rgba(58,110,165,0.15); border-color: rgba(58,110,165,0.38); }
+    .reason-icon {
+      font-size: 2rem; margin-bottom: 20px;
+      width: 72px; height: 72px; border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      margin-left: auto; margin-right: auto;
+      background: linear-gradient(135deg, rgba(58,110,165,0.1), rgba(95,158,160,0.07));
+      border: 1px solid rgba(58,110,165,0.16);
+      box-shadow: 0 4px 14px rgba(58,110,165,0.1);
+    }
     .newsletter { background: #fafaff; border-radius: 80px; padding: 70px 40px; text-align: center; border: 1px solid #e0e0ff; }
     .email-form { display: flex; max-width: 500px; margin: 30px auto 0; gap: 12px; }
     .email-input { flex: 1; padding: 18px 26px; border-radius: 60px; border: 2px solid #3a6ea5; font-size: 1rem; }
     .faq-grid { max-width: 900px; margin: 0 auto; }
-    .faq-item { background: #fff; border-radius: 44px; padding: 28px 36px; margin-bottom: 20px; border: 1px solid #e0e0ff; }
-    .faq-question { font-weight: 600; font-size: 1.3rem; margin-bottom: 8px; color: #1e3a5f; }
+    .faq-item { background: #fff; border-radius: 44px; padding: 28px 36px; margin-bottom: 20px; border: 1px solid #e0e0ff; transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
+    .faq-item:hover { transform: translateY(-4px); box-shadow: 0 14px 36px rgba(58,110,165,0.14); border-color: rgba(58,110,165,0.38); }
+    .faq-question { font-weight: 600; font-size: 1.3rem; margin-bottom: 8px; color: #2d4a6e; }
     .hero { padding: 100px 0 80px; text-align: center; background: radial-gradient(circle at 80% 30%, rgba(58,110,165,0.1) 0%, #fff 70%); position: relative; overflow: hidden; }
     #constellation-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
     .hero .container { position: relative; z-index: 1; }
     .hero h1 { font-size: 3.8rem; max-width: 800px; margin: 0 auto 20px; background: linear-gradient(135deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .btn { padding: 14px 32px; border-radius: 40px; font-size: 1.1rem; cursor: pointer; background: white; border: 1px solid #3a6ea5; }
-    .btn-primary { background: #1d1c1f; color: white; border: none; }
+    .hero-subtitle {
+      max-width: 860px;
+      margin: 0 auto;
+      font-size: 1.16rem;
+      font-weight: 500;
+      line-height: 1.9;
+      color: #4d6184;
+      letter-spacing: 0.01em;
+    }
+    @keyframes btnPress {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.96); }
+      100% { transform: scale(1); }
+    }
+    .btn {
+      padding: 14px 32px;
+      border-radius: 40px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: rgba(255,255,255,0.85);
+      border: 1.5px solid rgba(58,110,165,0.45);
+      color: #1e3a5f;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.15s, border-color 0.2s;
+      letter-spacing: 0.01em;
+    }
+    .btn:hover {
+      background: rgba(58,110,165,0.1);
+      border-color: #3a6ea5;
+      box-shadow: 0 4px 16px rgba(58,110,165,0.18);
+    }
+    .btn:active { animation: btnPress 0.22s ease; }
+    .btn-primary {
+      background: linear-gradient(135deg, #1e3a5f 0%, #3a6ea5 100%);
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 18px rgba(58,110,165,0.28);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #2a4f7e 0%, #4a80bb 100%);
+      box-shadow: 0 6px 24px rgba(58,110,165,0.4);
+    }
+    .nav-pill {
+      display: inline-block;
+      padding: 7px 18px;
+      border-radius: 30px;
+      border: 1.5px solid rgba(58,110,165,0.28);
+      background: rgba(58,110,165,0.06);
+      color: #1e3a5f !important;
+      font-size: 0.96rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      cursor: pointer;
+    }
+    .nav-pill:hover {
+      background: rgba(58,110,165,0.14);
+      border-color: #3a6ea5;
+      box-shadow: 0 2px 10px rgba(58,110,165,0.16);
+    }
+    .nav-pill:active { animation: btnPress 0.22s ease; }
+    .nav-pill.nav-active {
+      background: rgba(58,110,165,0.15);
+      border-color: #3a6ea5;
+      font-weight: 700;
+    }
+    .nav-pill.nav-secondary { color: #3a6ea5 !important; }
+    .btn-login {
+      padding: 7px 20px;
+      border-radius: 30px;
+      border: 1.5px solid #3a6ea5;
+      background: linear-gradient(135deg, #1e3a5f, #3a6ea5);
+      color: #fff;
+      font-size: 0.96rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.15s;
+      letter-spacing: 0.01em;
+    }
+    .btn-login:hover { box-shadow: 0 4px 16px rgba(58,110,165,0.35); }
+    .btn-login:active { animation: btnPress 0.22s ease; }
+    .btn-logout {
+      padding: 7px 18px;
+      border-radius: 30px;
+      border: 1.5px solid rgba(58,110,165,0.3);
+      background: rgba(58,110,165,0.07);
+      color: #1e3a5f;
+      font-size: 0.92rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-logout:hover { background: rgba(58,110,165,0.15); border-color: #3a6ea5; }
     section { padding: 90px 0; }
     .section-title { font-size: 2.6rem; text-align: center; margin-bottom: 60px; background: linear-gradient(145deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     footer { padding: 40px 0; border-top: 1px solid #f0f0f8; display: flex; justify-content: space-between; align-items: center; }
@@ -219,11 +381,47 @@
 <body>
 <header>
   <div class="container header-inner">
-    <div class="logo">
+    <div class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer;">
       <span class="logo-moon-wrap">
         <span class="moon-icon" id="mainMoon">
-          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path class="moon-crescent" d="M28 17.5C28 23.851 22.851 29 16.5 29C13.48 29 10.74 27.82 8.72 25.9C9.97 26.28 11.3 26.5 12.68 26.5C20.074 26.5 26.072 20.502 26.072 13.108C26.072 10.41 25.26 7.9 23.86 5.82C26.43 8.05 28 11.59 28 17.5Z"/>
+          <svg width="46" height="46" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="logoMoonFull" cx="36%" cy="30%" r="60%">
+                <stop offset="0%" stop-color="#eaf4ff"/>
+                <stop offset="45%" stop-color="#b0cff0"/>
+                <stop offset="100%" stop-color="#4a7ab5"/>
+              </radialGradient>
+              <radialGradient id="logoMoonCrescent" cx="28%" cy="24%" r="65%">
+                <stop offset="0%" stop-color="#fffacc"/>
+                <stop offset="45%" stop-color="#ffd000"/>
+                <stop offset="100%" stop-color="#a07000"/>
+              </radialGradient>
+              <mask id="crescentMask">
+                <circle cx="19" cy="19" r="11" fill="white"/>
+                <circle cx="23.5" cy="15" r="9.5" fill="black"/>
+              </mask>
+            </defs>
+            <!-- Чёрный круг - ночное небо -->
+            <circle cx="19" cy="19" r="18" fill="#08090f"/>
+            <!-- Звёзды - белые точки -->
+            <circle cx="6"  cy="8"  r="0.7" fill="white" opacity="0.9"/>
+            <circle cx="13" cy="4"  r="0.5" fill="white" opacity="0.7"/>
+            <circle cx="28" cy="6"  r="0.8" fill="white" opacity="0.85"/>
+            <circle cx="33" cy="13" r="0.5" fill="white" opacity="0.6"/>
+            <circle cx="31" cy="28" r="0.7" fill="white" opacity="0.8"/>
+            <circle cx="9"  cy="30" r="0.55" fill="white" opacity="0.65"/>
+            <circle cx="4"  cy="20" r="0.6" fill="white" opacity="0.75"/>
+            <circle cx="22" cy="33" r="0.5" fill="white" opacity="0.6"/>
+            <circle cx="35" cy="21" r="0.45" fill="white" opacity="0.5"/>
+            <circle cx="10" cy="14" r="0.4" fill="white" opacity="0.55"/>
+            <!-- Полная луна (default) -->
+            <circle class="moon-full" cx="19" cy="19" r="11" fill="url(#logoMoonFull)"/>
+            <!-- Кратеры -->
+            <circle class="moon-full" cx="16" cy="16" r="2" fill="rgba(60,100,160,0.22)"/>
+            <circle class="moon-full" cx="21" cy="21" r="1.3" fill="rgba(60,100,160,0.18)"/>
+            <circle class="moon-full" cx="14" cy="21" r="1.6" fill="rgba(60,100,160,0.16)"/>
+            <!-- Золотой полумесяц (scroll) -->
+            <circle class="moon-crescent" cx="19" cy="19" r="11" mask="url(#crescentMask)" fill="url(#logoMoonCrescent)"/>
           </svg>
         </span>
         <span class="logo-star">★</span>
@@ -233,14 +431,14 @@
       <span class="logo-text">SayMoonHelp</span>
     </div>
     <nav>
-      <a href="#how-it-works" class="nav-link">Jak to funguje</a>
-      <a href="#zadosti" class="nav-link">Žádosti</a>
-      <a href="#hlasovani" class="nav-link">Hlasování</a>
-      <a href="#my-space" class="nav-link nav-secondary">Můj profil</a>
-      <button id="showLoginBtn" style="background:none; border:1px solid #3a6ea5; padding:8px 20px; border-radius:30px; color:#3a6ea5; cursor:pointer;">Přihlásit se</button>
+      <a href="#how-it-works" class="nav-link nav-pill">Jak to funguje</a>
+      <a href="#zadosti" class="nav-link nav-pill">Žádosti</a>
+      <a href="#hlasovani" class="nav-link nav-pill">Hlasování</a>
+      <a href="#my-space" class="nav-link nav-pill nav-secondary">Můj profil</a>
+      <button id="showLoginBtn" class="btn-login">Přihlásit se</button>
       <span id="userInfo" style="display:none; align-items:center; gap:10px;">
         <div class="user-badge"><span id="userEmail"></span></div>
-        <button id="logoutBtn" style="background:none; border:1px solid #ddd; padding:8px 20px; border-radius:30px; cursor:pointer;">Odhlásit</button>
+        <button id="logoutBtn" class="btn-logout">Odhlásit</button>
       </span>
     </nav>
   </div>
@@ -263,7 +461,7 @@
 </div>
 
 <main>
-  <section class="hero"><canvas id="constellation-canvas"></canvas><div class="container"><h1>Pomoc, která si tě najde</h1><p>SayMoonHelp je lunární loterie dobrých skutků — komunita vzájemné pomoci, kde každý příspěvek se jednou vrátí. Pomáhej druhým, získej body a měj šanci získat pomoc, když ji nejvíc potřebuješ.</p><div style="display:flex; gap:16px; justify-content:center; margin-top:30px;"><button class="btn btn-primary" onclick="document.getElementById('zadosti').scrollIntoView({behavior:'smooth'})">Zapojit se</button><button class="btn" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">Jak to funguje</button></div></div></section>
+  <section class="hero"><canvas id="constellation-canvas"></canvas><div class="container"><h1>Pomoc, která si tě najde</h1><p class="hero-subtitle">SayMoonHelp je lunární loterie dobrých skutků — komunita vzájemné pomoci, kde každý příspěvek se jednou vrátí. Pomáhej druhým, získej body a měj šanci získat pomoc, když ji nejvíc potřebuješ.</p><div style="display:flex; gap:16px; justify-content:center; margin-top:30px;"><button class="btn btn-primary" onclick="document.getElementById('zadosti').scrollIntoView({behavior:'smooth'})">Zapojit se</button><button class="btn" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">Jak to funguje</button></div></div></section>
 
   <section id="how-it-works">
     <div class="container">
@@ -537,12 +735,13 @@
         return;
       }
       requestsGrid.innerHTML = filtered.map(function(request) {
-        const profileMeta = '📍 ' + (request.city || 'Neuvedeno') + ' &nbsp;·&nbsp; 👤 ' + (request.memberLabel || 'Člen komunity') + ' &nbsp;·&nbsp; ⭐ ' + (request.points || 0) + ' bodů';
+        const cityLink = request.city ? '<a href="https://www.google.com/maps/search/' + encodeURIComponent(request.city + ', Česká republika') + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dotted rgba(58,110,165,0.5);cursor:pointer;">' + request.city + '</a>' : 'Neuvedeno';
+        const profileMeta = '📍 ' + cityLink + ' &nbsp;·&nbsp; 👤 ' + (request.memberLabel || 'Člen komunity') + ' &nbsp;·&nbsp; ⭐ ' + (request.points || 0) + ' bodů';
         if (request.status === 'active') {
           const progress = Math.min(100, Math.round(((request.raised || 0) / request.target) * 100));
           return '<div class="request-card" data-status="' + request.status + '">' +
+            '<a class="request-number" href="#my-space" onclick="smoothScroll(\'my-space\')'  + '">' + request.number + '</a>' +
             getStatusLabel(request.status) +
-            '<div class="request-number">' + request.number + '</div>' +
             '<div class="request-name">' + request.name + '</div>' +
             '<div class="request-title">' + request.title + '</div>' +
             '<div class="request-meta">' + profileMeta + '</div>' +
@@ -557,8 +756,8 @@
         const accent = request.status === 'approved' ? '#1e3a5f' : (percent >= 70 ? '#3a6ea5' : '#b07800');
         const suffix = request.status === 'approved' ? ' hlasů' : (percent >= 70 ? ' ✓' : '');
         return '<div class="request-card" data-status="' + request.status + '">' +
+          '<a class="request-number" href="#my-space" onclick="smoothScroll(\'my-space\')'  + '">' + request.number + '</a>' +
           getStatusLabel(request.status) +
-          '<div class="request-number">' + request.number + '</div>' +
           '<div class="request-name">' + request.name + '</div>' +
           '<div class="request-title">' + request.title + '</div>' +
           '<div class="request-meta">' + profileMeta + '</div>' +
@@ -582,10 +781,11 @@
         const totalNo = request.no || 0;
         const voted = currentVotes[request.id];
         return '<div class="vote-card">' +
+          '<a class="request-number" href="#my-space" onclick="smoothScroll(\'my-space\')">' + request.number + '</a>' +
           '<span class="card-status status-voting">🗳️ Probíhá hlasování</span>' +
           '<div class="request-name">' + request.name + '</div>' +
           '<div class="request-title">' + request.title + '</div>' +
-          '<div class="request-meta">📍 ' + (request.city || 'Neuvedeno') + ' &nbsp;·&nbsp; potřebuje ' + request.target.toLocaleString('cs-CZ') + ' Kč &nbsp;·&nbsp; 👤 ' + (request.memberLabel || 'Člen komunity') + '</div>' +
+          '<div class="request-meta">📍 ' + (request.city ? '<a href="https://www.google.com/maps/search/' + encodeURIComponent(request.city + ', Česká republika') + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dotted rgba(58,110,165,0.5)">' + request.city + '</a>' : 'Neuvedeno') + ' &nbsp;·&nbsp; <span style="color:#e04444;font-weight:600">potřebuje ' + request.target.toLocaleString('cs-CZ') + ' Kč</span> &nbsp;·&nbsp; 👤 ' + (request.memberLabel || 'Člen komunity') + '</div>' +
           '<div class="request-story">' + request.story + '</div>' +
           '<div class="vote-threshold" style="margin:14px 0"><div class="threshold-bar" style="height:8px"><div class="threshold-fill" style="width:' + percent + '%"></div></div></div>' +
           '<div class="vote-numbers">👍 ' + totalYes + ' Ano &nbsp;/&nbsp; 👎 ' + totalNo + ' Ne &nbsp;·&nbsp; <strong style="color:' + (percent >= 70 ? '#3a6ea5' : '#b07800') + '">' + percent + '%</strong> pro &nbsp;<span style="color:' + (percent >= 70 ? '#3a6ea5' : '#999') + ';font-size:0.85rem">' + (percent >= 70 ? '✓ Připraveno postoupit' : 'potřeba 70%') + '</span></div>' +
