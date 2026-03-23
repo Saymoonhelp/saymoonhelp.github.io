@@ -128,7 +128,31 @@
     .btn-small:hover { background: #3a6ea5; color: white; }
     .vote-numbers { background: #f7f7fd; padding: 12px; border-radius: 60px; text-align: center; margin: 15px 0; }
     .vote-buttons { display: flex; gap: 12px; }
-    .vote-yes, .vote-no { flex: 1; padding: 12px; border-radius: 40px; border: 1px solid #3a6ea5; background: white; cursor: pointer; }
+    .vote-yes, .vote-no { flex: 1; padding: 12px; border-radius: 40px; border: 1px solid #3a6ea5; background: white; cursor: pointer; transition: 0.2s; }
+    .vote-yes:hover { background: #3a6ea5; color: white; }
+    .vote-no:hover { background: #e04444; color: white; border-color: #e04444; }
+    .vote-yes.voted { background: #3a6ea5; color: white; }
+    .vote-no.voted { background: #e04444; color: white; border-color: #e04444; }
+    nav a.nav-active { color: #3a6ea5; font-weight: 600; border-bottom: 2px solid #3a6ea5; padding-bottom: 2px; }
+    .section-tabs { display: flex; gap: 12px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+    .tab-btn { padding: 10px 24px; border-radius: 40px; border: 1px solid #e0e0ff; background: white; cursor: pointer; font-size: 0.95rem; transition: 0.2s; color: #2c2c2e; }
+    .tab-btn.active, .tab-btn:hover { background: #3a6ea5; color: white; border-color: #3a6ea5; }
+    .card-status { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 12px; }
+    .status-voting { background: rgba(255,180,0,0.12); color: #b07800; }
+    .status-approved { background: rgba(58,110,165,0.12); color: #1e3a5f; }
+    .status-active { background: rgba(40,160,80,0.12); color: #1a7a3a; }
+    .request-meta { font-size: 0.88rem; color: #666; margin: 6px 0 4px; }
+    .request-story { font-size: 0.95rem; color: #444; margin: 10px 0 14px; line-height: 1.6; }
+    .progress-stats { display: flex; justify-content: space-between; font-size: 0.85rem; color: #3a6ea5; font-weight: 500; margin-top: 4px; }
+    .vote-threshold { display: flex; align-items: center; gap: 8px; margin: 10px 0; font-size: 0.85rem; color: #666; }
+    .threshold-bar { flex: 1; height: 6px; background: #eaeaf0; border-radius: 10px; overflow: hidden; }
+    .threshold-fill { height: 6px; background: linear-gradient(90deg,#3a6ea5,#5fc47a); border-radius: 10px; transition: width 0.5s; }
+    .jak-features { display: grid; grid-template-columns: repeat(2,1fr); gap: 24px; margin-top: 40px; }
+    .jak-feature { background: #f8f8ff; border-radius: 24px; padding: 28px; border: 1px solid #e0e0ff; }
+    .jak-feature-icon { font-size: 2rem; margin-bottom: 12px; }
+    .jak-feature h4 { color: #1e3a5f; font-size: 1.1rem; margin-bottom: 8px; }
+    .jak-feature p { color: #555; font-size: 0.95rem; line-height: 1.6; }
+    @media (max-width: 700px) { .jak-features { grid-template-columns: 1fr; } }
     .stats-grid { display: flex; gap: 20px; justify-content: space-around; background: #fbfbff; border-radius: 80px; padding: 50px 30px; border: 1px solid #e0e0ff; }
     .stat-number { font-size: 3.5rem; font-weight: 600; background: linear-gradient(130deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .reasons-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 25px; margin-top: 40px; }
@@ -171,9 +195,9 @@
       <span class="logo-text">SayMoonHelp</span>
     </div>
     <nav>
-      <a href="#">Jak to funguje</a>
-      <a href="#">Žádosti</a>
-      <a href="#">Hlasování</a>
+      <a href="#how-it-works" class="nav-link">Jak to funguje</a>
+      <a href="#zadosti" class="nav-link">Žádosti</a>
+      <a href="#hlasovani" class="nav-link">Hlasování</a>
       <button id="showLoginBtn" style="background:none; border:1px solid #3a6ea5; padding:8px 20px; border-radius:30px; color:#3a6ea5; cursor:pointer;">Přihlásit se</button>
       <span id="userInfo" style="display:none; align-items:center; gap:10px;">
         <div class="user-badge"><span id="userEmail"></span></div>
@@ -199,13 +223,132 @@
 </div>
 
 <main>
-  <section class="hero"><canvas id="constellation-canvas"></canvas><div class="container"><h1>Pomoc, která si tě najde</h1><p>SayMoonHelp je loterie dobrých skutků. Pomáhej druhým, získej body a měj šanci získat pomoc, když ji nejvíc potřebuješ.</p><div style="display:flex; gap:16px; justify-content:center; margin-top:30px;"><button class="btn btn-primary">Zapojit se</button><button class="btn">Jak to funguje</button></div></div></section>
+  <section class="hero"><canvas id="constellation-canvas"></canvas><div class="container"><h1>Pomoc, která si tě najde</h1><p>SayMoonHelp je lunární loterie dobrých skutků — komunita vzájemné pomoci, kde každý příspěvek se jednou vrátí. Pomáhej druhým, získej body a měj šanci získat pomoc, když ji nejvíc potřebuješ.</p><div style="display:flex; gap:16px; justify-content:center; margin-top:30px;"><button class="btn btn-primary" onclick="document.getElementById('zadosti').scrollIntoView({behavior:'smooth'})">Zapojit se</button><button class="btn" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">Jak to funguje</button></div></div></section>
 
-  <section><div class="container"><h2 class="section-title">Jak to funguje</h2><div class="steps-grid"><div class="step-card"><div class="step-number">1</div><h3>Přispěj</h3><p>Pošli libovolnou částku na cizí žádost. 10 Kč = 1 bod pomoci.</p></div><div class="step-card"><div class="step-number">2</div><h3>Získej body</h3><p>Čím víc pomáháš, tím víc bodů máš. Body = tvoje šance v loterii.</p></div><div class="step-card"><div class="step-number">3</div><h3>Vyhraj pomoc</h3><p>Až někdo podá žádost, loterie vybere šťastlivce, který dostane vybrané peníze.</p></div></div><div class="detail-box"><button id="detailBtn" class="btn">🔍 Jak to celé funguje?</button><div id="detailText" class="detail-content"><h3>Loterie dobrých skutků 🌙</h3><p><strong>1. Přispěj:</strong> Pošli peníze na cizí žádost. 10 Kč = 1 bod.</p><p><strong>2. Hlasuj:</strong> Každý člen hlasuje 👍/👎. 70% "pro" = postup do loterie.</p><p><strong>3. Loterie:</strong> Náhodný výběr podle počtu bodů.</p><p><strong>4. Výhra:</strong> Výherce dostane vybranou částku (minus 5–10% provoz).</p></div></div></div></section>
+  <section id="how-it-works">
+    <div class="container">
+      <h2 class="section-title">Jak to funguje</h2>
+      <div class="steps-grid">
+        <div class="step-card"><div class="step-number">1</div><h3>Přispěj komunitě</h3><p>Pošli libovolnou částku na cizí žádost. 10 Kč = 1 bod pomoci, který se připíše na tvůj účet navždy.</p></div>
+        <div class="step-card"><div class="step-number">2</div><h3>Hlasuj a rozhoduj</h3><p>Každý člen hlasuje 👍/👎. Žádost potřebuje 70 % hlasů „pro", aby postoupila do loterie.</p></div>
+        <div class="step-card"><div class="step-number">3</div><h3>Vyhraj pomoc</h3><p>Čím více jsi pomohl, tím více šancí máš. Loterie vybere výherce, který získá celou vybranou částku.</p></div>
+      </div>
+      <div class="jak-features">
+        <div class="jak-feature"><div class="jak-feature-icon">🌙</div><h4>Proč „lunární loterie"?</h4><p>Stejně jako Měsíc ovlivňuje příliv, naše komunita pohybuje energií tam, kde je nejvíc potřeba. Každý člen je součástí cyklu — dáváš i přijímáš. Čím více dáváš, tím větší šanci máš.</p></div>
+        <div class="jak-feature"><div class="jak-feature-icon">🔒</div><h4>Bezpečnost a průhlednost</h4><p>Všechny žádosti procházejí komunitním hlasováním. Každá transakce je viditelná členům. Provoz hradíme 5–10 % z každé vybrané částky — žádné skryté poplatky.</p></div>
+        <div class="jak-feature"><div class="jak-feature-icon">🎯</div><h4>Kdo může žádat?</h4><p>Každý registrovaný člen, který již alespoň jednou přispěl. Pomoc funguje jako kruh — nejprve dáváš, pak můžeš přijímat. Žádný člen není výjimkou.</p></div>
+        <div class="jak-feature"><div class="jak-feature-icon">📈</div><h4>Body rostou s každým příspěvkem</h4><p>Body se nesmazávají. Každý příspěvek trvale zvyšuje tvou šanci v budoucí loterii. Stačí začít — i 10 Kč dělá rozdíl.</p></div>
+      </div>
+    </div>
+  </section>
 
-  <section><div class="container"><h2 class="section-title">Právě teď někdo potřebuje pomoc</h2><div class="requests-grid"><div class="request-card"><div class="request-number">01</div><div class="request-name">Jana Nováková</div><div>Potřebuje 5 000 Kč na opravu auta</div><div class="progress-bar-bg"><div class="progress-fill" style="width:64%"></div></div><div class="progress-stats"><span>3 200 Kč</span><span>z 5 000 Kč</span></div><button class="btn-small">Pomoci</button></div><div class="request-card"><div class="request-number">02</div><div class="request-name">Petr Svoboda</div><div>Potřebuje 2 500 Kč na veterináře</div><div class="progress-bar-bg"><div class="progress-fill" style="width:72%"></div></div><div class="progress-stats"><span>1 800 Kč</span><span>z 2 500 Kč</span></div><button class="btn-small">Pomoci</button></div><div class="request-card"><div class="request-number">03</div><div class="request-name">Marie Veselá</div><div>Potřebuje 8 000 Kč na školní pomůcky</div><div class="progress-bar-bg"><div class="progress-fill" style="width:56%"></div></div><div class="progress-stats"><span>4 500 Kč</span><span>z 8 000 Kč</span></div><button class="btn-small">Pomoci</button></div></div></div></section>
+  <section id="zadosti">
+    <div class="container">
+      <h2 class="section-title">Žádosti o pomoc</h2>
+      <div class="section-tabs">
+        <button class="tab-btn active" onclick="filterCards('all',this)">Všechny</button>
+        <button class="tab-btn" onclick="filterCards('active',this)">✅ Aktivní výběr</button>
+        <button class="tab-btn" onclick="filterCards('voting',this)">🗳️ Ve hlasování</button>
+        <button class="tab-btn" onclick="filterCards('approved',this)">🌙 Schválené</button>
+      </div>
+      <div class="requests-grid" id="requestsGrid">
+        <div class="request-card" data-status="active">
+          <span class="card-status status-active">✅ Aktivní výběr</span>
+          <div class="request-number">#001</div>
+          <div class="request-name">Jana Nováková</div>
+          <div class="request-meta">📍 Praha &nbsp;·&nbsp; 👤 Členka 8 měsíců &nbsp;·&nbsp; ⭐ 42 bodů</div>
+          <div class="request-story">Pracuji jako zdravotní sestra a auto je moje jediné spojení se zaměstnáním. Rozbila se převodovka — oprava stojí 5 000 Kč. Bez auta přijdu o práci. Děkuji každému, kdo pomůže.</div>
+          <div class="progress-bar-bg"><div class="progress-fill" style="width:64%"></div></div>
+          <div class="progress-stats"><span>3 200 Kč vybráno</span><span>cíl: 5 000 Kč</span></div>
+          <button class="btn-small" onclick="document.getElementById('showLoginBtn').click()">💙 Pomoci — přispět</button>
+        </div>
+        <div class="request-card" data-status="active">
+          <span class="card-status status-active">✅ Aktivní výběr</span>
+          <div class="request-number">#002</div>
+          <div class="request-name">Petr Svoboda</div>
+          <div class="request-meta">📍 Brno &nbsp;·&nbsp; 👤 Člen 5 měsíců &nbsp;·&nbsp; ⭐ 28 bodů</div>
+          <div class="request-story">Můj pes Bobík potřebuje operaci — diagnostikovali mu nádor. Veterinář říká, že bez zákroku do týdne je to vážné. Mám jeden příjem a vše jsem investoval do léčby. Prosím o pomoc.</div>
+          <div class="progress-bar-bg"><div class="progress-fill" style="width:72%"></div></div>
+          <div class="progress-stats"><span>1 800 Kč vybráno</span><span>cíl: 2 500 Kč</span></div>
+          <button class="btn-small" onclick="document.getElementById('showLoginBtn').click()">💙 Pomoci — přispět</button>
+        </div>
+        <div class="request-card" data-status="active">
+          <span class="card-status status-active">✅ Aktivní výběr</span>
+          <div class="request-number">#003</div>
+          <div class="request-name">Marie Veselá</div>
+          <div class="request-meta">📍 Ostrava &nbsp;·&nbsp; 👤 Členka 11 měsíců &nbsp;·&nbsp; ⭐ 67 bodů</div>
+          <div class="request-story">Jsem samoživitelka se dvěma dětmi. Nastupují do nové školy a potřebují pomůcky, uniformy a notebook. Přišla jsem o druhý příjem. Každá koruna pomůže.</div>
+          <div class="progress-bar-bg"><div class="progress-fill" style="width:56%"></div></div>
+          <div class="progress-stats"><span>4 500 Kč vybráno</span><span>cíl: 8 000 Kč</span></div>
+          <button class="btn-small" onclick="document.getElementById('showLoginBtn').click()">💙 Pomoci — přispět</button>
+        </div>
+        <div class="request-card" data-status="voting">
+          <span class="card-status status-voting">🗳️ Ve hlasování</span>
+          <div class="request-number">#004</div>
+          <div class="request-name">Tomáš Dvořák</div>
+          <div class="request-meta">📍 Plzeň &nbsp;·&nbsp; 👤 Člen 3 měsíce &nbsp;·&nbsp; ⭐ 15 bodů</div>
+          <div class="request-story">Přišel jsem o práci před měsícem. Nová je za městem, ale než dostanu první výplatu, nemám na jízdenky. Prosím o 3 000 Kč na měsíční jízdné.</div>
+          <div class="vote-threshold"><span>Hlasování:</span><div class="threshold-bar"><div class="threshold-fill" style="width:79%"></div></div><span style="font-weight:600;color:#3a6ea5">79% ✓</span></div>
+          <button class="btn-small" onclick="document.getElementById('hlasovani').scrollIntoView({behavior:'smooth'})">🗳️ Jít hlasovat</button>
+        </div>
+        <div class="request-card" data-status="approved">
+          <span class="card-status status-approved">🌙 Schváleno — čeká na loterii</span>
+          <div class="request-number">#005</div>
+          <div class="request-name">Lucie Horáková</div>
+          <div class="request-meta">📍 Liberec &nbsp;·&nbsp; 👤 Členka 14 měsíců &nbsp;·&nbsp; ⭐ 89 bodů</div>
+          <div class="request-story">Jsem samoživitelka, pračka se rozbila a oprava je dražší než nová. S malým dítětem bez pračky to nejde. Komunita schválila mou žádost — čekám na loterii. Děkuji všem!</div>
+          <div class="vote-threshold"><span>Schváleno:</span><div class="threshold-bar"><div class="threshold-fill" style="width:74%"></div></div><span style="font-weight:600;color:#1e3a5f">74% hlasů</span></div>
+          <button class="btn-small" disabled style="opacity:0.5;cursor:default">⏳ Čeká na loterii</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <section><div class="container"><h2 class="section-title">Hlasujte, komu pomůžeme</h2><div class="votes-grid"><div class="vote-card"><div class="request-name">Tomáš Dvořák</div><div>Potřebuje 3 000 Kč na jízdenky do práce</div><p>Přišel jsem o práci, nová je za městem. Potřebuji dojezdit, než dostanu první výplatu.</p><div class="vote-numbers">👍 45 / 👎 12 (79% pro)</div><div class="vote-buttons"><button class="vote-yes">👍 Ano</button><button class="vote-no">👎 Ne</button></div></div><div class="vote-card"><div class="request-name">Lucie Horáková</div><div>Potřebuje 12 000 Kč na opravu pračky</div><p>Jsem samoživitelka, pračka se rozbila a nemám na novou.</p><div class="vote-numbers">👍 23 / 👎 8 (74% pro)</div><div class="vote-buttons"><button class="vote-yes">👍 Ano</button><button class="vote-no">👎 Ne</button></div></div></div></div></section>
+  <section id="hlasovani">
+    <div class="container">
+      <h2 class="section-title">Hlasování komunity</h2>
+      <p style="text-align:center;color:#555;max-width:700px;margin:-30px auto 50px;font-size:1.05rem;line-height:1.7;">Každá žádost musí získat alespoň <strong>70 % hlasů „Ano"</strong> od komunity, aby postoupila do loterie. Přihlášení členové mohou hlasovat jednou za každou žádost.</p>
+      <div class="votes-grid">
+        <div class="vote-card" id="vcard1">
+          <span class="card-status status-voting">🗳️ Probíhá hlasování</span>
+          <div class="request-name">Tomáš Dvořák</div>
+          <div class="request-meta">📍 Plzeň &nbsp;·&nbsp; potřebuje 3 000 Kč &nbsp;·&nbsp; 👤 člen 3 měsíce</div>
+          <div class="request-story">Přišel jsem o práci. Nová je za městem, ale než dostanu první výplatu, nemám na jízdenky. Jinak o tuto práci přijdu. Prosím o pomoc s jízdenkami na jeden měsíc.</div>
+          <div class="vote-threshold" style="margin:14px 0"><div class="threshold-bar" style="height:8px"><div class="threshold-fill" id="vbar1" style="width:79%"></div></div></div>
+          <div class="vote-numbers">👍 <span id="vy1">45</span> Ano &nbsp;/&nbsp; 👎 <span id="vn1">12</span> Ne &nbsp;·&nbsp; <strong id="vp1" style="color:#3a6ea5">79%</strong> pro &nbsp;<span style="color:#3a6ea5;font-size:0.85rem">✓ Blíží se!</span></div>
+          <div class="vote-buttons" style="margin-top:14px">
+            <button class="vote-yes" id="vyes1" onclick="castVote(1,'yes')">👍 Ano, pomozme mu</button>
+            <button class="vote-no" id="vno1btn" onclick="castVote(1,'no')">👎 Ne</button>
+          </div>
+        </div>
+        <div class="vote-card" id="vcard2">
+          <span class="card-status status-voting">🗳️ Probíhá hlasování</span>
+          <div class="request-name">Karolína Marková</div>
+          <div class="request-meta">📍 České Budějovice &nbsp;·&nbsp; potřebuje 4 500 Kč &nbsp;·&nbsp; 👤 členka 6 měsíců</div>
+          <div class="request-story">Mám diabetické dítě a inzulínová pumpa se porouchala. Pojišťovna uhradí náhradu až za 3 měsíce, ale dítě nemůže čekat. Potřebuji překlenout toto kritické období.</div>
+          <div class="vote-threshold" style="margin:14px 0"><div class="threshold-bar" style="height:8px"><div class="threshold-fill" id="vbar2" style="width:61%"></div></div></div>
+          <div class="vote-numbers">👍 <span id="vy2">38</span> Ano &nbsp;/&nbsp; 👎 <span id="vn2">24</span> Ne &nbsp;·&nbsp; <strong id="vp2" style="color:#b07800">61%</strong> pro &nbsp;<span style="color:#999;font-size:0.85rem">potřeba 70%</span></div>
+          <div class="vote-buttons" style="margin-top:14px">
+            <button class="vote-yes" id="vyes2" onclick="castVote(2,'yes')">👍 Ano, pomozme jí</button>
+            <button class="vote-no" id="vno2btn" onclick="castVote(2,'no')">👎 Ne</button>
+          </div>
+        </div>
+        <div class="vote-card" id="vcard3">
+          <span class="card-status status-voting">🗳️ Probíhá hlasování</span>
+          <div class="request-name">Miroslav Kříž</div>
+          <div class="request-meta">📍 Olomouc &nbsp;·&nbsp; potřebuje 6 000 Kč &nbsp;·&nbsp; 👤 člen 2 měsíce</div>
+          <div class="request-story">Jsem řemeslník na volné noze. Zlomil se mi hlavní pracovní nástroj. Bez něj nemohu pracovat. Novou brusku potřebuji, abych uživil rodinu — vrátím se do práce do dvou dnů.</div>
+          <div class="vote-threshold" style="margin:14px 0"><div class="threshold-bar" style="height:8px"><div class="threshold-fill" id="vbar3" style="width:52%"></div></div></div>
+          <div class="vote-numbers">👍 <span id="vy3">29</span> Ano &nbsp;/&nbsp; 👎 <span id="vn3">27</span> Ne &nbsp;·&nbsp; <strong id="vp3" style="color:#b07800">52%</strong> pro &nbsp;<span style="color:#999;font-size:0.85rem">potřeba 70%</span></div>
+          <div class="vote-buttons" style="margin-top:14px">
+            <button class="vote-yes" id="vyes3" onclick="castVote(3,'yes')">👍 Ano, pomozme mu</button>
+            <button class="vote-no" id="vno3btn" onclick="castVote(3,'no')">👎 Ne</button>
+          </div>
+        </div>
+      </div>
+      <p style="text-align:center;margin-top:40px;color:#888;font-size:0.9rem;">🔒 Pro hlasování musíš být přihlášen a mít alespoň 1 bod pomoci na účtu.</p>
+    </div>
+  </section>
 
   <section><div class="container"><h2 class="section-title">SayMoonHelp v číslech</h2><div class="stats-grid"><div><div class="stat-number">156 000 Kč</div><div>Vybráno na pomoc</div></div><div><div class="stat-number">47</div><div>Lidí dostalo pomoc</div></div><div><div class="stat-number">312</div><div>Aktivních členů</div></div></div></div></section>
 
@@ -375,6 +518,73 @@
     init();
     loop();
   })();
+</script>
+<script>
+  // Smooth scroll helper
+  function smoothScroll(id) {
+    var el = document.querySelector(id);
+    if (el) el.scrollIntoView({behavior: 'smooth'});
+  }
+
+  // Nav active highlight on scroll
+  document.addEventListener('DOMContentLoaded', function() {
+    var sections = ['how-it-works','zadosti','hlasovani'];
+    var navLinks = document.querySelectorAll('.nav-link');
+    window.addEventListener('scroll', function() {
+      var scrollY = window.scrollY + 120;
+      sections.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var link = document.querySelector('.nav-link[href="#'+id+'"]');
+        if (!link) return;
+        if (scrollY >= el.offsetTop && scrollY < el.offsetTop + el.offsetHeight) {
+          navLinks.forEach(function(l){ l.classList.remove('nav-active'); });
+          link.classList.add('nav-active');
+        }
+      });
+    });
+  });
+
+  // Votes state
+  var votes = {
+    1: {yes:45, no:12, voted:null},
+    2: {yes:38, no:24, voted:null},
+    3: {yes:29, no:27, voted:null}
+  };
+
+  function castVote(id, side) {
+    var v = votes[id];
+    if (v.voted) { alert('Již jsi hlasoval(a) pro tuto žádost.'); return; }
+    if (side==='yes') v.yes++; else v.no++;
+    v.voted = side;
+    updateVoteUI(id);
+    document.getElementById('vyes'+id).classList.toggle('voted', side==='yes');
+    document.getElementById('vno'+id+'btn').classList.toggle('voted', side==='no');
+  }
+
+  function updateVoteUI(id) {
+    var v = votes[id];
+    var total = v.yes + v.no;
+    var pct = Math.round(v.yes / total * 100);
+    document.getElementById('vy'+id).textContent = v.yes;
+    document.getElementById('vn'+id).textContent = v.no;
+    document.getElementById('vp'+id).textContent = pct + '%';
+    document.getElementById('vbar'+id).style.width = pct + '%';
+    document.getElementById('vp'+id).style.color = pct >= 70 ? '#3a6ea5' : '#b07800';
+  }
+
+  // Filter request cards
+  function filterCards(status, btn) {
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    document.querySelectorAll('#requestsGrid .request-card').forEach(function(card) {
+      if (status === 'all' || card.dataset.status === status) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
 </script>
 </body>
 </html>
