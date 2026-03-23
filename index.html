@@ -9,6 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -235,6 +237,8 @@
     .activity-item p { color: #5c6880; line-height: 1.75; font-size: 0.95rem; }
     .activity-meta { color: #8c99b0; font-size: 0.87rem; margin-top: 8px; }
     .empty-state { padding: 24px; background: #f5f8fd; border: 1px dashed #cfe0f1; border-radius: 24px; color: #8592a8; line-height: 1.7; }
+    .backup-tools { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .backup-import-label { display: inline-flex; align-items: center; justify-content: center; }
     .request-title { color: #1e3a5f; font-weight: 600; margin: 10px 0 8px; font-size: 1.05rem; }
     .auth-name-field { display: none; }
     .nav-secondary { color: #3a6ea5; }
@@ -277,6 +281,15 @@
       .nav-pill,
       .btn-login {
         font-size: 0.9rem;
+      }
+      .backup-tools {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .profile-identity,
+      .lottery-grid,
+      .admin-grid {
+        grid-template-columns: 1fr;
       }
     }
     @media (max-width: 900px) {
@@ -400,8 +413,49 @@
       transition: background 0.2s, border-color 0.2s;
     }
     .btn-logout:hover { background: rgba(58,110,165,0.15); border-color: #3a6ea5; }
+    .page-section {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .page-section.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
     section { padding: 90px 0; }
     .section-title { font-size: 2.6rem; text-align: center; margin-bottom: 60px; background: linear-gradient(145deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .status-lottery-ready { background: rgba(92,196,122,0.14); color: #23753c; }
+    .status-won { background: rgba(255,215,0,0.16); color: #9b6a00; }
+    .status-rejected { background: rgba(224,68,68,0.12); color: #a43131; }
+    .request-create-card { margin-bottom: 32px; }
+    .checkbox-field { display: flex; align-items: center; gap: 10px; font-weight: 600; color: #1e3a5f; }
+    .checkbox-field input { width: auto; }
+    .profile-identity { display: flex; align-items: center; gap: 18px; margin-bottom: 20px; flex-wrap: wrap; }
+    .profile-avatar { width: 82px; height: 82px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(58,110,165,0.2); box-shadow: 0 12px 28px rgba(58,110,165,0.16); background: linear-gradient(135deg, #dbe9f7, #f6fbff); }
+    .profile-identity-meta strong { display: block; color: #1e3a5f; font-size: 1.05rem; margin-bottom: 4px; }
+    .profile-identity-meta span { display: block; color: #7a8599; line-height: 1.7; font-size: 0.92rem; }
+    .lottery-grid, .admin-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+    .lottery-history, .admin-list { display: grid; gap: 16px; margin-top: 18px; }
+    .lottery-item, .admin-item, .donation-item { padding: 18px 20px; border-radius: 24px; background: #f7fafe; border: 1px solid #dce7f4; }
+    .lottery-item h4, .admin-item h4, .donation-item h4 { color: #1e3a5f; margin-bottom: 6px; }
+    .lottery-item p, .admin-item p, .donation-item p { color: #5c6880; line-height: 1.7; font-size: 0.94rem; }
+    .admin-actions, .inline-actions, .amount-preset-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .amount-chip { border: 1px solid rgba(58,110,165,0.28); background: rgba(58,110,165,0.06); color: #1e3a5f; border-radius: 999px; padding: 10px 16px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; }
+    .amount-chip.active, .amount-chip:hover { background: linear-gradient(135deg, #1e3a5f, #3a6ea5); color: #fff; border-color: transparent; box-shadow: 0 10px 22px rgba(58,110,165,0.22); }
+    .modal-shell { position: fixed; inset: 0; background: rgba(8,9,15,0.48); display: none; align-items: center; justify-content: center; padding: 24px; z-index: 1200; backdrop-filter: blur(6px); }
+    .modal-card { width: min(100%, 520px); background: #fff; border-radius: 34px; padding: 30px; border: 1px solid rgba(58,110,165,0.14); box-shadow: 0 30px 80px rgba(12,28,52,0.22); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .modal-close { border: none; background: transparent; font-size: 1.7rem; cursor: pointer; color: #5c6880; }
+    .toast-container { position: fixed; top: 18px; right: 18px; display: grid; gap: 10px; z-index: 1400; }
+    .toast { min-width: 260px; padding: 14px 18px; border-radius: 18px; background: linear-gradient(135deg, #1e3a5f, #3a6ea5); color: #fff; box-shadow: 0 20px 44px rgba(30,58,95,0.24); border: 1px solid rgba(255,255,255,0.16); }
+    .toast.error { background: linear-gradient(135deg, #8e2f2f, #c94f4f); }
+    .toast.info { background: linear-gradient(135deg, #37557d, #5f9ea0); }
+    .spinner { width: 22px; height: 22px; border-radius: 50%; border: 3px solid rgba(58,110,165,0.16); border-top-color: #3a6ea5; animation: spin 0.85s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-card { padding: 32px; text-align: center; background: #f7fafe; border: 1px dashed #dce7f4; border-radius: 24px; color: #7a8599; }
+    .admin-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,215,0,0.14); color: #9b6a00; border-radius: 999px; padding: 6px 14px; font-size: 0.85rem; font-weight: 700; margin-bottom: 10px; }
+    .hidden-input { display: none; }
+    .muted-note { color: #7a8599; font-size: 0.9rem; line-height: 1.7; }
     footer { padding: 40px 0; border-top: 1px solid #f0f0f8; display: flex; justify-content: space-between; align-items: center; }
     .lunar-design { font-size: 0.9rem; color: #3a6ea5; transition: all 0.3s; }
     .lunar-design.gold { color: #ffd700; text-shadow: 0 0 4px rgba(255,215,0,0.5); }
@@ -463,7 +517,9 @@
       <a href="#how-it-works" class="nav-link nav-pill">Jak to funguje</a>
       <a href="#zadosti" class="nav-link nav-pill">Žádosti</a>
       <a href="#hlasovani" class="nav-link nav-pill">Hlasování</a>
+      <a href="#loterie" class="nav-link nav-pill">Loterie</a>
       <a href="#my-space" class="nav-link nav-pill nav-secondary">Můj profil</a>
+      <a href="#admin-panel" id="adminNavLink" class="nav-link nav-pill nav-secondary" style="display:none;">Admin</a>
       <button id="showLoginBtn" class="btn-login">Přihlásit se</button>
       <span id="userInfo" style="display:none; align-items:center; gap:10px;">
         <div class="user-badge"><span id="userEmail"></span></div>
@@ -490,9 +546,9 @@
 </div>
 
 <main>
-  <section class="hero"><canvas id="constellation-canvas"></canvas><div class="container"><h1>Pomoc, která si tě najde</h1><p class="hero-subtitle">SayMoonHelp je lunární loterie dobrých skutků — komunita vzájemné pomoci, kde každý příspěvek se jednou vrátí. Pomáhej druhým, získej body a měj šanci získat pomoc, když ji nejvíc potřebuješ.</p><div style="display:flex; gap:16px; justify-content:center; margin-top:30px;"><button class="btn btn-primary" onclick="document.getElementById('zadosti').scrollIntoView({behavior:'smooth'})">Zapojit se</button><button class="btn" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">Jak to funguje</button></div></div></section>
+  <section class="hero page-section"><canvas id="constellation-canvas"></canvas><div class="container"><h1>Pomoc, která si tě najde</h1><p class="hero-subtitle">SayMoonHelp je lunární loterie dobrých skutků — komunita vzájemné pomoci, kde každý příspěvek se jednou vrátí. Pomáhej druhým, získej body a měj šanci získat pomoc, když ji nejvíc potřebuješ.</p><div style="display:flex; gap:16px; justify-content:center; margin-top:30px;"><button class="btn btn-primary" onclick="document.getElementById('zadosti').scrollIntoView({behavior:'smooth'})">Zapojit se</button><button class="btn" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">Jak to funguje</button></div></div></section>
 
-  <section id="how-it-works">
+  <section id="how-it-works" class="page-section">
     <div class="container">
       <h2 class="section-title">Jak to funguje</h2>
       <div class="steps-grid">
@@ -509,10 +565,45 @@
     </div>
   </section>
 
-  <section id="zadosti">
+  <section id="zadosti" class="page-section">
     <div class="container">
       <h2 class="section-title">Žádosti o pomoc</h2>
       <p class="section-intro">Tady se zobrazují schválené i nově podané žádosti komunity. Po registraci a vyplnění profilu můžeš vytvořit vlastní žádost a hned ji uvidíš mezi ostatními.</p>
+      <div id="requestCreateGuest" class="dashboard-guest" style="margin-bottom:32px;">
+        <h3 style="color:#1e3a5f; margin-bottom:12px;">Chceš podat vlastní žádost?</h3>
+        <p style="max-width:700px; margin:0 auto 20px; color:#56606d; line-height:1.7;">Po přihlášení můžeš ihned vytvořit vlastní žádost, zvolit anonymní zobrazení jména a sledovat celý průběh podpory v reálném čase.</p>
+        <button class="btn btn-primary" onclick="openAuthModal()">Přihlásit se a vytvořit žádost</button>
+      </div>
+      <div id="requestCreateCard" class="dashboard-card request-create-card" style="display:none;">
+        <h3 style="color:#1e3a5f; margin-bottom:14px;">Vytvořit novou žádost</h3>
+        <form id="quickRequestForm">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="quickRequestTitle">Název žádosti</label>
+              <input type="text" id="quickRequestTitle" placeholder="Např. Oprava auta do práce">
+            </div>
+            <div class="form-field">
+              <label for="quickRequestCity">Město / lokace</label>
+              <input type="text" id="quickRequestCity" placeholder="Např. Brno">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="quickRequestAmount">Potřebná částka (Kč)</label>
+              <input type="number" id="quickRequestAmount" min="50" step="50" placeholder="5000">
+            </div>
+            <div class="form-field">
+              <label class="checkbox-field" for="quickRequestAnonymous"><input type="checkbox" id="quickRequestAnonymous"> Zobrazit žádost anonymně</label>
+              <div class="inline-note">Jméno autora se nahradí textem „Anonymní člen“.</div>
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="quickRequestStory">Popis problému</label>
+            <textarea id="quickRequestStory" placeholder="Popiš svou situaci, proč pomoc potřebuješ a jaká částka pomůže situaci vyřešit."></textarea>
+          </div>
+          <button type="submit" class="btn-auth">Vytvořit žádost</button>
+        </form>
+      </div>
       <div class="section-tabs">
         <button class="tab-btn active" onclick="filterCards('all',this)">Všechny</button>
         <button class="tab-btn" onclick="filterCards('active',this)">✅ Aktivní výběr</button>
@@ -523,7 +614,7 @@
     </div>
   </section>
 
-  <section id="hlasovani">
+  <section id="hlasovani" class="page-section">
     <div class="container">
       <h2 class="section-title">Hlasování komunity</h2>
       <p style="text-align:center;color:#555;max-width:700px;margin:-30px auto 50px;font-size:1.05rem;line-height:1.7;">Každá žádost musí získat alespoň <strong>70 % hlasů „Ano"</strong> od komunity, aby postoupila do loterie. Přihlášení členové mohou hlasovat jednou za každou žádost.</p>
@@ -532,7 +623,31 @@
     </div>
   </section>
 
-  <section id="my-space">
+  <section id="loterie" class="page-section">
+    <div class="container">
+      <h2 class="section-title">Loterie pomoci</h2>
+      <p class="section-intro">Do měsíčního losování vstupují žádosti, které komunitě dávají smysl a získaly dostatečnou podporu hlasováním. Váha každé žádosti roste s body autora.</p>
+      <div class="lottery-grid">
+        <div class="dashboard-card">
+          <h3 style="color:#1e3a5f; margin-bottom:12px;">Tento cyklus loterie</h3>
+          <div id="currentLotteryCard"></div>
+        </div>
+        <div class="dashboard-card">
+          <h3 style="color:#1e3a5f; margin-bottom:12px;">Další datum losování</h3>
+          <div id="nextDrawCard"></div>
+          <div class="inline-actions">
+            <button id="manualDrawBtn" type="button" class="btn-auth" style="display:none;">Spustit rozlosování ručně</button>
+          </div>
+        </div>
+        <div class="dashboard-card full-span">
+          <h3 style="color:#1e3a5f; margin-bottom:12px;">Historie rozlosování</h3>
+          <div id="lotteryHistoryList" class="lottery-history"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="my-space" class="page-section">
     <div class="container">
       <h2 class="section-title">Můj profil a žádost</h2>
       <p class="section-intro">Tady si po registraci nastavíš profil, podáš vlastní žádost, uvidíš všechna svá hlasování a připravíš údaje pro převzetí výhry, jakmile tvoje žádost projde komunitou.</p>
@@ -547,9 +662,27 @@
             <h3 style="color:#1e3a5f; margin-bottom:10px;">Přehled tvého účtu</h3>
             <p style="color:#56606d; line-height:1.7;">SayMoonHelp pracuje s důvěrou. Proto tady vždy vidíš svůj profil, svou žádost, historii hlasování i stav pro převzetí výhry na jednom místě.</p>
             <div class="summary-strip" id="profileSummary"></div>
+            <div class="backup-tools">
+              <button type="button" id="exportDataBtn" class="btn-logout">Stáhnout zálohu dat (.json)</button>
+              <label for="importDataInput" class="btn-logout backup-import-label">Načíst zálohu dat
+                <input type="file" id="importDataInput" accept="application/json,.json" hidden>
+              </label>
+            </div>
+            <div class="helper-note">Záloha uloží profil, vlastní žádosti, hlasování i údaje pro převzetí výhry do JSON souboru.</div>
           </div>
           <div class="dashboard-card">
             <h3 style="color:#1e3a5f; margin-bottom:16px;">Profil člena</h3>
+            <div class="profile-identity">
+              <img id="profileAvatarPreview" class="profile-avatar" alt="Avatar člena">
+              <div class="profile-identity-meta">
+                <strong id="profileEmailDisplay">—</strong>
+                <span id="profileBalanceDisplay">0 bodů pomoci</span>
+                <span>Avatar se ukládá do Firebase Storage a profil do Firestore.</span>
+              </div>
+              <label class="btn-logout backup-import-label" for="avatarUploadInput">Nahrát avatar
+                <input type="file" id="avatarUploadInput" class="hidden-input" accept="image/*">
+              </label>
+            </div>
             <form id="profileForm">
               <div class="form-row">
                 <div class="form-field">
@@ -588,7 +721,8 @@
               </div>
               <button type="submit" class="btn-auth">Odeslat žádost do hlasování</button>
             </form>
-            <div class="helper-note">Nová žádost se okamžitě objeví v Žádostech i v Hlasování jako profil reálného přihlášeného člena.</div>
+            <div class="helper-note">Nová žádost se okamžitě uloží do Firestore, objeví se v Žádostech a začne sbírat podporu komunity v reálném čase.</div>
+            <div class="inline-actions"><button type="button" id="goToRequestsBtn" class="btn-logout">Otevřít veřejný formulář žádosti</button></div>
           </div>
           <div class="dashboard-card">
             <h3 style="color:#1e3a5f; margin-bottom:16px;">Převzetí výhry</h3>
@@ -619,19 +753,78 @@
             <h3 style="color:#1e3a5f; margin-bottom:16px;">Moje hlasování</h3>
             <div id="myVotesList"></div>
           </div>
+          <div class="dashboard-card">
+            <h3 style="color:#1e3a5f; margin-bottom:16px;">Moje příspěvky</h3>
+            <div id="myDonationsList"></div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section><div class="container"><h2 class="section-title">SayMoonHelp v číslech</h2><div class="stats-grid"><div><div class="stat-number">156 000 Kč</div><div>Vybráno na pomoc</div></div><div><div class="stat-number">47</div><div>Lidí dostalo pomoc</div></div><div><div class="stat-number">312</div><div>Aktivních členů</div></div></div></div></section>
+  <section id="admin-panel" class="page-section" style="display:none;">
+    <div class="container">
+      <h2 class="section-title">Admin panel</h2>
+      <p class="section-intro">Správa žádostí, uživatelů, statistik a ruční spuštění loterie. Tato sekce je viditelná pouze pro administrátora.</p>
+      <div class="admin-grid">
+        <div class="dashboard-card full-span">
+          <div class="admin-badge">🔐 Administrátor</div>
+          <h3 style="color:#1e3a5f; margin-bottom:12px;">Souhrn platformy</h3>
+          <div id="adminStats" class="lottery-history"></div>
+        </div>
+        <div class="dashboard-card">
+          <h3 style="color:#1e3a5f; margin-bottom:12px;">Uživatelé</h3>
+          <div id="adminUsersList" class="admin-list"></div>
+        </div>
+        <div class="dashboard-card">
+          <h3 style="color:#1e3a5f; margin-bottom:12px;">Ruční nástroje</h3>
+          <p class="muted-note">Odtud můžeš ručně spustit rozlosování z žádostí připravených k loterii.</p>
+          <div class="inline-actions">
+            <button type="button" id="adminRunLotteryBtn" class="btn-auth">Spustit loterii teď</button>
+          </div>
+        </div>
+        <div class="dashboard-card full-span">
+          <h3 style="color:#1e3a5f; margin-bottom:12px;">Správa žádostí</h3>
+          <div id="adminRequestsList" class="admin-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <section><div class="container"><h2 class="section-title">Proč se zapojit</h2><div class="reasons-grid"><div class="reason-item"><div class="reason-icon">🤝</div><h4>Pomáháš konkrétním lidem</h4><p>Každá koruna jde na ověřenou žádost.</p></div><div class="reason-item"><div class="reason-icon">🎲</div><h4>Máš šanci na pomoc i ty</h4><p>Čím víc pomáháš, tím víc šancí máš.</p></div><div class="reason-item"><div class="reason-icon">🗳️</div><h4>Rozhoduješ ty</h4><p>Hlasuješ, kdo pomoc dostane.</p></div><div class="reason-item"><div class="reason-icon">🔍</div><h4>Jsme transparentní</h4><p>Všechny transakce jsou veřejné.</p></div></div></div></section>
+  <section class="page-section"><div class="container"><h2 class="section-title">SayMoonHelp v číslech</h2><div class="stats-grid"><div><div class="stat-number" id="statDonated">0 Kč</div><div>Vybráno na pomoc</div></div><div><div class="stat-number" id="statWinners">0</div><div>Lidí dostalo pomoc</div></div><div><div class="stat-number" id="statMembers">0</div><div>Aktivních členů</div></div></div></div></section>
 
-  <section><div class="container newsletter"><h2>Buďte první, až spustíme</h2><p>Zatím testujeme. Zanechte nám email a dáme vám vědět, jakmile bude možné se zapojit.</p><div class="email-form"><input class="email-input" type="email" placeholder="váš@email.cz"><button class="btn btn-primary" style="padding:18px 32px;">Odeslat</button></div><div class="privacy-note">Žádný spam. Jen jedna zpráva, až budeme živí.</div></div></section>
+  <section class="page-section"><div class="container"><h2 class="section-title">Proč se zapojit</h2><div class="reasons-grid"><div class="reason-item"><div class="reason-icon">🤝</div><h4>Pomáháš konkrétním lidem</h4><p>Každá koruna jde na ověřenou žádost.</p></div><div class="reason-item"><div class="reason-icon">🎲</div><h4>Máš šanci na pomoc i ty</h4><p>Čím víc pomáháš, tím víc šancí máš.</p></div><div class="reason-item"><div class="reason-icon">🗳️</div><h4>Rozhoduješ ty</h4><p>Hlasuješ, kdo pomoc dostane.</p></div><div class="reason-item"><div class="reason-icon">🔍</div><h4>Jsme transparentní</h4><p>Všechny transakce jsou veřejné.</p></div></div></div></section>
 
-  <section><div class="container"><h2 class="section-title">Časté otázky</h2><div class="faq-grid"><div class="faq-item"><div class="faq-question">Kdo může žádat o pomoc?</div><div>Každý registrovaný člen, který už alespoň jednou pomohl.</div></div><div class="faq-item"><div class="faq-question">Jak funguje loterie?</div><div>10 Kč = 1 bod. Losujeme podle bodů. Vyhrává jeden člen.</div></div></div></div></section>
+  <section class="page-section"><div class="container newsletter"><h2>Buďte první, až spustíme</h2><p>Zatím testujeme. Zanechte nám email a dáme vám vědět, jakmile bude možné se zapojit.</p><form id="newsletterForm" class="email-form"><input id="newsletterEmail" class="email-input" type="email" placeholder="váš@email.cz"><button id="newsletterSubmitBtn" class="btn btn-primary" style="padding:18px 32px;" type="submit">Odeslat</button></form><div class="privacy-note">Žádný spam. Jen jedna zpráva, až budeme živí.</div></div></section>
+
+  <section class="page-section"><div class="container"><h2 class="section-title">Časté otázky</h2><div class="faq-grid"><div class="faq-item"><div class="faq-question">Kdo může žádat o pomoc?</div><div>Každý registrovaný člen, který už alespoň jednou pomohl.</div></div><div class="faq-item"><div class="faq-question">Jak funguje loterie?</div><div>10 Kč = 1 bod. Losujeme podle bodů. Vyhrává jeden člen.</div></div></div></div></section>
 </main>
+
+<div id="donationModal" class="modal-shell">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div>
+        <h3 style="color:#1e3a5f; margin-bottom:4px;">Pomoci žádosti</h3>
+        <p id="donationModalSubtitle" class="muted-note">Vyber částku, kterou chceš přispět.</p>
+      </div>
+      <button type="button" id="closeDonationModal" class="modal-close">×</button>
+    </div>
+    <div class="amount-preset-grid">
+      <button type="button" class="amount-chip donation-chip" data-amount="50">50 Kč</button>
+      <button type="button" class="amount-chip donation-chip active" data-amount="100">100 Kč</button>
+      <button type="button" class="amount-chip donation-chip" data-amount="200">200 Kč</button>
+      <button type="button" class="amount-chip donation-chip" data-amount="500">500 Kč</button>
+    </div>
+    <div class="form-field" style="margin-top:18px;">
+      <label for="customDonationAmount">Vlastní částka</label>
+      <input type="number" id="customDonationAmount" min="10" step="10" value="100" placeholder="Např. 250">
+    </div>
+    <button type="button" id="confirmDonationBtn" class="btn-auth">Potvrdit příspěvek</button>
+    <div class="helper-note">Za každých 10 Kč získáš 1 bod pomoci. Příspěvek se okamžitě promítne do Firestore i do statistik žádosti.</div>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
 
 <footer class="container">
   <div>© 2025 SayMoonHelp · průhledná pomoc</div>
@@ -650,63 +843,1056 @@
   firebase.initializeApp(firebaseConfig);
 
   document.addEventListener('DOMContentLoaded', () => {
-    const STORAGE_KEY = 'saymoonhelp-app-v4';
-    const seedRequests = [
-      { id: 'seed-001', number: '#001', name: 'Jana Nováková', city: 'Praha', memberLabel: 'Členka 8 měsíců', points: 42, title: 'Oprava auta do práce', story: 'Pracuji jako zdravotní sestra a auto je moje jediné spojení se zaměstnáním. Rozbila se převodovka a oprava stojí 5 000 Kč. Bez auta přijdu o práci.', target: 5000, raised: 3200, status: 'active' },
-      { id: 'seed-002', number: '#002', name: 'Petr Svoboda', city: 'Brno', memberLabel: 'Člen 5 měsíců', points: 28, title: 'Operace pro psa Bobíka', story: 'Můj pes Bobík potřebuje akutní operaci. Veterinář potvrzuje, že bez zákroku do týdne je situace vážná. Všechny rezervy už jsem vložil do léčby.', target: 2500, raised: 1800, status: 'active' },
-      { id: 'seed-003', number: '#003', name: 'Marie Veselá', city: 'Ostrava', memberLabel: 'Členka 11 měsíců', points: 67, title: 'Pomůcky pro dvě děti do školy', story: 'Jsem samoživitelka se dvěma dětmi. Nastupují do nové školy a potřebují pomůcky, uniformy i notebook. Každá koruna pomůže udržet děti ve škole bez výpadku.', target: 8000, raised: 4500, status: 'active' },
-      { id: 'seed-004', number: '#004', name: 'Tomáš Dvořák', city: 'Plzeň', memberLabel: 'Člen 3 měsíce', points: 15, title: 'Měsíční jízdné do nové práce', story: 'Přišel jsem o práci před měsícem. Novou mám za městem, ale než dostanu první výplatu, nemám na jízdenky. Prosím o pomoc s překlenutím prvního měsíce.', target: 3000, raised: 0, status: 'voting', yes: 45, no: 12 },
-      { id: 'seed-005', number: '#005', name: 'Lucie Horáková', city: 'Liberec', memberLabel: 'Členka 14 měsíců', points: 89, title: 'Nová pračka pro samoživitelku', story: 'Jsem samoživitelka, pračka se rozbila a oprava je dražší než nová. Komunita moji situaci schválila a teď čekám na další losování.', target: 7000, raised: 0, status: 'approved', yes: 74, no: 26 },
-      { id: 'seed-006', number: '#006', name: 'Karolína Marková', city: 'České Budějovice', memberLabel: 'Členka 6 měsíců', points: 31, title: 'Dočasná náhrada inzulínové pumpy', story: 'Mám diabetické dítě a inzulínová pumpa se porouchala. Pojišťovna náhradu uhradí až za tři měsíce. Potřebuji překlenout kritické období.', target: 4500, raised: 0, status: 'voting', yes: 38, no: 24 },
-      { id: 'seed-007', number: '#007', name: 'Miroslav Kříž', city: 'Olomouc', memberLabel: 'Člen 2 měsíce', points: 12, title: 'Nové nářadí pro návrat do práce', story: 'Jsem řemeslník na volné noze. Zlomil se mi hlavní pracovní nástroj a bez něj nemohu pracovat. Potřebuji rychle koupit novou brusku, abych uživil rodinu.', target: 6000, raised: 0, status: 'voting', yes: 29, no: 27 }
-    ];
-    let activeRequestFilter = 'all';
-    let currentUser = null;
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+    const fieldValue = firebase.firestore.FieldValue;
+    const ADMIN_EMAILS = ['admin@saymoonhelp.com'];
+
+    const state = {
+      currentUser: null,
+      profile: null,
+      requests: [],
+      users: [],
+      userMap: {},
+      lotteries: [],
+      donations: [],
+      userVotes: {},
+      activeRequestFilter: 'all',
+      donationRequest: null,
+      isAdmin: false,
+      unsubscribers: [],
+      loading: {
+        requests: true,
+        users: true,
+        lotteries: true,
+        donations: true,
+        votes: false
+      }
+    };
 
     const moon = document.getElementById('mainMoon');
     const footerLunar = document.getElementById('footerLunar');
     const requestsGrid = document.getElementById('requestsGrid');
     const votesGrid = document.getElementById('votesGrid');
+    const requestCreateGuest = document.getElementById('requestCreateGuest');
+    const requestCreateCard = document.getElementById('requestCreateCard');
     const dashboardGuest = document.getElementById('dashboardGuest');
     const dashboardApp = document.getElementById('dashboardApp');
     const profileSummary = document.getElementById('profileSummary');
     const myRequestsList = document.getElementById('myRequestsList');
     const myVotesList = document.getElementById('myVotesList');
+    const myDonationsList = document.getElementById('myDonationsList');
     const claimStatus = document.getElementById('claimStatus');
     const profileForm = document.getElementById('profileForm');
     const requestForm = document.getElementById('requestForm');
+    const quickRequestForm = document.getElementById('quickRequestForm');
     const claimForm = document.getElementById('claimForm');
+    const exportDataBtn = document.getElementById('exportDataBtn');
+    const importDataInput = document.getElementById('importDataInput');
+    const currentLotteryCard = document.getElementById('currentLotteryCard');
+    const nextDrawCard = document.getElementById('nextDrawCard');
+    const lotteryHistoryList = document.getElementById('lotteryHistoryList');
+    const adminPanel = document.getElementById('admin-panel');
+    const adminNavLink = document.getElementById('adminNavLink');
+    const adminStats = document.getElementById('adminStats');
+    const adminUsersList = document.getElementById('adminUsersList');
+    const adminRequestsList = document.getElementById('adminRequestsList');
+    const manualDrawBtn = document.getElementById('manualDrawBtn');
+    const adminRunLotteryBtn = document.getElementById('adminRunLotteryBtn');
+    const donationModal = document.getElementById('donationModal');
+    const donationModalSubtitle = document.getElementById('donationModalSubtitle');
+    const customDonationAmount = document.getElementById('customDonationAmount');
+    const confirmDonationBtn = document.getElementById('confirmDonationBtn');
+    const closeDonationModalBtn = document.getElementById('closeDonationModal');
+    const toastContainer = document.getElementById('toastContainer');
+    const newsletterForm = document.getElementById('newsletterForm');
+    const newsletterEmail = document.getElementById('newsletterEmail');
+    const profileAvatarPreview = document.getElementById('profileAvatarPreview');
+    const avatarUploadInput = document.getElementById('avatarUploadInput');
+    const profileEmailDisplay = document.getElementById('profileEmailDisplay');
+    const profileBalanceDisplay = document.getElementById('profileBalanceDisplay');
+    const goToRequestsBtn = document.getElementById('goToRequestsBtn');
+    const statDonated = document.getElementById('statDonated');
+    const statWinners = document.getElementById('statWinners');
+    const statMembers = document.getElementById('statMembers');
 
-    function loadState() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return { profiles: {}, requests: [], votesByUser: {}, voteTallies: {}, claims: {}, nextRequestNumber: 8 };
-        const parsed = JSON.parse(raw);
-        return {
-          profiles: parsed.profiles || {},
-          requests: parsed.requests || [],
-          votesByUser: parsed.votesByUser || {},
-          voteTallies: parsed.voteTallies || {},
-          claims: parsed.claims || {},
-          nextRequestNumber: parsed.nextRequestNumber || 8
-        };
-      } catch (error) {
-        return { profiles: {}, requests: [], votesByUser: {}, voteTallies: {}, claims: {}, nextRequestNumber: 8 };
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function toMillis(value) {
+      if (!value) return 0;
+      if (typeof value === 'number') return value;
+      if (typeof value.toMillis === 'function') return value.toMillis();
+      if (typeof value.seconds === 'number') return value.seconds * 1000;
+      const parsed = new Date(value).getTime();
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function formatCurrency(value) {
+      return Number(value || 0).toLocaleString('cs-CZ') + ' Kč';
+    }
+
+    function formatDate(value) {
+      const millis = toMillis(value);
+      if (!millis) return '—';
+      return new Date(millis).toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function formatDateTime(value) {
+      const millis = toMillis(value);
+      if (!millis) return '—';
+      return new Date(millis).toLocaleString('cs-CZ', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function initials(value) {
+      const parts = String(value || 'SayMoonHelp').trim().split(/\s+/).filter(Boolean);
+      return parts.slice(0, 2).map(function(part) { return part.charAt(0).toUpperCase(); }).join('') || 'SM';
+    }
+
+    function defaultAvatar(seed) {
+      const label = initials(seed);
+      const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e3a5f"/><stop offset="100%" stop-color="#5f9ea0"/></linearGradient></defs><rect width="160" height="160" rx="80" fill="url(#g)"/><circle cx="80" cy="64" r="28" fill="rgba(255,255,255,0.2)"/><path d="M36 134c8-23 28-36 44-36s36 13 44 36" fill="rgba(255,255,255,0.2)"/><text x="80" y="96" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="34" font-weight="800" fill="#fff">' + escapeHtml(label) + '</text></svg>';
+      return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+    }
+
+    function showToast(message, type) {
+      const toast = document.createElement('div');
+      toast.className = 'toast' + (type ? ' ' + type : '');
+      toast.textContent = message;
+      toastContainer.appendChild(toast);
+      window.setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-8px)';
+      }, 3400);
+      window.setTimeout(function() {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 3800);
+    }
+
+    function renderLoading(text) {
+      return '<div class="loading-card"><div class="spinner"></div>' + escapeHtml(text) + '</div>';
+    }
+
+    function docData(doc) {
+      return Object.assign({ id: doc.id }, doc.data());
+    }
+
+    function normalizeRequest(request) {
+      const target = Number(request.amountNeeded || request.target || 0);
+      const raised = Number(request.currentAmount || request.raised || 0);
+      return Object.assign({}, request, {
+        title: request.title || 'Žádost o pomoc',
+        story: request.description || request.story || '',
+        city: request.city || request.location || '',
+        target: target,
+        raised: raised,
+        yes: Number(request.votesYes || request.yes || 0),
+        no: Number(request.votesNo || request.no || 0),
+        workflowStage: request.workflowStage || 'voting',
+        displayName: request.anonymous ? 'Anonymní člen' : (request.displayName || request.name || 'Člen komunity')
+      });
+    }
+
+    function getVotePercentage(request) {
+      const total = Number(request.yes || 0) + Number(request.no || 0);
+      return total ? Math.round((Number(request.yes || 0) / total) * 100) : 0;
+    }
+
+    function getCityLink(city) {
+      if (!city) return 'Neuvedeno';
+      const safeCity = escapeHtml(city);
+      return '<a href="https://www.google.com/maps/search/' + encodeURIComponent(city + ', Česká republika') + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dotted rgba(58,110,165,0.5);cursor:pointer;">' + safeCity + '</a>';
+    }
+
+    function getRequestStatusLabel(request) {
+      if (request.status === 'won') return '<span class="card-status status-won">🏆 Výherce loterie</span>';
+      if (request.status === 'rejected') return '<span class="card-status status-rejected">⛔ Zamítnutá</span>';
+      if (request.workflowStage === 'lottery_ready') return '<span class="card-status status-lottery-ready">🌙 Připraveno do loterie</span>';
+      if (request.workflowStage === 'funding') return '<span class="card-status status-active">✅ Aktivní výběr</span>';
+      return '<span class="card-status status-voting">🗳️ Ve hlasování</span>';
+    }
+
+    function getCurrentProfileName() {
+      if (!state.profile) return 'Člen komunity';
+      return state.profile.displayName || state.profile.name || (state.currentUser ? state.currentUser.email.split('@')[0] : 'Člen komunity');
+    }
+
+    function getCurrentProfileAvatar() {
+      return state.profile && state.profile.avatar ? state.profile.avatar : defaultAvatar(getCurrentProfileName());
+    }
+
+    function computeNextRequestNumber() {
+      return state.requests.reduce(function(maxValue, request) {
+        const value = Number(String(request.number || '').replace(/[^0-9]/g, '')) || 0;
+        return Math.max(maxValue, value);
+      }, 0) + 1;
+    }
+
+    function clearSubscriptions() {
+      while (state.unsubscribers.length) {
+        const unsubscribe = state.unsubscribers.pop();
+        if (typeof unsubscribe === 'function') unsubscribe();
       }
     }
 
-    const state = loadState();
-
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    function updateAdminState() {
+      state.isAdmin = Boolean(state.currentUser && (ADMIN_EMAILS.indexOf(state.currentUser.email || '') >= 0 || (state.profile && state.profile.role === 'admin')));
+      adminPanel.style.display = state.isAdmin ? 'block' : 'none';
+      adminNavLink.style.display = state.isAdmin ? 'inline-block' : 'none';
+      manualDrawBtn.style.display = state.isAdmin ? 'inline-flex' : 'none';
     }
 
-    function monthsSince(timestamp) {
-      if (!timestamp) return 'Člen nově';
-      const diff = Math.max(1, Math.round((Date.now() - timestamp) / (1000 * 60 * 60 * 24 * 30)));
-      return diff === 1 ? 'Člen 1 měsíc' : 'Člen ' + diff + ' měsíců';
+    function refreshUserHeader() {
+      const info = document.getElementById('userInfo');
+      const btn = document.getElementById('showLoginBtn');
+      if (state.currentUser) {
+        btn.style.display = 'none';
+        info.style.display = 'flex';
+        document.getElementById('userEmail').innerText = getCurrentProfileName() + ' · ' + state.currentUser.email;
+      } else {
+        btn.style.display = 'inline-block';
+        info.style.display = 'none';
+      }
     }
 
+    function refreshComposerVisibility() {
+      const isLogged = Boolean(state.currentUser);
+      requestCreateGuest.style.display = isLogged ? 'none' : 'block';
+      requestCreateCard.style.display = isLogged ? 'block' : 'none';
+      if (isLogged && state.profile) {
+        const cityInput = document.getElementById('quickRequestCity');
+        if (cityInput && !cityInput.value) cityInput.value = state.profile.city || '';
+      }
+    }
+
+    function renderRequests() {
+      if (state.loading.requests) {
+        requestsGrid.innerHTML = renderLoading('Načítám žádosti z Firestore...');
+        return;
+      }
+      const filtered = state.requests
+        .map(normalizeRequest)
+        .filter(function(request) {
+          if (request.status === 'deleted') return false;
+          if (state.activeRequestFilter === 'all') return true;
+          if (state.activeRequestFilter === 'active') return request.status === 'active';
+          if (state.activeRequestFilter === 'voting') return request.status === 'active' && request.workflowStage === 'voting';
+          if (state.activeRequestFilter === 'approved') return request.status === 'active' && request.workflowStage === 'lottery_ready';
+          return true;
+        });
+      if (!filtered.length) {
+        requestsGrid.innerHTML = '<div class="empty-state">V databázi zatím nejsou žádné žádosti pro tento filtr. Přihlas se a vytvoř první příběh komunity.</div>';
+        return;
+      }
+      requestsGrid.innerHTML = filtered.map(function(request) {
+        const progress = request.target ? Math.min(100, Math.round((request.raised / request.target) * 100)) : 0;
+        const percent = getVotePercentage(request);
+        const action = request.status === 'won'
+          ? '<div class="helper-note">Tato žádost už v loterii vyhrála.</div>'
+          : request.status === 'rejected'
+            ? '<div class="helper-note">Žádost byla administrátorem uzavřena.</div>'
+            : '<button class="btn-small" onclick="openDonationModal(\'' + request.id + '\')">💙 Pomoci</button>';
+        return '<div class="request-card" data-status="' + escapeHtml(request.status) + '">' +
+          '<span class="request-number">' + escapeHtml(request.number || '#000') + '</span>' +
+          getRequestStatusLabel(request) +
+          '<div class="request-name">' + escapeHtml(request.displayName) + '</div>' +
+          '<div class="request-title">' + escapeHtml(request.title) + '</div>' +
+          '<div class="request-meta">📍 ' + getCityLink(request.city) + ' &nbsp;·&nbsp; 💰 ' + formatCurrency(request.target) + ' &nbsp;·&nbsp; 👍 ' + percent + '%</div>' +
+          '<div class="request-story">' + escapeHtml(request.story) + '</div>' +
+          '<div class="progress-bar-bg"><div class="progress-fill" style="width:' + progress + '%"></div></div>' +
+          '<div class="progress-stats"><span>' + formatCurrency(request.raised) + ' vybráno</span><span>cíl: ' + formatCurrency(request.target) + '</span></div>' +
+          action +
+        '</div>';
+      }).join('');
+    }
+
+    function renderVotes() {
+      if (state.loading.requests || state.loading.votes) {
+        votesGrid.innerHTML = renderLoading('Načítám hlasování komunity...');
+        return;
+      }
+      const votable = state.requests.map(normalizeRequest).filter(function(request) {
+        return request.status === 'active' && request.workflowStage === 'voting';
+      });
+      if (!votable.length) {
+        votesGrid.innerHTML = '<div class="empty-state">Právě není žádná žádost ve hlasování. Nové žádosti se objeví okamžitě po vytvoření.</div>';
+        return;
+      }
+      votesGrid.innerHTML = votable.map(function(request) {
+        const percent = getVotePercentage(request);
+        const voted = state.userVotes[request.id];
+        return '<div class="vote-card">' +
+          '<span class="request-number">' + escapeHtml(request.number || '#000') + '</span>' +
+          '<span class="card-status status-voting">🗳️ Probíhá hlasování</span>' +
+          '<div class="request-name">' + escapeHtml(request.displayName) + '</div>' +
+          '<div class="request-title">' + escapeHtml(request.title) + '</div>' +
+          '<div class="request-meta">📍 ' + getCityLink(request.city) + ' &nbsp;·&nbsp; <span style="color:#e04444;font-weight:600">potřebuje ' + formatCurrency(request.target) + '</span></div>' +
+          '<div class="request-story">' + escapeHtml(request.story) + '</div>' +
+          '<div class="vote-threshold" style="margin:14px 0"><div class="threshold-bar" style="height:8px"><div class="threshold-fill" style="width:' + percent + '%"></div></div></div>' +
+          '<div class="vote-numbers">👍 ' + Number(request.yes || 0) + ' Ano &nbsp;/&nbsp; 👎 ' + Number(request.no || 0) + ' Ne &nbsp;·&nbsp; <strong style="color:' + (percent >= 70 ? '#3a6ea5' : '#b07800') + '">' + percent + '%</strong> pro</div>' +
+          '<div class="vote-buttons" style="margin-top:14px">' +
+            '<button class="vote-yes' + (voted === 'yes' ? ' voted' : '') + '" onclick="castVote(\'' + request.id + '\',\'yes\')">👍 Ano</button>' +
+            '<button class="vote-no' + (voted === 'no' ? ' voted' : '') + '" onclick="castVote(\'' + request.id + '\',\'no\')">👎 Ne</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function renderStats() {
+      const totalDonated = state.donations.reduce(function(sum, donation) { return sum + Number(donation.amount || 0); }, 0);
+      const wonCount = state.requests.filter(function(request) { return request.status === 'won'; }).length;
+      statDonated.innerText = formatCurrency(totalDonated);
+      statWinners.innerText = String(wonCount);
+      statMembers.innerText = String(state.users.length);
+    }
+
+    function renderDashboard() {
+      if (!state.currentUser) {
+        dashboardGuest.style.display = 'block';
+        dashboardApp.style.display = 'none';
+        return;
+      }
+      dashboardGuest.style.display = 'none';
+      dashboardApp.style.display = 'block';
+
+      const profile = state.profile || {};
+      const ownRequests = state.requests.map(normalizeRequest).filter(function(request) { return request.authorId === state.currentUser.uid; });
+      const ownDonations = state.donations.filter(function(donation) { return donation.donorId === state.currentUser.uid; });
+      const votedEntries = Object.keys(state.userVotes).map(function(requestId) {
+        const request = state.requests.map(normalizeRequest).find(function(item) { return item.id === requestId; });
+        return request ? { request: request, side: state.userVotes[requestId] } : null;
+      }).filter(Boolean);
+      const claimDetails = profile.claimDetails || { phone: '', iban: '', note: '' };
+      const wonRequest = ownRequests.find(function(request) { return request.status === 'won'; });
+
+      document.getElementById('profileName').value = profile.displayName || profile.name || '';
+      document.getElementById('profileCity').value = profile.city || '';
+      document.getElementById('profileAbout').value = profile.about || '';
+      document.getElementById('claimPhone').value = claimDetails.phone || '';
+      document.getElementById('claimIban').value = claimDetails.iban || '';
+      document.getElementById('claimNote').value = claimDetails.note || '';
+      profileAvatarPreview.src = profile.avatar || defaultAvatar(getCurrentProfileName());
+      profileEmailDisplay.textContent = state.currentUser.email;
+      profileBalanceDisplay.textContent = (profile.balance || 0) + ' bodů pomoci';
+
+      profileSummary.innerHTML = [
+        '<div class="summary-item"><strong>' + Number(profile.balance || 0) + '</strong><span>Body pomoci na účtu. Každých 10 Kč příspěvku přidá 1 bod.</span></div>',
+        '<div class="summary-item"><strong>' + ownRequests.length + '</strong><span>Vlastní žádosti uložené ve Firestore. Každá se propisuje do veřejného seznamu v reálném čase.</span></div>',
+        '<div class="summary-item"><strong>' + ownDonations.length + '</strong><span>Odeslané příspěvky. Historie níže ukazuje datum, částku i podpořenou žádost.</span></div>'
+      ].join('');
+
+      myRequestsList.innerHTML = ownRequests.length ? ownRequests.slice().reverse().map(function(request) {
+        return '<div class="activity-item">' + getRequestStatusLabel(request) + '<h4>' + escapeHtml(request.title) + '</h4><p>' + escapeHtml(request.story) + '</p><div class="activity-meta">' + escapeHtml(request.number || '#000') + ' · ' + formatCurrency(request.target) + ' · ' + formatDate(request.createdAt) + '</div></div>';
+      }).join('') : '<div class="empty-state">Ještě nemáš žádnou vytvořenou žádost.</div>';
+
+      myVotesList.innerHTML = votedEntries.length ? votedEntries.slice().reverse().map(function(entry) {
+        return '<div class="activity-item"><h4>' + escapeHtml(entry.request.title) + '</h4><p>Tvůj hlas: <strong style="color:' + (entry.side === 'yes' ? '#3a6ea5' : '#b07800') + '">' + (entry.side === 'yes' ? 'Ano' : 'Ne') + '</strong>. Aktuální podpora komunity je ' + getVotePercentage(entry.request) + '%.</p><div class="activity-meta">' + escapeHtml(entry.request.number || '#000') + ' · ' + formatDate(entry.request.createdAt) + '</div></div>';
+      }).join('') : '<div class="empty-state">Zatím jsi nehlasoval(a) o žádné žádosti.</div>';
+
+      myDonationsList.innerHTML = ownDonations.length ? ownDonations.slice().reverse().map(function(donation) {
+        return '<div class="donation-item"><h4>' + escapeHtml(donation.requestTitle || 'Příspěvek komunitě') + '</h4><p>Příspěvek ' + formatCurrency(donation.amount) + ' připsaný dne ' + formatDateTime(donation.createdAt) + '. Získané body: ' + Number(donation.points || 0) + '.</p></div>';
+      }).join('') : '<div class="empty-state">Zatím nemáš žádné příspěvky. Otevři libovolnou žádost a klikni na „Pomoci“.</div>';
+
+      claimStatus.innerHTML = wonRequest
+        ? 'Tvoje žádost <strong>' + escapeHtml(wonRequest.title) + '</strong> už byla vylosována. Zkontroluj údaje pro převzetí výhry a čekej na kontakt administrátora.'
+        : 'Údaje pro převzetí výhry můžeš připravit dopředu. Aktivují se ve chvíli, kdy tvoje žádost vyhraje měsíční loterii.';
+    }
+
+    function computeNextDrawDate() {
+      const latest = state.lotteries[0];
+      const base = latest ? toMillis(latest.createdAt) : Date.now();
+      return base + (30 * 24 * 60 * 60 * 1000);
+    }
+
+    function renderLottery() {
+      if (state.loading.requests || state.loading.lotteries || state.loading.users) {
+        currentLotteryCard.innerHTML = renderLoading('Načítám loterii...');
+        nextDrawCard.innerHTML = renderLoading('Počítám další termín...');
+        lotteryHistoryList.innerHTML = renderLoading('Načítám historii loterií...');
+        return;
+      }
+      const eligible = state.requests.map(normalizeRequest).filter(function(request) {
+        return request.status === 'active' && request.workflowStage === 'lottery_ready';
+      });
+      currentLotteryCard.innerHTML = eligible.length
+        ? '<div class="lottery-item"><h4>' + eligible.length + ' žádostí čeká na los</h4><p>Do aktuálního cyklu vstupují pouze žádosti, které mají 70 % hlasů „Ano“. Čím vyšší má autor bodový zůstatek, tím větší je jeho váha při losování.</p></div>'
+        : '<div class="empty-state">Zatím není žádná žádost připravená do loterie.</div>';
+      nextDrawCard.innerHTML = '<div class="lottery-item"><h4>' + escapeHtml(formatDate(computeNextDrawDate())) + '</h4><p>Rozlosování běží v měsíčních cyklech po 30 dnech. Administrátor může další los spustit i ručně.</p></div>';
+      lotteryHistoryList.innerHTML = state.lotteries.length ? state.lotteries.map(function(lottery) {
+        const request = state.requests.map(normalizeRequest).find(function(item) { return item.id === lottery.winnerRequestId; });
+        const user = state.userMap[lottery.winnerUserId] || {};
+        return '<div class="lottery-item"><h4>' + escapeHtml(request ? request.title : (lottery.winnerTitle || 'Rozlosovaná žádost')) + '</h4><p>Vylosováno: ' + escapeHtml(formatDateTime(lottery.createdAt)) + ' · autor: ' + escapeHtml(user.displayName || lottery.winnerName || 'Člen komunity') + ' · vyplaceno: ' + formatCurrency(lottery.amount || 0) + '</p></div>';
+      }).join('') : '<div class="empty-state">Historie loterií je zatím prázdná.</div>';
+    }
+
+    function renderAdmin() {
+      updateAdminState();
+      if (!state.isAdmin) return;
+      const totalDonated = state.donations.reduce(function(sum, donation) { return sum + Number(donation.amount || 0); }, 0);
+      adminStats.innerHTML = [
+        '<div class="lottery-item"><h4>Celkem vybráno</h4><p>' + formatCurrency(totalDonated) + '</p></div>',
+        '<div class="lottery-item"><h4>Aktivní uživatelé</h4><p>' + state.users.length + '</p></div>',
+        '<div class="lottery-item"><h4>Žádosti v systému</h4><p>' + state.requests.length + '</p></div>'
+      ].join('');
+      adminUsersList.innerHTML = state.users.length ? state.users.slice(0, 20).map(function(user) {
+        return '<div class="admin-item"><h4>' + escapeHtml(user.displayName || user.name || user.email || 'Uživatel') + '</h4><p>' + escapeHtml(user.email || '') + ' · ' + Number(user.balance || 0) + ' bodů · vytvořeno ' + formatDate(user.createdAt) + '</p></div>';
+      }).join('') : '<div class="empty-state">Žádní uživatelé.</div>';
+      adminRequestsList.innerHTML = state.requests.length ? state.requests.map(normalizeRequest).map(function(request) {
+        return '<div class="admin-item"><h4>' + escapeHtml(request.title) + '</h4><p>' + escapeHtml(request.displayName) + ' · ' + getRequestStatusLabel(request) + ' · ' + formatCurrency(request.target) + '</p><div class="admin-actions">' +
+          '<button type="button" class="btn-logout" onclick="adminRequestAction(\'' + request.id + '\',\'approve\')">Potvrdit výběr</button>' +
+          '<button type="button" class="btn-logout" onclick="adminRequestAction(\'' + request.id + '\',\'lottery\')">Do loterie</button>' +
+          '<button type="button" class="btn-logout" onclick="adminRequestAction(\'' + request.id + '\',\'reject\')">Odmítnout</button>' +
+          '<button type="button" class="btn-logout" onclick="adminRequestAction(\'' + request.id + '\',\'delete\')">Skrýt</button>' +
+        '</div></div>';
+      }).join('') : '<div class="empty-state">Žádné žádosti k moderaci.</div>';
+    }
+
+    function renderAll() {
+      refreshUserHeader();
+      refreshComposerVisibility();
+      renderRequests();
+      renderVotes();
+      renderDashboard();
+      renderLottery();
+      renderStats();
+      renderAdmin();
+    }
+
+    async function ensureUserDocument(user, displayName) {
+      if (!user) return;
+      const name = displayName || user.displayName || user.email.split('@')[0];
+      const ref = db.collection('users').doc(user.uid);
+      const snapshot = await ref.get();
+      const existing = snapshot.exists ? snapshot.data() : {};
+      await ref.set({
+        email: user.email,
+        displayName: existing.displayName || existing.name || name,
+        name: existing.name || existing.displayName || name,
+        balance: typeof existing.balance === 'number' ? existing.balance : 0,
+        city: existing.city || '',
+        about: existing.about || '',
+        avatar: existing.avatar || defaultAvatar(name),
+        role: existing.role || (ADMIN_EMAILS.indexOf(user.email || '') >= 0 ? 'admin' : 'member'),
+        claimDetails: existing.claimDetails || { phone: '', iban: '', note: '' },
+        createdAt: existing.createdAt || fieldValue.serverTimestamp(),
+        updatedAt: fieldValue.serverTimestamp()
+      }, { merge: true });
+    }
+
+    function subscribeQuery(ref, key, handler) {
+      const unsubscribe = ref.onSnapshot(function(snapshot) {
+        handler(snapshot);
+        state.loading[key] = false;
+        renderAll();
+      }, function(error) {
+        state.loading[key] = false;
+        renderAll();
+        showToast('Chyba Firestore: ' + error.message, 'error');
+      });
+      state.unsubscribers.push(unsubscribe);
+    }
+
+    function subscribeRealtime() {
+      clearSubscriptions();
+      state.loading.requests = true;
+      state.loading.users = true;
+      state.loading.lotteries = true;
+      state.loading.donations = true;
+      state.loading.votes = Boolean(state.currentUser);
+      subscribeQuery(db.collection('requests').orderBy('createdAt', 'desc'), 'requests', function(snapshot) {
+        state.requests = snapshot.docs.map(docData);
+      });
+      subscribeQuery(db.collection('users').orderBy('createdAt', 'desc'), 'users', function(snapshot) {
+        state.users = snapshot.docs.map(docData);
+        state.userMap = state.users.reduce(function(acc, user) {
+          acc[user.id] = user;
+          return acc;
+        }, {});
+        state.profile = state.currentUser ? state.userMap[state.currentUser.uid] || null : null;
+      });
+      subscribeQuery(db.collection('lotteries').orderBy('createdAt', 'desc').limit(20), 'lotteries', function(snapshot) {
+        state.lotteries = snapshot.docs.map(docData);
+      });
+      subscribeQuery(db.collection('donations').orderBy('createdAt', 'desc').limit(300), 'donations', function(snapshot) {
+        state.donations = snapshot.docs.map(docData);
+      });
+      if (state.currentUser) {
+        subscribeQuery(db.collection('votes').where('voterId', '==', state.currentUser.uid), 'votes', function(snapshot) {
+          state.userVotes = snapshot.docs.reduce(function(acc, doc) {
+            const data = doc.data();
+            acc[data.requestId] = data.side;
+            return acc;
+          }, {});
+        });
+      } else {
+        state.userVotes = {};
+        state.loading.votes = false;
+      }
+      renderAll();
+    }
+
+    function serializeForBackup(value) {
+      if (Array.isArray(value)) return value.map(serializeForBackup);
+      if (value && typeof value === 'object') {
+        if (typeof value.toMillis === 'function') return value.toMillis();
+        if (typeof value.seconds === 'number') return value.seconds * 1000;
+        return Object.keys(value).reduce(function(acc, key) {
+          acc[key] = serializeForBackup(value[key]);
+          return acc;
+        }, {});
+      }
+      return value;
+    }
+
+    function restoreImportedDates(value, key) {
+      if (Array.isArray(value)) return value.map(function(item) { return restoreImportedDates(item, key); });
+      if (value && typeof value === 'object') {
+        return Object.keys(value).reduce(function(acc, innerKey) {
+          acc[innerKey] = restoreImportedDates(value[innerKey], innerKey);
+          return acc;
+        }, {});
+      }
+      if (typeof value === 'number' && key && /(At|Date)$/i.test(key)) return new Date(value);
+      return value;
+    }
+
+    async function importRecords(collectionName, records) {
+      if (!records || !records.length) return;
+      for (let index = 0; index < records.length; index += 400) {
+        const batch = db.batch();
+        records.slice(index, index + 400).forEach(function(record) {
+          const ref = db.collection(collectionName).doc(record.id || db.collection(collectionName).doc().id);
+          const payload = restoreImportedDates(record);
+          delete payload.id;
+          batch.set(ref, payload, { merge: true });
+        });
+        await batch.commit();
+      }
+    }
+
+    async function submitRequestFromValues(values) {
+      if (!state.currentUser) {
+        window.openAuthModal();
+        return;
+      }
+      const profile = state.profile || {};
+      if (!values.title || !values.city || !values.story || !values.amount) {
+        throw new Error('Vyplň název, město, částku i popis situace.');
+      }
+      const nextNumber = String(computeNextRequestNumber()).padStart(3, '0');
+      await db.collection('requests').add({
+        number: '#' + nextNumber,
+        authorId: state.currentUser.uid,
+        displayName: values.anonymous ? 'Anonymní člen' : getCurrentProfileName(),
+        anonymous: values.anonymous,
+        city: values.city,
+        location: values.city,
+        title: values.title,
+        description: values.story,
+        amountNeeded: values.amount,
+        currentAmount: 0,
+        status: 'active',
+        workflowStage: 'voting',
+        votesYes: 0,
+        votesNo: 0,
+        authorBalanceSnapshot: Number(profile.balance || 0),
+        createdAt: fieldValue.serverTimestamp(),
+        updatedAt: fieldValue.serverTimestamp()
+      });
+    }
+
+    async function processDonation() {
+      if (!state.currentUser) {
+        window.openAuthModal();
+        return;
+      }
+      if (!state.donationRequest) return;
+      const amount = Number(customDonationAmount.value || 0);
+      if (!amount || amount < 10) {
+        showToast('Minimální příspěvek je 10 Kč.', 'error');
+        return;
+      }
+      const requestRef = db.collection('requests').doc(state.donationRequest.id);
+      const userRef = db.collection('users').doc(state.currentUser.uid);
+      const donationRef = db.collection('donations').doc();
+      confirmDonationBtn.disabled = true;
+      try {
+        await db.runTransaction(async function(transaction) {
+          const requestSnap = await transaction.get(requestRef);
+          const userSnap = await transaction.get(userRef);
+          if (!requestSnap.exists) throw new Error('Žádost už neexistuje.');
+          if (!userSnap.exists) throw new Error('Profil uživatele nebyl nalezen.');
+          const request = requestSnap.data();
+          const user = userSnap.data();
+          const points = Math.floor(amount / 10);
+          transaction.set(donationRef, {
+            requestId: state.donationRequest.id,
+            requestTitle: request.title || 'Žádost o pomoc',
+            donorId: state.currentUser.uid,
+            donorEmail: state.currentUser.email,
+            donorName: user.displayName || user.name || state.currentUser.email,
+            recipientUserId: request.authorId || null,
+            amount: amount,
+            points: points,
+            createdAt: fieldValue.serverTimestamp()
+          });
+          transaction.update(requestRef, {
+            currentAmount: Number(request.currentAmount || 0) + amount,
+            updatedAt: fieldValue.serverTimestamp()
+          });
+          transaction.set(userRef, {
+            balance: Number(user.balance || 0) + points,
+            updatedAt: fieldValue.serverTimestamp()
+          }, { merge: true });
+        });
+        closeDonationModal();
+        showToast('Příspěvek byl uložen a body připsány.', 'info');
+      } catch (error) {
+        showToast(error.message, 'error');
+      } finally {
+        confirmDonationBtn.disabled = false;
+      }
+    }
+
+    function closeDonationModal() {
+      donationModal.style.display = 'none';
+      state.donationRequest = null;
+    }
+
+    function chooseWeightedWinner(candidates) {
+      const weights = candidates.map(function(candidate) {
+        const owner = state.userMap[candidate.authorId] || {};
+        return Math.max(1, Number(owner.balance || candidate.authorBalanceSnapshot || 0));
+      });
+      const totalWeight = weights.reduce(function(sum, weight) { return sum + weight; }, 0);
+      let cursor = Math.random() * totalWeight;
+      for (let index = 0; index < candidates.length; index += 1) {
+        cursor -= weights[index];
+        if (cursor <= 0) return candidates[index];
+      }
+      return candidates[0];
+    }
+
+    async function runLottery() {
+      if (!state.isAdmin) {
+        showToast('Tuto akci může provést pouze administrátor.', 'error');
+        return;
+      }
+      const eligible = state.requests.map(normalizeRequest).filter(function(request) {
+        return request.status === 'active' && request.workflowStage === 'lottery_ready';
+      });
+      if (!eligible.length) {
+        showToast('Žádná žádost není připravená do loterie.', 'error');
+        return;
+      }
+      const winner = chooseWeightedWinner(eligible);
+      const lotteryRef = db.collection('lotteries').doc();
+      const requestRef = db.collection('requests').doc(winner.id);
+      const userRef = db.collection('users').doc(winner.authorId);
+      await db.runTransaction(async function(transaction) {
+        const requestSnap = await transaction.get(requestRef);
+        const userSnap = await transaction.get(userRef);
+        if (!requestSnap.exists || !userSnap.exists) throw new Error('Výherní data nebyla nalezena.');
+        const request = requestSnap.data();
+        const user = userSnap.data();
+        const amount = Number(request.currentAmount || request.amountNeeded || 0);
+        transaction.set(lotteryRef, {
+          winnerRequestId: winner.id,
+          winnerUserId: winner.authorId,
+          winnerName: user.displayName || user.name || user.email,
+          winnerTitle: request.title || winner.title,
+          amount: amount,
+          createdAt: fieldValue.serverTimestamp(),
+          eligibleCount: eligible.length
+        });
+        transaction.update(requestRef, {
+          status: 'won',
+          lotteryId: lotteryRef.id,
+          wonAt: fieldValue.serverTimestamp(),
+          updatedAt: fieldValue.serverTimestamp()
+        });
+        transaction.set(userRef, {
+          lastWin: {
+            requestId: winner.id,
+            lotteryId: lotteryRef.id,
+            amount: amount,
+            createdAt: new Date().toISOString()
+          },
+          updatedAt: fieldValue.serverTimestamp()
+        }, { merge: true });
+      });
+      showToast('Loterie byla úspěšně rozlosována.', 'info');
+    }
+
+    window.openDonationModal = function(requestId) {
+      const request = state.requests.map(normalizeRequest).find(function(item) { return item.id === requestId; });
+      if (!request) return;
+      state.donationRequest = request;
+      donationModalSubtitle.textContent = request.title + ' · ' + formatCurrency(request.target);
+      customDonationAmount.value = '100';
+      document.querySelectorAll('.donation-chip').forEach(function(button) {
+        button.classList.toggle('active', button.getAttribute('data-amount') === '100');
+      });
+      donationModal.style.display = 'flex';
+    };
+
+    window.castVote = async function(requestId, side) {
+      if (!state.currentUser) {
+        window.openAuthModal();
+        return;
+      }
+      const voteRef = db.collection('votes').doc(requestId + '_' + state.currentUser.uid);
+      const requestRef = db.collection('requests').doc(requestId);
+      const userRef = db.collection('users').doc(state.currentUser.uid);
+      try {
+        await db.runTransaction(async function(transaction) {
+          const voteSnap = await transaction.get(voteRef);
+          const requestSnap = await transaction.get(requestRef);
+          const userSnap = await transaction.get(userRef);
+          if (voteSnap.exists) throw new Error('Pro tuto žádost už jsi hlasoval(a).');
+          if (!requestSnap.exists) throw new Error('Žádost nebyla nalezena.');
+          if (!userSnap.exists) throw new Error('Profil uživatele nebyl nalezen.');
+          const user = userSnap.data();
+          if (Number(user.balance || 0) < 1) throw new Error('Pro hlasování potřebuješ alespoň 1 bod pomoci.');
+          const request = requestSnap.data();
+          const yes = Number(request.votesYes || 0) + (side === 'yes' ? 1 : 0);
+          const no = Number(request.votesNo || 0) + (side === 'no' ? 1 : 0);
+          const total = yes + no;
+          const percent = total ? Math.round((yes / total) * 100) : 0;
+          transaction.set(voteRef, {
+            requestId: requestId,
+            voterId: state.currentUser.uid,
+            side: side,
+            createdAt: fieldValue.serverTimestamp()
+          });
+          transaction.update(requestRef, {
+            votesYes: yes,
+            votesNo: no,
+            workflowStage: percent >= 70 ? 'lottery_ready' : (request.workflowStage || 'voting'),
+            updatedAt: fieldValue.serverTimestamp()
+          });
+        });
+        showToast('Hlas byl uložen.', 'info');
+      } catch (error) {
+        showToast(error.message, 'error');
+      }
+    };
+
+    window.filterCards = function(status, btn) {
+      state.activeRequestFilter = status;
+      document.querySelectorAll('.tab-btn').forEach(function(button) { button.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+      renderRequests();
+    };
+
+    window.smoothScroll = function(id) {
+      const selector = String(id || '').charAt(0) === '#' ? String(id) : '#' + String(id);
+      const el = document.querySelector(selector);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.adminRequestAction = async function(requestId, action) {
+      if (!state.isAdmin) {
+        showToast('Tuto akci může provést pouze administrátor.', 'error');
+        return;
+      }
+      const updates = {
+        approve: { status: 'active', workflowStage: 'funding', updatedAt: fieldValue.serverTimestamp() },
+        lottery: { status: 'active', workflowStage: 'lottery_ready', updatedAt: fieldValue.serverTimestamp() },
+        reject: { status: 'rejected', updatedAt: fieldValue.serverTimestamp() },
+        delete: { status: 'deleted', updatedAt: fieldValue.serverTimestamp() }
+      };
+      try {
+        await db.collection('requests').doc(requestId).set(updates[action], { merge: true });
+        showToast('Žádost byla upravena.', 'info');
+      } catch (error) {
+        showToast(error.message, 'error');
+      }
+    };
+
+    const detailBtn = document.getElementById('detailBtn');
+    const detailText = document.getElementById('detailText');
+    if (detailBtn) detailBtn.onclick = function() {
+      const show = detailText.style.display === 'block';
+      detailText.style.display = show ? 'none' : 'block';
+      detailBtn.textContent = show ? '🔍 Jak to celé funguje?' : '🔍 Skrýt detail';
+    };
+
+    const eye = document.getElementById('togglePassword');
+    const pass = document.getElementById('password');
+    const eyeLine = document.getElementById('eyeLine');
+    const nameField = document.getElementById('displayName');
+    if (eye) eye.onclick = function() {
+      const type = pass.type === 'password' ? 'text' : 'password';
+      pass.type = type;
+      if (eyeLine) eyeLine.style.display = type === 'text' ? 'none' : 'block';
+    };
+
+    const modal = document.getElementById('authModal');
+    window.openAuthModal = function() { modal.style.display = 'flex'; };
+    document.getElementById('showLoginBtn').onclick = function() { modal.style.display = 'flex'; };
+    document.getElementById('closeModal').onclick = function() { modal.style.display = 'none'; };
+    window.onclick = function(event) {
+      if (event.target === modal) modal.style.display = 'none';
+      if (event.target === donationModal) closeDonationModal();
+    };
+
+    let isLogin = true;
+    const switchAuth = document.getElementById('switchAuth');
+    const authTitle = document.getElementById('authTitle');
+    const authAction = document.getElementById('authAction');
+    if (switchAuth) switchAuth.onclick = function(event) {
+      event.preventDefault();
+      isLogin = !isLogin;
+      authTitle.innerText = isLogin ? 'Přihlásit se' : 'Registrace';
+      authAction.innerText = isLogin ? 'Přihlásit se' : 'Registrovat se';
+      switchAuth.innerText = isLogin ? 'Nemáte účet? Registrujte se' : 'Máte účet? Přihlaste se';
+      nameField.style.display = isLogin ? 'none' : 'block';
+    };
+    if (authAction) authAction.onclick = async function() {
+      const email = document.getElementById('email').value.trim();
+      const pwd = pass.value;
+      const displayName = nameField.value.trim();
+      if (!email || !pwd) {
+        showToast('Vyplň email a heslo.', 'error');
+        return;
+      }
+      if (!isLogin && !displayName) {
+        showToast('Vyplň také své jméno pro vytvoření profilu.', 'error');
+        return;
+      }
+      try {
+        const credential = isLogin
+          ? await auth.signInWithEmailAndPassword(email, pwd)
+          : await auth.createUserWithEmailAndPassword(email, pwd);
+        if (!isLogin && credential.user) {
+          await credential.user.updateProfile({ displayName: displayName });
+          await ensureUserDocument(credential.user, displayName);
+        }
+        modal.style.display = 'none';
+        document.getElementById('email').value = '';
+        pass.value = '';
+        nameField.value = '';
+        showToast(isLogin ? 'Přihlášení proběhlo úspěšně.' : 'Účet byl vytvořen.', 'info');
+      } catch (error) {
+        showToast(error.message, 'error');
+      }
+    };
+
+    auth.onAuthStateChanged(async function(user) {
+      state.currentUser = user;
+      if (user) await ensureUserDocument(user);
+      subscribeRealtime();
+      renderAll();
+    });
+
+    document.getElementById('logoutBtn').onclick = function() {
+      auth.signOut();
+    };
+
+    profileForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      if (!state.currentUser) {
+        showToast('Nejdřív se přihlas.', 'error');
+        return;
+      }
+      try {
+        const displayName = document.getElementById('profileName').value.trim() || getCurrentProfileName();
+        const city = document.getElementById('profileCity').value.trim();
+        const about = document.getElementById('profileAbout').value.trim();
+        await db.collection('users').doc(state.currentUser.uid).set({
+          displayName: displayName,
+          name: displayName,
+          city: city,
+          about: about,
+          updatedAt: fieldValue.serverTimestamp()
+        }, { merge: true });
+        showToast('Profil byl uložen.', 'info');
+      } catch (error) {
+        showToast(error.message, 'error');
+      }
+    });
+
+    requestForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      try {
+        await submitRequestFromValues({
+          title: document.getElementById('requestTitle').value.trim(),
+          city: (state.profile && state.profile.city) || document.getElementById('profileCity').value.trim(),
+          story: document.getElementById('requestStory').value.trim(),
+          amount: Number(document.getElementById('requestAmount').value || 0),
+          anonymous: false
+        });
+        requestForm.reset();
+        showToast('Žádost byla vytvořena a uložena do Firestore.', 'info');
+        window.smoothScroll('#zadosti');
+      } catch (error) {
+        showToast(error.message, 'error');
+      }
+    });
+
+    if (quickRequestForm) {
+      quickRequestForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        try {
+          await submitRequestFromValues({
+            title: document.getElementById('quickRequestTitle').value.trim(),
+            city: document.getElementById('quickRequestCity').value.trim(),
+            story: document.getElementById('quickRequestStory').value.trim(),
+            amount: Number(document.getElementById('quickRequestAmount').value || 0),
+            anonymous: document.getElementById('quickRequestAnonymous').checked
+          });
+          quickRequestForm.reset();
+          showToast('Veřejná žádost byla vytvořena.', 'info');
+        } catch (error) {
+          showToast(error.message, 'error');
+        }
+      });
+    }
+
+    claimForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      if (!state.currentUser) {
+        showToast('Nejdřív se přihlas.', 'error');
+        return;
+      }
+      try {
+        await db.collection('users').doc(state.currentUser.uid).set({
+          claimDetails: {
+            phone: document.getElementById('claimPhone').value.trim(),
+            iban: document.getElementById('claimIban').value.trim(),
+            note: document.getElementById('claimNote').value.trim(),
+            updatedAt: new Date().toISOString()
+          },
+          updatedAt: fieldValue.serverTimestamp()
+        }, { merge: true });
+        showToast('Údaje pro převzetí výhry byly uloženy.', 'info');
+      } catch (error) {
+        showToast(error.message, 'error');
+      }
+    });
+
+    if (newsletterForm) {
+      newsletterForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const email = newsletterEmail.value.trim().toLowerCase();
+        if (!email) {
+          showToast('Zadej email pro odběr novinek.', 'error');
+          return;
+        }
+        try {
+          await db.collection('subscribers').doc(email).set({
+            email: email,
+            source: 'website',
+            createdAt: fieldValue.serverTimestamp()
+          }, { merge: true });
+          newsletterForm.reset();
+          showToast('Děkujeme, jsi přihlášen(a) k odběru.', 'info');
+        } catch (error) {
+          showToast(error.message, 'error');
+        }
+      });
+    }
+
+    if (avatarUploadInput) {
+      avatarUploadInput.addEventListener('change', async function(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file || !state.currentUser) return;
+        try {
+          const avatarRef = storage.ref('avatars/' + state.currentUser.uid + '/' + Date.now() + '-' + file.name.replace(/\s+/g, '-'));
+          await avatarRef.put(file);
+          const url = await avatarRef.getDownloadURL();
+          await db.collection('users').doc(state.currentUser.uid).set({ avatar: url, updatedAt: fieldValue.serverTimestamp() }, { merge: true });
+          showToast('Avatar byl nahrán.', 'info');
+        } catch (error) {
+          showToast(error.message, 'error');
+        } finally {
+          avatarUploadInput.value = '';
+        }
+      });
+    }
+
+    if (exportDataBtn) {
+      exportDataBtn.addEventListener('click', function() {
+        const payload = {
+          schema: 'saymoonhelp-firestore-backup-v1',
+          exportedAt: Date.now(),
+          users: serializeForBackup(state.users),
+          requests: serializeForBackup(state.requests),
+          donations: serializeForBackup(state.donations),
+          lotteries: serializeForBackup(state.lotteries)
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'saymoonhelp-firestore-backup-' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+      });
+    }
+
+    if (importDataInput) {
+      importDataInput.addEventListener('change', function(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async function(loadEvent) {
+          try {
+            if (!state.isAdmin) throw new Error('Import zálohy je povolen jen administrátorovi.');
+            const parsed = JSON.parse(String(loadEvent.target.result || '{}'));
+            await importRecords('users', parsed.users || []);
+            await importRecords('requests', parsed.requests || []);
+            await importRecords('donations', parsed.donations || []);
+            await importRecords('lotteries', parsed.lotteries || []);
+            showToast('Záloha byla importována do Firestore.', 'info');
+          } catch (error) {
+            showToast(error.message, 'error');
+          } finally {
+            importDataInput.value = '';
+          }
+        };
+        reader.readAsText(file, 'utf-8');
+      });
+    }
+
+    if (goToRequestsBtn) {
+      goToRequestsBtn.addEventListener('click', function() {
+        window.smoothScroll('#zadosti');
+      });
+    }
+
+    document.querySelectorAll('.donation-chip').forEach(function(button) {
+      button.addEventListener('click', function() {
+        document.querySelectorAll('.donation-chip').forEach(function(item) { item.classList.remove('active'); });
+        button.classList.add('active');
+        customDonationAmount.value = button.getAttribute('data-amount') || '100';
+      });
+    });
+
+    confirmDonationBtn.addEventListener('click', processDonation);
+    closeDonationModalBtn.addEventListener('click', closeDonationModal);
+    manualDrawBtn.addEventListener('click', runLottery);
+    adminRunLotteryBtn.addEventListener('click', runLottery);
+
+    window.addEventListener('scroll', function() {
+      const scrolled = window.scrollY > 100;
+      moon.classList.toggle('gold-moon', scrolled);
+      footerLunar.classList.toggle('gold', scrolled);
+      document.querySelectorAll('.logo-star').forEach(function(star) {
+        star.style.color = scrolled ? '#ffd700' : '#3a6ea5';
+      });
+    });
+
+    renderAll();
     function getProfile(user) {
       return user ? state.profiles[user.uid] : null;
     }
@@ -1058,6 +2244,46 @@
       alert('Údaje pro převzetí výhry byly uloženy.');
     });
 
+    if (exportDataBtn) {
+      exportDataBtn.addEventListener('click', function() {
+        const payload = getBackupPayload();
+        const json = JSON.stringify(payload, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const link = document.createElement('a');
+        const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'saymoonhelp-backup-' + stamp + '.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+      });
+    }
+
+    if (importDataInput) {
+      importDataInput.addEventListener('change', function(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(loadEvent) {
+          try {
+            const parsed = JSON.parse(String(loadEvent.target.result || '{}'));
+            applyImportedState(parsed);
+            alert('Záloha byla úspěšně načtena.');
+          } catch (error) {
+            alert('Nepodařilo se načíst zálohu: ' + error.message);
+          } finally {
+            importDataInput.value = '';
+          }
+        };
+        reader.onerror = function() {
+          alert('Soubor se nepodařilo přečíst.');
+          importDataInput.value = '';
+        };
+        reader.readAsText(file, 'utf-8');
+      });
+    }
+
     window.castVote = function(requestId, side) {
       if (!currentUser) {
         openAuthModal();
@@ -1180,19 +2406,29 @@
 </script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    var sections = ['how-it-works', 'zadosti', 'hlasovani', 'my-space'];
     var navLinks = document.querySelectorAll('.nav-link');
-    window.addEventListener('scroll', function() {
-      var scrollY = window.scrollY + 140;
-      sections.forEach(function(id) {
-        var el = document.getElementById(id);
-        var link = document.querySelector('.nav-link[href="#' + id + '"]');
-        if (!el || !link) return;
-        if (scrollY >= el.offsetTop && scrollY < el.offsetTop + el.offsetHeight) {
-          navLinks.forEach(function(item) { item.classList.remove('nav-active'); });
-          link.classList.add('nav-active');
-        }
+    var observedSections = Array.prototype.slice.call(document.querySelectorAll('main section[id], .hero'));
+    observedSections.forEach(function(section) {
+      section.classList.add('page-section');
+    });
+    var revealObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) entry.target.classList.add('is-visible');
       });
+    }, { threshold: 0.12 });
+    observedSections.forEach(function(section) {
+      revealObserver.observe(section);
+    });
+    var navObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (!entry.isIntersecting || !entry.target.id) return;
+        navLinks.forEach(function(item) { item.classList.remove('nav-active'); });
+        var link = document.querySelector('.nav-link[href="#' + entry.target.id + '"]');
+        if (link) link.classList.add('nav-active');
+      });
+    }, { rootMargin: '-30% 0px -55% 0px', threshold: 0.1 });
+    observedSections.filter(function(section) { return section.id; }).forEach(function(section) {
+      navObserver.observe(section);
     });
   });
 </script>
