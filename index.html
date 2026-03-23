@@ -1,1351 +1,1171 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SayMoonHelp – loterie dobrých skutků</title>
-  
-  <!-- Firebase SDK -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #ffffff;
-      color: #1d1c1f;
-      line-height: 1.4;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f8f9fc;
+      color: #3a4358;
+      -webkit-font-smoothing: antialiased;
     }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* Hlavička */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
     header {
       padding: 20px 0;
       border-bottom: 1px solid rgba(0,0,0,0.03);
       backdrop-filter: blur(8px);
-      background-color: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.8);
       position: sticky;
       top: 0;
       z-index: 10;
     }
-
-    .header-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
+    .header-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    @keyframes moonFloat {
+      0%, 100% { transform: translateY(0px) rotate(-12deg); }
+      50% { transform: translateY(-4px) rotate(-8deg); }
     }
-
+    @keyframes moonGlow {
+      0%, 100% { filter: drop-shadow(0 0 3px rgba(180,215,255,0.45)) drop-shadow(0 0 8px rgba(100,160,230,0.15)); }
+      50% { filter: drop-shadow(0 0 6px rgba(220,238,255,0.65)) drop-shadow(0 0 14px rgba(130,185,255,0.25)); }
+    }
+    @keyframes moonGlowGold {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(255,200,0,0.4)) drop-shadow(0 0 10px rgba(255,160,0,0.2)); }
+      50% { filter: drop-shadow(0 0 8px rgba(255,215,0,0.65)) drop-shadow(0 0 18px rgba(255,140,0,0.3)); }
+    }
+    @keyframes starTwinkle1 {
+      0%, 100% { opacity: 0.25; transform: scale(0.75); }
+      50% { opacity: 0.7; transform: scale(1); }
+    }
+    @keyframes starTwinkle2 {
+      0%, 100% { opacity: 0.6; transform: scale(0.9); }
+      50% { opacity: 0.2; transform: scale(0.65); }
+    }
+    @keyframes starTwinkle3 {
+      0%, 100% { opacity: 0.4; transform: scale(0.85); }
+      50% { opacity: 0.75; transform: scale(1); }
+    }
+    @keyframes moonRotate {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     .logo {
-      font-size: 1.8rem;
-      font-weight: 500;
+      font-size: 2.2rem;
+      font-weight: 800;
       display: flex;
+      flex-direction: row;
       align-items: center;
-      gap: 6px;
+      gap: 10px;
+      text-decoration: none;
+      cursor: pointer;
+      line-height: 1;
     }
-
-    /* ===== LUNA ===== */
-    .moon-icon {
-      display: inline-block;
-      font-size: 2.5rem;
-      transition: all 0.5s ease;
-      background: linear-gradient(135deg, #1e3a5f, #3a6ea5, #5f9ea0);
+    .logo-text {
+      background: linear-gradient(90deg, #1e3a5f, #3a6ea5, #5f9ea0, #3a6ea5, #1e3a5f);
+      background-size: 300% 300%;
       -webkit-background-clip: text;
       background-clip: text;
-      color: transparent;
+      -webkit-text-fill-color: transparent;
+      animation: logoTextShimmer 10s ease infinite;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      text-shadow: none;
+      line-height: 1;
+      align-self: center;
+      vertical-align: middle;
       position: relative;
-      transform: rotate(-10deg);
+      top: 0;
     }
-
-    .moon-icon::after {
-      content: "★ ★ ★";
+    .logo-moon-letter {
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 1px -3px 1px;
+      position: relative;
+    }
+    .logo-moon-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+      align-self: center;
+      vertical-align: middle;
+    }
+    .moon-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      animation: moonGlow 5s ease-in-out infinite, moonRotate 18s linear infinite;
+      position: relative;
+      z-index: 1;
+      transform-origin: center center;
+    }
+    .moon-icon svg { display: block; }
+    .moon-icon .moon-full     { transition: opacity 1.8s cubic-bezier(0.4,0,0.2,1); opacity: 1; }
+    .moon-icon .moon-crescent { transition: opacity 1.8s cubic-bezier(0.4,0,0.2,1); opacity: 0; }
+    .moon-icon.gold-moon { animation: moonGlowGold 5s ease-in-out infinite, moonRotate 18s linear infinite; }
+    .moon-icon.gold-moon .moon-full     { opacity: 0; }
+    .moon-icon.gold-moon .moon-crescent { opacity: 1; }
+    .logo-star {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 0.5rem;
-      letter-spacing: 0.2rem;
-      white-space: nowrap;
+      font-size: 0.55rem;
+      color: #3a6ea5;
       pointer-events: none;
     }
+    .logo-star:nth-child(2) { top: 2px; right: 2px; animation: starTwinkle1 4s ease-in-out infinite; }
+    .logo-star:nth-child(3) { bottom: 4px; right: 0px; animation: starTwinkle2 5.5s ease-in-out infinite 1s; }
+    .logo-star:nth-child(4) { top: 6px; left: 2px; animation: starTwinkle3 4.8s ease-in-out infinite 2s; }
 
-    .moon-icon.gold-moon {
-      background: radial-gradient(circle at 30% 30%, #ffd700, #fdb813, #ff8c00);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      transform: scale(1.2) rotate(0deg);
+    nav { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    nav a { text-decoration: none; }
+    .user-badge { background: rgba(58,110,165,0.1); border-radius: 40px; padding: 8px 20px; border: 1px solid rgba(58,110,165,0.3); }
+    .user-badge span { color: #1e3a5f; font-weight: 500; }
+    .password-container { position: relative; width: 100%; margin-bottom: 20px; }
+    .password-container input { width: 100%; padding: 15px; padding-right: 60px; border: 2px solid #3a6ea5; border-radius: 30px; font-size: 16px; }
+    .eye-button { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; }
+    .eye-button svg { width: 30px; height: 30px; fill: none; stroke: #3a6ea5; stroke-width: 2; }
+    .btn-auth { width: 100%; padding: 15px; background: #3a6ea5; color: white; border: none; border-radius: 30px; font-size: 18px; cursor: pointer; transition: 0.2s; }
+    .btn-auth:active { transform: scale(0.98); }
+    .steps-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 30px; margin: 40px 0; }
+    .step-card { background: #f8f8ff; border-radius: 30px; padding: 40px 30px; text-align: center; border: 1px solid #e0e0ff; transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease; }
+    .step-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 16px 40px rgba(58,110,165,0.16); border-color: rgba(58,110,165,0.4); }
+    .step-number {
+      width: 64px; height: 64px; border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 1.6rem; font-weight: 800; color: #fff;
+      background: linear-gradient(135deg, #1e3a5f, #3a6ea5);
+      box-shadow: 0 6px 18px rgba(58,110,165,0.3);
     }
-
-    .small-moon {
-      background: #dedef0;
-      border-radius: 100px;
-      padding: 6px 14px;
-      font-size: 0.9rem;
-      transition: all 0.5s ease;
-    }
-
-    .small-moon.gold-moon {
-      background: radial-gradient(circle at 30% 30%, #ffd700, #fdb813);
-      color: white;
-    }
-
-    /* ===== NAVIGACE ===== */
-    nav {
-      display: flex;
-      gap: 32px;
-      font-weight: 400;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .nav-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      background: none;
-      border: 1px solid #3a6ea5;
-      padding: 8px 20px;
-      border-radius: 30px;
+    .detail-box { text-align: center; margin: 60px 0; }
+    .detail-content { display: none; background: #f5f5fa; padding: 40px; border-radius: 40px; text-align: left; max-width: 800px; margin: 20px auto 0; border: 1px solid #3a6ea5; }
+    .requests-grid, .votes-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 30px; margin-top: 40px; }
+    .request-card, .vote-card { background: #fff; border-radius: 30px; padding: 30px; box-shadow: 0 20px 40px rgba(58,110,165,0.1); border: 1px solid #e0e0ff; transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; position: relative; }
+    .request-card:hover, .vote-card:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 24px 50px rgba(58,110,165,0.2); border-color: rgba(58,110,165,0.4); }
+    .request-number {
+      position: absolute; top: 16px; right: 18px;
+      display: inline-flex; align-items: center;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
       color: #3a6ea5;
-      font-size: 1rem;
+      background: rgba(58,110,165,0.1);
+      padding: 3px 10px; border-radius: 20px;
+      border: 1px solid rgba(58,110,165,0.2);
+      font-family: 'Inter', monospace;
       cursor: pointer;
-      transition: background 0.2s ease, transform 0.15s ease, color 0.2s ease;
+      transition: background 0.2s, color 0.2s;
+      text-decoration: none;
     }
-
-    .nav-btn:hover {
-      background: rgba(58, 110, 165, 0.12);
-      transform: translateY(-1px);
-    }
-
-    .nav-btn:active {
-      transform: translateY(0);
-    }
-
-    .nav-btn--secondary {
-      border-color: rgba(0,0,0,0.25);
-      color: #333;
-    }
-
-    .nav-btn--secondary:hover {
-      background: rgba(0,0,0,0.08);
-    }
-
-    /* ===== EMAIL ===== */
-    .user-badge {
-      display: inline-flex;
-      align-items: center;
-      background: rgba(58, 110, 165, 0.1);
-      border-radius: 40px;
-      padding: 8px 20px;
-      border: 1px solid rgba(58, 110, 165, 0.3);
-      transition: all 0.3s ease;
-    }
-
-    .user-badge:hover {
-      background: rgba(58, 110, 165, 0.2);
-      box-shadow: 0 0 15px rgba(58, 110, 165, 0.4);
-    }
-
-    .user-badge span {
+    .request-number:hover {
+      background: rgba(58,110,165,0.18);
       color: #1e3a5f;
+    }
+    .request-name { font-size: 1.6rem; font-weight: 600; color: #2d4a6e; }
+    .progress-bar-bg { height: 8px; background: #eaeaf0; border-radius: 20px; overflow: hidden; margin: 15px 0; }
+    .progress-fill { height: 8px; background: linear-gradient(90deg,#3a6ea5,#7f9fcf); border-radius: 20px; }
+    .btn-small { background: #f4f4fa; border: 1px solid #3a6ea5; border-radius: 40px; padding: 15px; width: 100%; margin-top: 15px; cursor: pointer; transition: 0.2s; }
+    .btn-small:hover { background: #3a6ea5; color: white; }
+    .vote-numbers { background: #f7f7fd; padding: 12px; border-radius: 60px; text-align: center; margin: 15px 0; }
+    .vote-buttons { display: flex; gap: 12px; }
+    .vote-yes, .vote-no { flex: 1; padding: 12px; border-radius: 40px; border: 1px solid #3a6ea5; background: white; cursor: pointer; transition: 0.2s; }
+    .vote-yes:hover { background: #3a6ea5; color: white; }
+    .vote-no:hover { background: #e04444; color: white; border-color: #e04444; }
+    .vote-yes.voted { background: #3a6ea5; color: white; }
+    .vote-no.voted { background: #e04444; color: white; border-color: #e04444; }
+    nav a.nav-active { color: #3a6ea5; font-weight: 700; }
+    .section-tabs { display: flex; gap: 12px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+    .tab-btn { padding: 10px 24px; border-radius: 40px; border: 1px solid #e0e0ff; background: white; cursor: pointer; font-size: 0.95rem; transition: 0.2s; color: #2c2c2e; }
+    .tab-btn.active, .tab-btn:hover { background: #3a6ea5; color: white; border-color: #3a6ea5; }
+    .card-status { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 12px; }
+    .status-voting { background: rgba(255,180,0,0.12); color: #b07800; }
+    .status-approved { background: rgba(58,110,165,0.12); color: #1e3a5f; }
+    .status-active { background: rgba(40,160,80,0.12); color: #1a7a3a; }
+    .request-meta { font-size: 0.88rem; color: #7a8599; margin: 6px 0 4px; }
+    .request-story { font-size: 0.95rem; color: #5c6880; margin: 10px 0 14px; line-height: 1.75; }
+    .progress-stats { display: flex; justify-content: space-between; font-size: 0.85rem; color: #3a6ea5; font-weight: 500; margin-top: 4px; }
+    .vote-threshold { display: flex; align-items: center; gap: 8px; margin: 10px 0; font-size: 0.85rem; color: #666; }
+    .threshold-bar { flex: 1; height: 6px; background: #eaeaf0; border-radius: 10px; overflow: hidden; }
+    .threshold-fill { height: 6px; background: linear-gradient(90deg,#3a6ea5,#5fc47a); border-radius: 10px; transition: width 0.5s; }
+    .jak-features { display: grid; grid-template-columns: repeat(2,1fr); gap: 24px; margin-top: 40px; }
+    .jak-feature { background: #f8f8ff; border-radius: 24px; padding: 28px; border: 1px solid #e0e0ff; transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
+    .jak-feature:hover { transform: translateY(-5px) scale(1.01); box-shadow: 0 14px 36px rgba(58,110,165,0.15); border-color: rgba(58,110,165,0.38); }
+    .jak-feature-icon {
+      font-size: 1.7rem; margin-bottom: 16px;
+      width: 58px; height: 58px; border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(58,110,165,0.12), rgba(95,158,160,0.08));
+      border: 1px solid rgba(58,110,165,0.18);
+      box-shadow: 0 4px 12px rgba(58,110,165,0.1);
+    }
+    .jak-feature h4 { color: #2d4a6e; font-size: 1.1rem; margin-bottom: 8px; }
+    .jak-feature p { color: #5c6880; font-size: 0.95rem; line-height: 1.7; }
+    @media (max-width: 700px) { .jak-features { grid-template-columns: 1fr; } }
+    .section-intro { text-align: center; color: #5c6880; max-width: 760px; margin: -28px auto 40px; line-height: 1.8; }
+    .dashboard-guest { background: linear-gradient(135deg, rgba(58,110,165,0.08), rgba(95,158,160,0.08)); border: 1px solid #dce7f4; border-radius: 36px; padding: 36px; text-align: center; }
+    .dashboard-grid, .activity-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+    .dashboard-card { background: #fff; border-radius: 30px; padding: 30px; box-shadow: 0 20px 40px rgba(58,110,165,0.08); border: 1px solid #e0e0ff; transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
+    .dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 20px 44px rgba(58,110,165,0.16); border-color: rgba(58,110,165,0.35); }
+    .dashboard-card.full-span { grid-column: 1 / -1; }
+    .summary-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 22px; }
+    .summary-item { background: #f7fafe; border: 1px solid #dce7f4; border-radius: 24px; padding: 18px; }
+    .summary-item strong { display: block; font-size: 1.5rem; color: #1e3a5f; margin-bottom: 6px; }
+    .summary-item span { color: #7a8599; font-size: 0.92rem; line-height: 1.6; }
+    .form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .form-field { margin-bottom: 16px; }
+    .form-field label { display: block; margin-bottom: 8px; color: #1e3a5f; font-weight: 600; }
+    .form-field input, .form-field textarea, .form-field select {
+      width: 100%;
+      border: 1px solid #cfe0f1;
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-size: 0.98rem;
+      font-family: inherit;
+      background: #fbfdff;
+    }
+    .form-field textarea { min-height: 120px; resize: vertical; }
+    .helper-note { color: #8592a8; font-size: 0.9rem; line-height: 1.7; margin-top: 10px; }
+    .inline-note { color: #657080; font-size: 0.88rem; }
+    .profile-chip { display: inline-flex; align-items: center; gap: 10px; padding: 9px 16px; border-radius: 30px; background: #f5f9ff; color: #1e3a5f; border: 1px solid #dce7f4; margin: 8px 8px 0 0; }
+    .activity-item { padding: 18px 0; border-bottom: 1px solid #eef3f9; }
+    .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .activity-item h4 { color: #1e3a5f; margin-bottom: 6px; }
+    .activity-item p { color: #5c6880; line-height: 1.75; font-size: 0.95rem; }
+    .activity-meta { color: #8c99b0; font-size: 0.87rem; margin-top: 8px; }
+    .empty-state { padding: 24px; background: #f5f8fd; border: 1px dashed #cfe0f1; border-radius: 24px; color: #8592a8; line-height: 1.7; }
+    .request-title { color: #1e3a5f; font-weight: 600; margin: 10px 0 8px; font-size: 1.05rem; }
+    .auth-name-field { display: none; }
+    .nav-secondary { color: #3a6ea5; }
+    .status-draft { background: rgba(130, 140, 160, 0.12); color: #5f6b78; }
+    .claim-status { margin-top: 14px; padding: 14px 16px; border-radius: 18px; background: #f7fafe; border: 1px solid #dce7f4; color: #4f5f70; line-height: 1.6; }
+    @media (max-width: 900px) {
+      .steps-grid, .reasons-grid, .dashboard-grid, .activity-grid, .summary-strip, .form-row { grid-template-columns: 1fr; }
+    }
+    .stats-grid { display: flex; gap: 20px; justify-content: space-around; background: #fbfbff; border-radius: 80px; padding: 50px 30px; border: 1px solid #e0e0ff; }
+    .stat-number { font-size: 3.5rem; font-weight: 600; background: linear-gradient(130deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .reasons-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 25px; margin-top: 40px; }
+    .reason-item { background: #fff; padding: 30px; border-radius: 36px; text-align: center; border: 1px solid #e0e0ff; transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
+    .reason-item:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 16px 40px rgba(58,110,165,0.15); border-color: rgba(58,110,165,0.38); }
+    .reason-icon {
+      font-size: 2rem; margin-bottom: 20px;
+      width: 72px; height: 72px; border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      margin-left: auto; margin-right: auto;
+      background: linear-gradient(135deg, rgba(58,110,165,0.1), rgba(95,158,160,0.07));
+      border: 1px solid rgba(58,110,165,0.16);
+      box-shadow: 0 4px 14px rgba(58,110,165,0.1);
+    }
+    .newsletter { background: #fafaff; border-radius: 80px; padding: 70px 40px; text-align: center; border: 1px solid #e0e0ff; }
+    .email-form { display: flex; max-width: 500px; margin: 30px auto 0; gap: 12px; }
+    .email-input { flex: 1; padding: 18px 26px; border-radius: 60px; border: 2px solid #3a6ea5; font-size: 1rem; }
+    .faq-grid { max-width: 900px; margin: 0 auto; }
+    .faq-item { background: #fff; border-radius: 44px; padding: 28px 36px; margin-bottom: 20px; border: 1px solid #e0e0ff; transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
+    .faq-item:hover { transform: translateY(-4px); box-shadow: 0 14px 36px rgba(58,110,165,0.14); border-color: rgba(58,110,165,0.38); }
+    .faq-question { font-weight: 600; font-size: 1.3rem; margin-bottom: 8px; color: #2d4a6e; }
+    .hero { padding: 100px 0 80px; text-align: center; background: radial-gradient(circle at 80% 30%, rgba(58,110,165,0.1) 0%, #fff 70%); position: relative; overflow: hidden; }
+    #constellation-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .hero .container { position: relative; z-index: 1; }
+    .hero h1 { font-size: 3.8rem; max-width: 800px; margin: 0 auto 20px; background: linear-gradient(135deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-subtitle {
+      max-width: 860px;
+      margin: 0 auto;
+      font-size: 1.16rem;
       font-weight: 500;
+      line-height: 1.9;
+      color: #4d6184;
+      letter-spacing: 0.01em;
     }
-
-    /* ===== OKO ===== */
-    .password-container {
-      position: relative;
-      width: 100%;
-      margin-bottom: 20px;
-    }
-
-    .password-container input {
-      width: 100%;
-      padding: 15px;
-      padding-right: 60px;
-      border: 2px solid #3a6ea5;
-      border-radius: 30px;
-      font-size: 16px;
-    }
-
-    .eye-button {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s;
-    }
-
-    .eye-button svg {
-      width: 30px;
-      height: 30px;
-      fill: none;
-      stroke: #3a6ea5;
-      stroke-width: 2;
-    }
-
-    .eye-button:active {
-      transform: translateY(-50%) scale(1.2);
-    }
-
-    /* ===== TLAČÍTKO ===== */
-    .btn-auth {
-      width: 100%;
-      padding: 15px;
-      background: #3a6ea5;
-      color: white;
-      border: none;
-      border-radius: 30px;
-      font-size: 18px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .btn-auth:active {
-      transform: scale(0.95);
-    }
-
-    .btn-auth.clicked {
-      animation: pulse 0.3s ease;
-    }
-
-    @keyframes pulse {
+    @keyframes btnPress {
       0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+      50% { transform: scale(0.96); }
       100% { transform: scale(1); }
     }
-
-    /* ===== KROKY ===== */
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 30px;
-      margin: 40px 0;
-    }
-
-    .step-card {
-      background: #f8f8ff;
-      border-radius: 30px;
-      padding: 40px 30px;
-      text-align: center;
-      border: 1px solid #e0e0ff;
-    }
-
-    .step-number {
-      background: white;
-      width: 60px;
-      height: 60px;
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 2rem;
-      color: #3a6ea5;
-      border: 2px solid #3a6ea5;
-    }
-
-    /* ===== DETAIL ===== */
-    .detail-box {
-      text-align: center;
-      margin: 60px 0;
-    }
-
-    .detail-content {
-      display: none;
-      background: #f5f5fa;
-      padding: 40px;
-      border-radius: 40px;
-      text-align: left;
-      max-width: 800px;
-      margin: 20px auto 0;
-      border: 1px solid #3a6ea5;
-    }
-
-    /* ===== ŽÁDOSTI ===== */
-    .requests-grid, .votes-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-      margin-top: 40px;
-    }
-
-    .request-card, .vote-card {
-      background: #ffffff;
-      border-radius: 30px;
-      padding: 30px;
-      box-shadow: 0 20px 40px rgba(58, 110, 165, 0.1);
-      border: 1px solid #e0e0ff;
-      transition: all 0.3s;
-    }
-
-    .request-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 30px 50px rgba(58, 110, 165, 0.2);
-    }
-
-    .request-number {
-      font-size: 1.2rem;
-      color: #3a6ea5;
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
-
-    .request-name {
-      font-size: 1.6rem;
-      font-weight: 600;
-      color: #1e3a5f;
-    }
-
-    .request-location {
-      color: #666;
-      font-size: 1rem;
-      margin-bottom: 10px;
-    }
-
-    .progress-bar-bg {
-      height: 8px;
-      background: #eaeaf0;
-      border-radius: 20px;
-      overflow: hidden;
-      margin: 15px 0;
-    }
-
-    .progress-fill {
-      height: 8px;
-      background: linear-gradient(90deg, #3a6ea5, #7f9fcf);
-      border-radius: 20px;
-    }
-
-    .progress-stats {
-      display: flex;
-      justify-content: space-between;
-      margin: 10px 0;
-      color: #4b4b63;
-    }
-
-    .btn-small {
-      background: #f4f4fa;
-      border: none;
-      border-radius: 40px;
-      padding: 15px;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      color: #1e3a5f;
-      border: 1px solid #3a6ea5;
-      transition: all 0.3s;
-      width: 100%;
-      margin-top: 15px;
-    }
-
-    .btn-small:hover {
-      background: #3a6ea5;
-      color: white;
-    }
-
-    /* ===== HLASOVÁNÍ ===== */
-    .vote-numbers {
-      background: #f7f7fd;
-      padding: 12px;
-      border-radius: 60px;
-      text-align: center;
-      margin: 15px 0;
-    }
-
-    .vote-buttons {
-      display: flex;
-      gap: 12px;
-    }
-
-    .vote-yes, .vote-no {
-      flex: 1;
-      padding: 12px;
-      border-radius: 40px;
-      border: 1px solid #3a6ea5;
-      background: white;
-      cursor: pointer;
-    }
-
-    /* ===== STATISTIKY ===== */
-    .stats-grid {
-      display: flex;
-      gap: 20px;
-      justify-content: space-around;
-      background: #fbfbff;
-      border-radius: 80px;
-      padding: 50px 30px;
-      border: 1px solid #e0e0ff;
-    }
-
-    .stat-item {
-      text-align: center;
-    }
-
-    .stat-number {
-      font-size: 3.5rem;
-      font-weight: 600;
-      background: linear-gradient(130deg, #1e3a5f, #3a6ea5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .stat-label {
-      font-size: 1rem;
-      color: #666;
-      margin-top: 10px;
-    }
-
-    /* ===== 4 DŮVODY ===== */
-    .reasons-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 25px;
-      margin-top: 40px;
-    }
-
-    .reason-item {
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 36px;
-      text-align: center;
-      border: 1px solid #e0e0ff;
-    }
-
-    .reason-icon {
-      font-size: 2.6rem;
-      margin-bottom: 20px;
-    }
-
-    /* ===== NEWSLETTER ===== */
-    .newsletter {
-      background: #fafaff;
-      border-radius: 80px;
-      padding: 70px 40px;
-      text-align: center;
-      border: 1px solid #e0e0ff;
-    }
-
-    .email-form {
-      display: flex;
-      max-width: 500px;
-      margin: 30px auto 0;
-      gap: 12px;
-    }
-
-    .email-input {
-      flex: 1;
-      padding: 18px 26px;
-      border-radius: 60px;
-      border: 2px solid #3a6ea5;
-      font-size: 1rem;
-    }
-
-    .privacy-note {
-      font-size: 0.9rem;
-      color: #666;
-      margin-top: 20px;
-    }
-
-    /* ===== FAQ ===== */
-    .faq-grid {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .faq-item {
-      background: #ffffff;
-      border-radius: 44px;
-      padding: 28px 36px;
-      margin-bottom: 20px;
-      border: 1px solid #e0e0ff;
-    }
-
-    .faq-question {
-      font-weight: 600;
-      font-size: 1.3rem;
-      margin-bottom: 8px;
-      color: #1e3a5f;
-    }
-
-    .faq-answer {
-      margin-top: 8px;
-      color: #666;
-      font-size: 1rem;
-    }
-
-    /* ===== OSTATNÍ ===== */
-    .hero {
-      padding: 100px 0 80px;
-      text-align: center;
-      background: radial-gradient(circle at 80% 30%, rgba(58,110,165,0.1) 0%, #fff 70%);
-    }
-
-    .hero h1 {
-      font-size: 3.8rem;
-      max-width: 800px;
-      margin: 0 auto 20px;
-      background: linear-gradient(135deg, #1e3a5f, #3a6ea5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .button-group {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 30px;
-    }
-
     .btn {
       padding: 14px 32px;
       border-radius: 40px;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
+      font-weight: 600;
       cursor: pointer;
-      background: white;
-      border: 1px solid #3a6ea5;
+      background: rgba(255,255,255,0.85);
+      border: 1.5px solid rgba(58,110,165,0.45);
+      color: #1e3a5f;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.15s, border-color 0.2s;
+      letter-spacing: 0.01em;
     }
-
+    .btn:hover {
+      background: rgba(58,110,165,0.1);
+      border-color: #3a6ea5;
+      box-shadow: 0 4px 16px rgba(58,110,165,0.18);
+    }
+    .btn:active { animation: btnPress 0.22s ease; }
     .btn-primary {
-      background: #1d1c1f;
-      color: white;
+      background: linear-gradient(135deg, #1e3a5f 0%, #3a6ea5 100%);
+      color: #fff;
       border: none;
+      box-shadow: 0 4px 18px rgba(58,110,165,0.28);
     }
-
-    section {
-      padding: 90px 0;
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #2a4f7e 0%, #4a80bb 100%);
+      box-shadow: 0 6px 24px rgba(58,110,165,0.4);
     }
-
-    .section-title {
-      font-size: 2.6rem;
-      text-align: center;
-      margin-bottom: 60px;
-      background: linear-gradient(145deg, #1e3a5f, #3a6ea5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .nav-pill {
+      display: inline-block;
+      padding: 7px 18px;
+      border-radius: 30px;
+      border: 1.5px solid rgba(58,110,165,0.28);
+      background: rgba(58,110,165,0.06);
+      color: #1e3a5f !important;
+      font-size: 0.96rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      cursor: pointer;
     }
-
-    footer {
-      padding: 40px 0;
-      border-top: 1px solid #f0f0f8;
-      display: flex;
-      justify-content: space-between;
+    .nav-pill:hover {
+      background: rgba(58,110,165,0.14);
+      border-color: #3a6ea5;
+      box-shadow: 0 2px 10px rgba(58,110,165,0.16);
     }
-
-    @media (max-width: 900px) {
-      .steps-grid, .reasons-grid {
-        grid-template-columns: 1fr;
-      }
+    .nav-pill:active { animation: btnPress 0.22s ease; }
+    .nav-pill.nav-active {
+      background: rgba(58,110,165,0.15);
+      border-color: #3a6ea5;
+      font-weight: 700;
     }
-  </style>
-</head>
-<body>
-  <header>
-    <div class="container header-inner">
-      <div class="logo">
-        <span class="moon-icon" id="mainMoon">🌙</span> SayMoonHelp
-      </div>
-      <nav>
-        <a href="#" class="nav-btn">Jak to funguje</a>
-        <a href="#" class="nav-btn">Žádosti</a>
-        <a href="#" class="nav-btn">Hlasování</a>
-        <button id="showLoginBtn" class="nav-btn">Přihlásit se</button>
-        <span id="userInfo" style="display: none; align-items: center; gap: 10px;">
-          <div class="user-badge">
-            <span id="userEmail"></span>
-          </div>
-          <button id="logoutBtn" class="nav-btn nav-btn--secondary">Odhlásit</button>
-        </span>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Modální okno -->
-  <div id="authModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:1000; justify-content: center; align-items: center;">
-    <div style="background: white; padding: 40px; border-radius: 40px; width: 90%; max-width: 400px;">
-      <h2 id="authTitle">Přihlásit se</h2>
-      <button id="closeModal" style="float:right; background:none; border:none; font-size:24px;">×</button>
-      <input type="email" id="email" placeholder="Email" style="width:100%; padding:15px; margin:20px 0; border:2px solid #3a6ea5; border-radius:30px;">
-      <div class="password-container">
-        <input type="password" id="password" placeholder="Heslo">
-        <div class="eye-button" id="togglePassword">
-          <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="3" fill="#3a6ea5"/>
-            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" stroke="#3a6ea5" fill="none"/>
-            <line x1="3" y1="4" x2="21" y2="20" stroke="#3a6ea5" stroke-width="2" id="eyeLine"/>
-          </svg>
-        </div>
-      </div>
-      <button id="authAction" class="btn-auth">Přihlásit se</button>
-      <p style="text-align:center;"><a href="#" class="nav-btn" id="switchAuth">Nemáte účet? Registrujte se</a></p>
-    </div>
-  </div>
-
-  <main>
-    <!-- Hero -->
-    <section class="hero">
-      <div class="container">
-        <h1>Pomoc, která si tě najde</h1>
-        <p>SayMoonHelp je loterie dobrých skutků. Pomáhej druhým, získej body a měj šanci získat pomoc, když ji nejvíc potřebuješ.</p>
-        <div class="button-group">
-          <button class="btn btn-primary">Zapojit se</button>
-          <button class="btn">Jak to funguje</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- 3 kroky -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Jak to funguje</h2>
-        <div class="steps-grid">
-          <div class="step-card">
-            <div class="step-number">1</div>
-            <h3>Přispěj</h3>
-            <p>Pošli libovolnou částku na cizí žádost. 10 Kč = 1 bod pomoci.</p>
-          </div>
-          <div class="step-card">
-            <div class="step-number">2</div>
-            <h3>Získej body</h3>
-            <p>Čím víc pomáháš, tím víc bodů máš. Body = tvoje šance v loterii.</p>
-          </div>
-          <div class="step-card">
-            <div class="step-number">3</div>
-            <h3>Vyhraj pomoc</h3>
-            <p>Až někdo podá žádost, loterie vybere šťastlivce, který dostane vybrané peníze.</p>
-          </div>
-        </div>
-
-        <!-- Detail -->
-        <div class="detail-box">
-          <button id="detailBtn" class="btn">🔍 Jak to celé funguje?</button>
-          <div id="detailText" class="detail-content">
-            <h3>Loterie dobrých skutků 🌙</h3>
-            <p><strong>1. Přispěj:</strong> Pošli peníze na cizí žádost. 10 Kč = 1 bod.</p>
-            <p><strong>2. Hlasuj:</strong> Každý člen hlasuje 👍/👎. 70% "pro" = postup do loterie.</p>
-            <p><strong>3. Loterie:</strong> Náhodný výběr podle počtu bodů.</p>
-            <p><strong>4. Výhra:</strong> Výherce dostane vybranou částku (minus 5–10% provoz).</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Aktivní žádosti -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Právě teď někdo potřebuje pomoc</h2>
-        <div class="requests-grid">
-          <div class="request-card">
-            <div class="request-number">01</div>
-            <div class="request-name">Jana Nováková</div>
-            <div class="request-location">Praha</div>
-            <div>Potřebuje 5 000 Kč na opravu auta</div>
-            <div class="progress-bar-bg"><div class="progress-fill" style="width:64%"></div></div>
-            <div class="progress-stats"><span>3 200 Kč</span><span>z 5 000 Kč</span><span>64%</span></div>
-            <button class="btn-small">Pomoci</button>
-          </div>
-          <div class="request-card">
-            <div class="request-number">02</div>
-            <div class="request-name">Petr Svoboda</div>
-            <div class="request-location">Brno</div>
-            <div>Potřebuje 2 500 Kč na veterináře</div>
-            <div class="progress-bar-bg"><div class="progress-fill" style="width:72%"></div></div>
-            <div class="progress-stats"><span>1 800 Kč</span><span>z 2 500 Kč</span><span>72%</span></div>
-            <button class="btn-small">Pomoci</button>
-          </div>
-          <div class="request-card">
-            <div class="request-number">03</div>
-            <div class="request-name">Marie Veselá</div>
-            <div class="request-location">Ostrava</div>
-            <div>Potřebuje 8 000 Kč na školní pomůcky</div>
-            <div class="progress-bar-bg"><div class="progress-fill" style="width:56%"></div></div>
-            <div class="progress-stats"><span>4 500 Kč</span><span>z 8 000 Kč</span><span>56%</span></div>
-            <button class="btn-small">Pomoci</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Hlasování -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Hlasujte, komu pomůžeme</h2>
-        <div class="votes-grid">
-          <div class="vote-card">
-            <div class="request-name">Tomáš Dvořák</div>
-            <div class="request-location">Plzeň</div>
-            <div>Potřebuje 3 000 Kč na jízdenky do práce</div>
-            <p>Přišel jsem o práci, nová je za městem. Potřebuji dojezdit, než dostanu první výplatu.</p>
-            <div class="vote-numbers">👍 45 / 👎 12 (79% pro)</div>
-            <div class="vote-buttons">
-              <button class="vote-yes">👍 Ano</button>
-              <button class="vote-no">👎 Ne</button>
-            </div>
-          </div>
-          <div class="vote-card">
-            <div class="request-name">Lucie Horáková</div>
-            <div class="request-location">Liberec</div>
-            <div>Potřebuje 12 000 Kč na opravu pračky</div>
-            <p>Jsem samoživitelka, pračka se rozbila a nemám na novou.</p>
-            <div class="vote-numbers">👍 23 / 👎 8 (74% pro)</div>
-            <div class="vote-buttons">
-              <button class="vote-yes">👍 Ano</button>
-              <button class="vote-no">👎 Ne</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Čísla -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">SayMoonHelp v číslech</h2>
-        <div class="stats-grid">
-          <div class="stat-item"><div class="stat-number">156 000 Kč</div><div class="stat-label">Vybráno na pomoc</div></div>
-          <div class="stat-item"><div class="stat-number">47</div><div class="stat-label">Lidí dostalo pomoc</div></div>
-          <div class="stat-item"><div class="stat-number">312</div><div class="stat-label">Aktivních členů</div></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 4 důvody -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Proč se zapojit</h2>
-        <div class="reasons-grid">
-          <div class="reason-item"><div class="reason-icon">🤝</div><h4>Pomáháš konkrétním lidem</h4><p>Každá koruna jde na ověřenou žádost.</p></div>
-          <div class="reason-item"><div class="reason-icon">🎲</div><h4>Máš šanci na pomoc i ty</h4><p>Čím víc pomáháš, tím víc šancí máš.</p></div>
-          <div class="reason-item"><div class="reason-icon">🗳️</div><h4>Rozhoduješ ty</h4><p>Hlasuješ, kdo pomoc dostane.</p></div>
-          <div class="reason-item"><div class="reason-icon">🔍</div><h4>Jsme transparentní</h4><p>Všechny transakce jsou veřejné.</p></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Newsletter -->
-    <section>
-      <div class="container newsletter">
-        <h2>Buďte první, až spustíme</h2>
-        <p>Zatím testujeme. Zanechte nám email a dáme vám vědět, jakmile bude možné se zapojit.</p>
-        <div class="email-form">
-          <input class="email-input" type="email" placeholder="váš@email.cz">
-          <button class="btn btn-primary" style="padding: 18px 32px;">Odeslat</button>
-        </div>
-        <div class="privacy-note">Žádný spam. Jen jedna zpráva, až budeme živí.</div>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Časté otázky</h2>
-        <div class="faq-grid">
-          <div class="faq-item"><div class="faq-question">Kdo může žádat o pomoc?</div><div class="faq-answer">Každý registrovaný člen, který už alespoň jednou pomohl.</div></div>
-          <div class="faq-item"><div class="faq-question">Jak funguje loterie?</div><div class="faq-answer">10 Kč = 1 bod. Losujeme podle bodů. Vyhrává jeden člen.</div></div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="container">
-    <div>© 2025 SayMoonHelp · průhledná pomoc</div>
-    <div class="small-moon" id="footerMoon">🌙 lunární design</div>
-  </footer>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyA1aSGtwkbVp8yAL_I2P-6bDITHe58ALtA",
-      authDomain: "saymoonhelp-af1e6.firebaseapp.com",
-      projectId: "saymoonhelp-af1e6",
-      storageBucket: "saymoonhelp-af1e6.firebasestorage.app",
-      messagingSenderId: "911248985825",
-      appId: "1:911248985825:web:b602feab7eb8f4dbd9b1a0"
-    };
-    firebase.initializeApp(firebaseConfig);
-
-    document.addEventListener('DOMContentLoaded', () => {
-      // Luna
-      const moon = document.getElementById('mainMoon');
-      const footerMoon = document.getElementById('footerMoon');
-      window.addEventListener('scroll', () => {
-        if (window.scrollY > 100) {
-          moon.classList.add('gold-moon');
-          footerMoon.classList.add('gold-moon');
-        } else {
-          moon.classList.remove('gold-moon');
-          footerMoon.classList.remove('gold-moon');
-        }
-      });
-
-      // Detail
-      document.getElementById('detailBtn').addEventListener('click', function() {
-        const detail = document.getElementById('detailText');
-        detail.style.display = detail.style.display === 'block' ? 'none' : 'block';
-        this.textContent = detail.style.display === 'block' ? '🔍 Skrýt detail' : '🔍 Jak to celé funguje?';
-      });
-
-      // Oko
-      const eye = document.getElementById('togglePassword');
-      const password = document.getElementById('password');
-      const eyeLine = document.getElementById('eyeLine');
-      eye?.addEventListener('click', function() {
-        this.style.transform = 'translateY(-50%) scale(1.2)';
-        setTimeout(() => this.style.transform = 'translateY(-50%) scale(1)', 200);
-        const type = password.type === 'password' ? 'text' : 'password';
-        password.type = type;
-        eyeLine.style.display = type === 'text' ? 'none' : 'block';
-      });
-
-      // Registrace
-      const modal = document.getElementById('authModal');
-      document.getElementById('showLoginBtn').addEventListener('click', () => modal.style.display = 'flex');
-      document.getElementById('closeModal').addEventListener('click', () => modal.style.display = 'none');
-      
-      let isLogin = true;
-      document.getElementById('switchAuth').addEventListener('click', (e) => {
-        e.preventDefault();
-        isLogin = !isLogin;
-        document.getElementById('authTitle').innerText = isLogin ? 'Přihlásit se' : 'Registrace';
-        document.getElementById('authAction').innerText = isLogin ? 'Přihlásit se' : 'Registrovat se';
-        e.target.innerText = isLogin ? 'Nemáte účet? Registrujte se' : 'Máte účet? Přihlaste se';
-      });
-
-      document.getElementById('authAction').addEventListener('click', function() {
-        this.classList.add('clicked');
-        setTimeout(() => this.classList.remove('clicked'), 300);
-        const email = document.getElementById('email').value;
-        const pass = password.value;
-        if (!email || !pass) return alert('Vyplň email a heslo');
-        const auth = isLogin 
-          ? firebase.auth().signInWithEmailAndPassword(email, pass)
-          : firebase.auth().createUserWithEmailAndPassword(email, pass);
-        auth.then(() => modal.style.display = 'none').catch(e => alert(e.message));
-      });
-
-      firebase.auth().onAuthStateChanged(user => {
-        const info = document.getElementById('userInfo');
-        const btn = document.getElementById('showLoginBtn');
-        if (user) {
-          btn.style.display = 'none';
-          info.style.display = 'flex';
-          document.getElementById('userEmail').innerText = user.email;
-        } else {
-          btn.style.display = 'inline-block';
-          info.style.display = 'none';
-        }
-      });
-
-      document.getElementById('logoutBtn').addEventListener('click', () => firebase.auth().signOut());
-    });
-  </script>
-</body>
-</html>
+    .nav-pill.nav-secondary { color: #3a6ea5 !important; }
+    .btn-login {
+      padding: 7px 20px;
+      border-radius: 30px;
+      border: 1.5px solid #3a6ea5;
+      background: linear-gradient(135deg, #1e3a5f, #3a6ea5);
+      color: #fff;
+      font-size: 0.96rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.15s;
+      letter-spacing: 0.01em;
     }
-
-    .btn-small {
-      background: #f4f4fa;
-      border: none;
-      border-radius: 40px;
-      padding: 15px;
-      font-size: 1rem;
+    .btn-login:hover { box-shadow: 0 4px 16px rgba(58,110,165,0.35); }
+    .btn-login:active { animation: btnPress 0.22s ease; }
+    .btn-logout {
+      padding: 7px 18px;
+      border-radius: 30px;
+      border: 1.5px solid rgba(58,110,165,0.3);
+      background: rgba(58,110,165,0.07);
+      color: #1e3a5f;
+      font-size: 0.92rem;
       font-weight: 500;
       cursor: pointer;
-      color: #1e3a5f;
-      border: 1px solid #3a6ea5;
-      transition: all 0.3s;
-      width: 100%;
-      margin-top: 15px;
+      transition: background 0.2s, border-color 0.2s;
     }
-
-    .btn-small:hover {
-      background: #3a6ea5;
-      color: white;
-    }
-
-    /* ===== HLASOVÁNÍ ===== */
-    .vote-numbers {
-      background: #f7f7fd;
-      padding: 12px;
-      border-radius: 60px;
-      text-align: center;
-      margin: 15px 0;
-    }
-
-    .vote-buttons {
-      display: flex;
-      gap: 12px;
-    }
-
-    .vote-yes, .vote-no {
-      flex: 1;
-      padding: 12px;
-      border-radius: 40px;
-      border: 1px solid #3a6ea5;
-      background: white;
-      cursor: pointer;
-    }
-
-    /* ===== STATISTIKY ===== */
-    .stats-grid {
-      display: flex;
-      gap: 20px;
-      justify-content: space-around;
-      background: #fbfbff;
-      border-radius: 80px;
-      padding: 50px 30px;
-      border: 1px solid #e0e0ff;
-    }
-
-    .stat-number {
-      font-size: 3.5rem;
-      font-weight: 600;
-      background: linear-gradient(130deg, #1e3a5f, #3a6ea5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* ===== 4 DŮVODY ===== */
-    .reasons-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 25px;
-      margin-top: 40px;
-    }
-
-    .reason-item {
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 36px;
-      text-align: center;
-      border: 1px solid #e0e0ff;
-    }
-
-    .reason-icon {
-      font-size: 2.6rem;
-      margin-bottom: 20px;
-    }
-
-    /* ===== NEWSLETTER ===== */
-    .newsletter {
-      background: #fafaff;
-      border-radius: 80px;
-      padding: 70px 40px;
-      text-align: center;
-      border: 1px solid #e0e0ff;
-    }
-
-    .email-form {
-      display: flex;
-      max-width: 500px;
-      margin: 30px auto 0;
-      gap: 12px;
-    }
-
-    .email-input {
-      flex: 1;
-      padding: 18px 26px;
-      border-radius: 60px;
-      border: 2px solid #3a6ea5;
-      font-size: 1rem;
-    }
-
-    /* ===== FAQ ===== */
-    .faq-grid {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .faq-item {
-      background: #ffffff;
-      border-radius: 44px;
-      padding: 28px 36px;
-      margin-bottom: 20px;
-      border: 1px solid #e0e0ff;
-    }
-
-    .faq-question {
-      font-weight: 600;
-      font-size: 1.3rem;
-      margin-bottom: 8px;
-      color: #1e3a5f;
-    }
-
-    /* ===== OSTATNÍ ===== */
-    .hero {
-      padding: 100px 0 80px;
-      text-align: center;
-      background: radial-gradient(circle at 80% 30%, rgba(58,110,165,0.1) 0%, #fff 70%);
-    }
-
-    .hero h1 {
-      font-size: 3.8rem;
-      max-width: 800px;
-      margin: 0 auto 20px;
-      background: linear-gradient(135deg, #1e3a5f, #3a6ea5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .btn {
-      padding: 14px 32px;
-      border-radius: 40px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      background: white;
-      border: 1px solid #3a6ea5;
-    }
-
-    .btn-primary {
-      background: #1d1c1f;
-      color: white;
-      border: none;
-    }
-
-    section {
-      padding: 90px 0;
-    }
-
-    .section-title {
-      font-size: 2.6rem;
-      text-align: center;
-      margin-bottom: 60px;
-      background: linear-gradient(145deg, #1e3a5f, #3a6ea5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    footer {
-      padding: 40px 0;
-      border-top: 1px solid #f0f0f8;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    @media (max-width: 900px) {
-      .steps-grid, .reasons-grid {
-        grid-template-columns: 1fr;
-      }
-    }
+    .btn-logout:hover { background: rgba(58,110,165,0.15); border-color: #3a6ea5; }
+    section { padding: 90px 0; }
+    .section-title { font-size: 2.6rem; text-align: center; margin-bottom: 60px; background: linear-gradient(145deg,#1e3a5f,#3a6ea5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    footer { padding: 40px 0; border-top: 1px solid #f0f0f8; display: flex; justify-content: space-between; align-items: center; }
+    .lunar-design { font-size: 0.9rem; color: #3a6ea5; transition: all 0.3s; }
+    .lunar-design.gold { color: #ffd700; text-shadow: 0 0 4px rgba(255,215,0,0.5); }
   </style>
 </head>
 <body>
-  <header>
-    <div class="container header-inner">
-      <div class="logo">
-        <span class="moon-icon" id="mainMoon">🌙</span> SayMoonHelp
-      </div>
-      <nav>
-        <a href="#" class="nav-btn">Jak to funguje</a>
-        <a href="#" class="nav-btn">Žádosti</a>
-        <a href="#" class="nav-btn">Hlasování</a>
-        <button id="showLoginBtn" class="nav-btn">Přihlásit se</button>
-        <span id="userInfo" style="display: none; align-items: center; gap: 10px;">
-          <div class="user-badge">
-            <span id="userEmail"></span>
-          </div>
-          <button id="logoutBtn" class="nav-btn nav-btn--secondary">Odhlásit</button>
-        </span>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Modální okno -->
-  <div id="authModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:1000; justify-content: center; align-items: center;">
-    <div style="background: white; padding: 40px; border-radius: 40px; width: 90%; max-width: 400px;">
-      <h2 id="authTitle">Přihlásit se</h2>
-      <button id="closeModal" style="float:right; background:none; border:none; font-size:24px;">×</button>
-      <input type="email" id="email" placeholder="Email" style="width:100%; padding:15px; margin:20px 0; border:2px solid #3a6ea5; border-radius:30px;">
-      <div class="password-container">
-        <input type="password" id="password" placeholder="Heslo">
-        <div class="eye-button" id="togglePassword">
-          <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="3" fill="#3a6ea5"/>
-            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" stroke="#3a6ea5" fill="none"/>
-            <line x1="3" y1="4" x2="21" y2="20" stroke="#3a6ea5" stroke-width="2" id="eyeLine"/>
+<header>
+  <div class="container header-inner">
+    <div class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer;">
+      <span class="logo-moon-wrap">
+        <span class="moon-icon" id="mainMoon">
+          <svg width="46" height="46" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="logoMoonFull" cx="36%" cy="30%" r="60%">
+                <stop offset="0%" stop-color="#eaf4ff"/>
+                <stop offset="45%" stop-color="#b0cff0"/>
+                <stop offset="100%" stop-color="#4a7ab5"/>
+              </radialGradient>
+              <radialGradient id="logoMoonCrescent" cx="28%" cy="24%" r="65%">
+                <stop offset="0%" stop-color="#fffacc"/>
+                <stop offset="45%" stop-color="#ffd000"/>
+                <stop offset="100%" stop-color="#a07000"/>
+              </radialGradient>
+              <mask id="crescentMask">
+                <circle cx="19" cy="19" r="11" fill="white"/>
+                <circle cx="23.5" cy="15" r="9.5" fill="black"/>
+              </mask>
+            </defs>
+            <!-- Чёрный круг - ночное небо -->
+            <circle cx="19" cy="19" r="18" fill="#08090f"/>
+            <!-- Звёзды - белые точки -->
+            <circle cx="6"  cy="8"  r="0.7" fill="white" opacity="0.9"/>
+            <circle cx="13" cy="4"  r="0.5" fill="white" opacity="0.7"/>
+            <circle cx="28" cy="6"  r="0.8" fill="white" opacity="0.85"/>
+            <circle cx="33" cy="13" r="0.5" fill="white" opacity="0.6"/>
+            <circle cx="31" cy="28" r="0.7" fill="white" opacity="0.8"/>
+            <circle cx="9"  cy="30" r="0.55" fill="white" opacity="0.65"/>
+            <circle cx="4"  cy="20" r="0.6" fill="white" opacity="0.75"/>
+            <circle cx="22" cy="33" r="0.5" fill="white" opacity="0.6"/>
+            <circle cx="35" cy="21" r="0.45" fill="white" opacity="0.5"/>
+            <circle cx="10" cy="14" r="0.4" fill="white" opacity="0.55"/>
+            <!-- Полная луна (default) -->
+            <circle class="moon-full" cx="19" cy="19" r="11" fill="url(#logoMoonFull)"/>
+            <!-- Кратеры -->
+            <circle class="moon-full" cx="16" cy="16" r="2" fill="rgba(60,100,160,0.22)"/>
+            <circle class="moon-full" cx="21" cy="21" r="1.3" fill="rgba(60,100,160,0.18)"/>
+            <circle class="moon-full" cx="14" cy="21" r="1.6" fill="rgba(60,100,160,0.16)"/>
+            <!-- Золотой полумесяц (scroll) -->
+            <circle class="moon-crescent" cx="19" cy="19" r="11" mask="url(#crescentMask)" fill="url(#logoMoonCrescent)"/>
           </svg>
-        </div>
-      </div>
-      <button id="authAction" class="btn-auth">Přihlásit se</button>
-      <p style="text-align:center;"><a href="#" class="nav-btn" id="switchAuth">Nemáte účet? Registrujte se</a></p>
+        </span>
+        <span class="logo-star">★</span>
+        <span class="logo-star">✦</span>
+        <span class="logo-star">·</span>
+      </span>
+      <span class="logo-text">SayMoonHelp</span>
     </div>
+    <nav>
+      <a href="#how-it-works" class="nav-link nav-pill">Jak to funguje</a>
+      <a href="#zadosti" class="nav-link nav-pill">Žádosti</a>
+      <a href="#hlasovani" class="nav-link nav-pill">Hlasování</a>
+      <a href="#my-space" class="nav-link nav-pill nav-secondary">Můj profil</a>
+      <button id="showLoginBtn" class="btn-login">Přihlásit se</button>
+      <span id="userInfo" style="display:none; align-items:center; gap:10px;">
+        <div class="user-badge"><span id="userEmail"></span></div>
+        <button id="logoutBtn" class="btn-logout">Odhlásit</button>
+      </span>
+    </nav>
   </div>
+</header>
 
-  <main>
-    <!-- Hero -->
-    <section class="hero">
-      <div class="container">
-        <h1>Pomoc, která si tě najde</h1>
-        <p>SayMoonHelp je loterie dobrých skutků. Pomáhej druhým, získej body a měj šanci získat pomoc, když ji nejvíc potřebuješ.</p>
-        <div class="button-group">
-          <button class="btn btn-primary">Zapojit se</button>
-          <button class="btn">Jak to funguje</button>
+<div id="authModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:white; padding:40px; border-radius:40px; width:90%; max-width:400px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h2 id="authTitle">Přihlásit se</h2><button id="closeModal" style="background:none; border:none; font-size:24px; cursor:pointer;">×</button></div>
+    <input type="text" id="displayName" class="auth-name-field" placeholder="Jméno a příjmení" style="width:100%; padding:15px; margin:0 0 20px; border:2px solid #3a6ea5; border-radius:30px;">
+    <input type="email" id="email" placeholder="Email" style="width:100%; padding:15px; margin:20px 0; border:2px solid #3a6ea5; border-radius:30px;">
+    <div class="password-container">
+      <input type="password" id="password" placeholder="Heslo">
+      <div class="eye-button" id="togglePassword">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="#3a6ea5"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" stroke="#3a6ea5" fill="none"/><line x1="3" y1="4" x2="21" y2="20" stroke="#3a6ea5" stroke-width="2" id="eyeLine"/></svg>
+      </div>
+    </div>
+    <button id="authAction" class="btn-auth">Přihlásit se</button>
+    <p style="text-align:center; margin-top:20px;"><a href="#" id="switchAuth" style="color:#3a6ea5;">Nemáte účet? Registrujte se</a></p>
+  </div>
+</div>
+
+<main>
+  <section class="hero"><canvas id="constellation-canvas"></canvas><div class="container"><h1>Pomoc, která si tě najde</h1><p class="hero-subtitle">SayMoonHelp je lunární loterie dobrých skutků — komunita vzájemné pomoci, kde každý příspěvek se jednou vrátí. Pomáhej druhým, získej body a měj šanci získat pomoc, když ji nejvíc potřebuješ.</p><div style="display:flex; gap:16px; justify-content:center; margin-top:30px;"><button class="btn btn-primary" onclick="document.getElementById('zadosti').scrollIntoView({behavior:'smooth'})">Zapojit se</button><button class="btn" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">Jak to funguje</button></div></div></section>
+
+  <section id="how-it-works">
+    <div class="container">
+      <h2 class="section-title">Jak to funguje</h2>
+      <div class="steps-grid">
+        <div class="step-card"><div class="step-number">1</div><h3>Přispěj komunitě</h3><p>Pošli libovolnou částku na cizí žádost. 10 Kč = 1 bod pomoci, který se připíše na tvůj účet navždy.</p></div>
+        <div class="step-card"><div class="step-number">2</div><h3>Hlasuj a rozhoduj</h3><p>Každý člen hlasuje 👍/👎. Žádost potřebuje 70 % hlasů „pro", aby postoupila do loterie.</p></div>
+        <div class="step-card"><div class="step-number">3</div><h3>Vyhraj pomoc</h3><p>Čím více jsi pomohl, tím více šancí máš. Loterie vybere výherce, který získá celou vybranou částku.</p></div>
+      </div>
+      <div class="jak-features">
+        <div class="jak-feature"><div class="jak-feature-icon">🌙</div><h4>Proč „lunární loterie"?</h4><p>Stejně jako Měsíc ovlivňuje příliv, naše komunita pohybuje energií tam, kde je nejvíc potřeba. Každý člen je součástí cyklu — dáváš i přijímáš. Čím více dáváš, tím větší šanci máš.</p></div>
+        <div class="jak-feature"><div class="jak-feature-icon">🔒</div><h4>Bezpečnost a průhlednost</h4><p>Všechny žádosti procházejí komunitním hlasováním. Každá transakce je viditelná členům. Provoz hradíme 5–10 % z každé vybrané částky — žádné skryté poplatky.</p></div>
+        <div class="jak-feature"><div class="jak-feature-icon">🎯</div><h4>Kdo může žádat?</h4><p>Každý registrovaný člen, který již alespoň jednou přispěl. Pomoc funguje jako kruh — nejprve dáváš, pak můžeš přijímat. Žádný člen není výjimkou.</p></div>
+        <div class="jak-feature"><div class="jak-feature-icon">📈</div><h4>Body rostou s každým příspěvkem</h4><p>Body se nesmazávají. Každý příspěvek trvale zvyšuje tvou šanci v budoucí loterii. Stačí začít — i 10 Kč dělá rozdíl.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="zadosti">
+    <div class="container">
+      <h2 class="section-title">Žádosti o pomoc</h2>
+      <p class="section-intro">Tady se zobrazují schválené i nově podané žádosti komunity. Po registraci a vyplnění profilu můžeš vytvořit vlastní žádost a hned ji uvidíš mezi ostatními.</p>
+      <div class="section-tabs">
+        <button class="tab-btn active" onclick="filterCards('all',this)">Všechny</button>
+        <button class="tab-btn" onclick="filterCards('active',this)">✅ Aktivní výběr</button>
+        <button class="tab-btn" onclick="filterCards('voting',this)">🗳️ Ve hlasování</button>
+        <button class="tab-btn" onclick="filterCards('approved',this)">🌙 Schválené</button>
+      </div>
+      <div class="requests-grid" id="requestsGrid"></div>
+    </div>
+  </section>
+
+  <section id="hlasovani">
+    <div class="container">
+      <h2 class="section-title">Hlasování komunity</h2>
+      <p style="text-align:center;color:#555;max-width:700px;margin:-30px auto 50px;font-size:1.05rem;line-height:1.7;">Každá žádost musí získat alespoň <strong>70 % hlasů „Ano"</strong> od komunity, aby postoupila do loterie. Přihlášení členové mohou hlasovat jednou za každou žádost.</p>
+      <div class="votes-grid" id="votesGrid"></div>
+      <p style="text-align:center;margin-top:40px;color:#888;font-size:0.9rem;">🔒 Pro hlasování musíš být přihlášen a mít alespoň 1 bod pomoci na účtu.</p>
+    </div>
+  </section>
+
+  <section id="my-space">
+    <div class="container">
+      <h2 class="section-title">Můj profil a žádost</h2>
+      <p class="section-intro">Tady si po registraci nastavíš profil, podáš vlastní žádost, uvidíš všechna svá hlasování a připravíš údaje pro převzetí výhry, jakmile tvoje žádost projde komunitou.</p>
+      <div id="dashboardGuest" class="dashboard-guest">
+        <h3 style="color:#1e3a5f; margin-bottom:12px;">Nejdřív se přihlas do komunity</h3>
+        <p style="max-width:620px; margin:0 auto 24px; color:#56606d; line-height:1.7;">Po přihlášení získáš vlastní profil, můžeš vyplnit svou situaci, podat žádost, hlasovat o ostatních a sledovat, jestli se tvoje žádost dostala do losování.</p>
+        <button class="btn btn-primary" onclick="openAuthModal()">Vytvořit profil / přihlásit se</button>
+      </div>
+      <div id="dashboardApp" style="display:none;">
+        <div class="dashboard-grid">
+          <div class="dashboard-card full-span">
+            <h3 style="color:#1e3a5f; margin-bottom:10px;">Přehled tvého účtu</h3>
+            <p style="color:#56606d; line-height:1.7;">SayMoonHelp pracuje s důvěrou. Proto tady vždy vidíš svůj profil, svou žádost, historii hlasování i stav pro převzetí výhry na jednom místě.</p>
+            <div class="summary-strip" id="profileSummary"></div>
+          </div>
+          <div class="dashboard-card">
+            <h3 style="color:#1e3a5f; margin-bottom:16px;">Profil člena</h3>
+            <form id="profileForm">
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="profileName">Jméno a příjmení</label>
+                  <input type="text" id="profileName" placeholder="Např. Jana Nováková">
+                </div>
+                <div class="form-field">
+                  <label for="profileCity">Město</label>
+                  <input type="text" id="profileCity" placeholder="Např. Praha">
+                </div>
+              </div>
+              <div class="form-field">
+                <label for="profileAbout">Krátce o sobě</label>
+                <textarea id="profileAbout" placeholder="Kdo jsi, čemu se věnuješ a proč chceš být součástí komunity?"></textarea>
+              </div>
+              <button type="submit" class="btn-auth">Uložit profil</button>
+            </form>
+            <div class="helper-note">Profil se uloží do tohoto prohlížeče a hned se promítne do sekcí Žádosti a Hlasování.</div>
+          </div>
+          <div class="dashboard-card">
+            <h3 style="color:#1e3a5f; margin-bottom:16px;">Podat novou žádost</h3>
+            <form id="requestForm">
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="requestTitle">Název žádosti</label>
+                  <input type="text" id="requestTitle" placeholder="Např. Oprava auta do práce">
+                </div>
+                <div class="form-field">
+                  <label for="requestAmount">Cílová částka (Kč)</label>
+                  <input type="number" id="requestAmount" min="100" step="100" placeholder="5000">
+                </div>
+              </div>
+              <div class="form-field">
+                <label for="requestStory">Popis situace</label>
+                <textarea id="requestStory" placeholder="Vysvětli svoji situaci, co potřebuješ a proč je to důležité právě teď."></textarea>
+              </div>
+              <button type="submit" class="btn-auth">Odeslat žádost do hlasování</button>
+            </form>
+            <div class="helper-note">Nová žádost se okamžitě objeví v Žádostech i v Hlasování jako profil reálného přihlášeného člena.</div>
+          </div>
+          <div class="dashboard-card">
+            <h3 style="color:#1e3a5f; margin-bottom:16px;">Převzetí výhry</h3>
+            <form id="claimForm">
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="claimPhone">Telefon</label>
+                  <input type="text" id="claimPhone" placeholder="+420 ...">
+                </div>
+                <div class="form-field">
+                  <label for="claimIban">IBAN / číslo účtu</label>
+                  <input type="text" id="claimIban" placeholder="CZ...">
+                </div>
+              </div>
+              <div class="form-field">
+                <label for="claimNote">Poznámka pro ověření</label>
+                <textarea id="claimNote" placeholder="Doplň kontaktní osobu, čas dostupnosti a cokoli důležitého pro předání výhry."></textarea>
+              </div>
+              <button type="submit" class="btn-auth">Uložit údaje pro převzetí</button>
+            </form>
+            <div id="claimStatus" class="claim-status"></div>
+          </div>
+          <div class="dashboard-card">
+            <h3 style="color:#1e3a5f; margin-bottom:16px;">Moje žádosti</h3>
+            <div id="myRequestsList"></div>
+          </div>
+          <div class="dashboard-card">
+            <h3 style="color:#1e3a5f; margin-bottom:16px;">Moje hlasování</h3>
+            <div id="myVotesList"></div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- 3 kroky -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Jak to funguje</h2>
-        <div class="steps-grid">
-          <div class="step-card">
-            <div class="step-number">1</div>
-            <h3>Přispěj</h3>
-            <p>Pošli libovolnou částku na cizí žádost. 10 Kč = 1 bod pomoci.</p>
-          </div>
-          <div class="step-card">
-            <div class="step-number">2</div>
-            <h3>Získej body</h3>
-            <p>Čím víc pomáháš, tím víc bodů máš. Body = tvoje šance v loterii.</p>
-          </div>
-          <div class="step-card">
-            <div class="step-number">3</div>
-            <h3>Vyhraj pomoc</h3>
-            <p>Až někdo podá žádost, loterie vybere šťastlivce, který dostane vybrané peníze.</p>
-          </div>
-        </div>
+  <section><div class="container"><h2 class="section-title">SayMoonHelp v číslech</h2><div class="stats-grid"><div><div class="stat-number">156 000 Kč</div><div>Vybráno na pomoc</div></div><div><div class="stat-number">47</div><div>Lidí dostalo pomoc</div></div><div><div class="stat-number">312</div><div>Aktivních členů</div></div></div></div></section>
 
-        <!-- Detail -->
-        <div class="detail-box">
-          <button id="detailBtn" class="btn">🔍 Jak to celé funguje?</button>
-          <div id="detailText" class="detail-content">
-            <h3>Loterie dobrých skutků 🌙</h3>
-            <p><strong>1. Přispěj:</strong> Pošli peníze na cizí žádost. 10 Kč = 1 bod.</p>
-            <p><strong>2. Hlasuj:</strong> Každý člen hlasuje 👍/👎. 70% "pro" = postup do loterie.</p>
-            <p><strong>3. Loterie:</strong> Náhodný výběr podle počtu bodů.</p>
-            <p><strong>4. Výhra:</strong> Výherce dostane vybranou částku (minus 5–10% provoz).</p>
-          </div>
-        </div>
-      </div>
-    </section>
+  <section><div class="container"><h2 class="section-title">Proč se zapojit</h2><div class="reasons-grid"><div class="reason-item"><div class="reason-icon">🤝</div><h4>Pomáháš konkrétním lidem</h4><p>Každá koruna jde na ověřenou žádost.</p></div><div class="reason-item"><div class="reason-icon">🎲</div><h4>Máš šanci na pomoc i ty</h4><p>Čím víc pomáháš, tím víc šancí máš.</p></div><div class="reason-item"><div class="reason-icon">🗳️</div><h4>Rozhoduješ ty</h4><p>Hlasuješ, kdo pomoc dostane.</p></div><div class="reason-item"><div class="reason-icon">🔍</div><h4>Jsme transparentní</h4><p>Všechny transakce jsou veřejné.</p></div></div></div></section>
 
-    <!-- Aktivní žádosti -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Právě teď někdo potřebuje pomoc</h2>
-        <div class="requests-grid">
-          <div class="request-card">
-            <div class="request-number">01</div>
-            <div class="request-name">Jana Nováková</div>
-            <div class="request-location">Praha</div>
-            <div>Potřebuje 5 000 Kč na opravu auta</div>
-            <div class="progress-bar-bg"><div class="progress-fill" style="width:64%"></div></div>
-            <div class="progress-stats"><span>3 200 Kč</span><span>z 5 000 Kč</span><span>64%</span></div>
-            <button class="btn-small">Pomoci</button>
-          </div>
-          <div class="request-card">
-            <div class="request-number">02</div>
-            <div class="request-name">Petr Svoboda</div>
-            <div class="request-location">Brno</div>
-            <div>Potřebuje 2 500 Kč na veterináře</div>
-            <div class="progress-bar-bg"><div class="progress-fill" style="width:72%"></div></div>
-            <div class="progress-stats"><span>1 800 Kč</span><span>z 2 500 Kč</span><span>72%</span></div>
-            <button class="btn-small">Pomoci</button>
-          </div>
-          <div class="request-card">
-            <div class="request-number">03</div>
-            <div class="request-name">Marie Veselá</div>
-            <div class="request-location">Ostrava</div>
-            <div>Potřebuje 8 000 Kč na školní pomůcky</div>
-            <div class="progress-bar-bg"><div class="progress-fill" style="width:56%"></div></div>
-            <div class="progress-stats"><span>4 500 Kč</span><span>z 8 000 Kč</span><span>56%</span></div>
-            <button class="btn-small">Pomoci</button>
-          </div>
-        </div>
-      </div>
-    </section>
+  <section><div class="container newsletter"><h2>Buďte první, až spustíme</h2><p>Zatím testujeme. Zanechte nám email a dáme vám vědět, jakmile bude možné se zapojit.</p><div class="email-form"><input class="email-input" type="email" placeholder="váš@email.cz"><button class="btn btn-primary" style="padding:18px 32px;">Odeslat</button></div><div class="privacy-note">Žádný spam. Jen jedna zpráva, až budeme živí.</div></div></section>
 
-    <!-- Hlasování -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Hlasujte, komu pomůžeme</h2>
-        <div class="votes-grid">
-          <div class="vote-card">
-            <div class="request-name">Tomáš Dvořák</div>
-            <div class="request-location">Plzeň</div>
-            <div>Potřebuje 3 000 Kč na jízdenky do práce</div>
-            <p>Přišel jsem o práci, nová je za městem. Potřebuji dojezdit, než dostanu první výplatu.</p>
-            <div class="vote-numbers">👍 45 / 👎 12 (79% pro)</div>
-            <div class="vote-buttons">
-              <button class="vote-yes">👍 Ano</button>
-              <button class="vote-no">👎 Ne</button>
-            </div>
-          </div>
-          <div class="vote-card">
-            <div class="request-name">Lucie Horáková</div>
-            <div class="request-location">Liberec</div>
-            <div>Potřebuje 12 000 Kč na opravu pračky</div>
-            <p>Jsem samoživitelka, pračka se rozbila a nemám na novou.</p>
-            <div class="vote-numbers">👍 23 / 👎 8 (74% pro)</div>
-            <div class="vote-buttons">
-              <button class="vote-yes">👍 Ano</button>
-              <button class="vote-no">👎 Ne</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+  <section><div class="container"><h2 class="section-title">Časté otázky</h2><div class="faq-grid"><div class="faq-item"><div class="faq-question">Kdo může žádat o pomoc?</div><div>Každý registrovaný člen, který už alespoň jednou pomohl.</div></div><div class="faq-item"><div class="faq-question">Jak funguje loterie?</div><div>10 Kč = 1 bod. Losujeme podle bodů. Vyhrává jeden člen.</div></div></div></div></section>
+</main>
 
-    <!-- Čísla -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">SayMoonHelp v číslech</h2>
-        <div class="stats-grid">
-          <div class="stat-item"><div class="stat-number">156 000 Kč</div><div class="stat-label">Vybráno na pomoc</div></div>
-          <div class="stat-item"><div class="stat-number">47</div><div class="stat-label">Lidí dostalo pomoc</div></div>
-          <div class="stat-item"><div class="stat-number">312</div><div class="stat-label">Aktivních členů</div></div>
-        </div>
-      </div>
-    </section>
+<footer class="container">
+  <div>© 2025 SayMoonHelp · průhledná pomoc</div>
+  <div class="lunar-design" id="footerLunar">🌙 lunární design</div>
+</footer>
 
-    <!-- 4 důvody -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Proč se zapojit</h2>
-        <div class="reasons-grid">
-          <div class="reason-item"><div class="reason-icon">🤝</div><h4>Pomáháš konkrétním lidem</h4><p>Každá koruna jde na ověřenou žádost.</p></div>
-          <div class="reason-item"><div class="reason-icon">🎲</div><h4>Máš šanci na pomoc i ty</h4><p>Čím víc pomáháš, tím víc šancí máš.</p></div>
-          <div class="reason-item"><div class="reason-icon">🗳️</div><h4>Rozhoduješ ty</h4><p>Hlasuješ, kdo pomoc dostane.</p></div>
-          <div class="reason-item"><div class="reason-icon">🔍</div><h4>Jsme transparentní</h4><p>Všechny transakce jsou veřejné.</p></div>
-        </div>
-      </div>
-    </section>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyA1aSGtwkbVp8yAL_I2P-6bDITHe58ALtA",
+    authDomain: "saymoonhelp-af1e6.firebaseapp.com",
+    projectId: "saymoonhelp-af1e6",
+    storageBucket: "saymoonhelp-af1e6.firebasestorage.app",
+    messagingSenderId: "911248985825",
+    appId: "1:911248985825:web:b602feab7eb8f4dbd9b1a0"
+  };
+  firebase.initializeApp(firebaseConfig);
 
-    <!-- Newsletter -->
-    <section>
-      <div class="container newsletter">
-        <h2>Buďte první, až spustíme</h2>
-        <p>Zatím testujeme. Zanechte nám email a dáme vám vědět, jakmile bude možné se zapojit.</p>
-        <div class="email-form">
-          <input class="email-input" type="email" placeholder="váš@email.cz">
-          <button class="btn btn-primary" style="padding: 18px 32px;">Odeslat</button>
-        </div>
-        <div class="privacy-note">Žádný spam. Jen jedna zpráva, až budeme živí.</div>
-      </div>
-    </section>
+  document.addEventListener('DOMContentLoaded', () => {
+    const STORAGE_KEY = 'saymoonhelp-app-v4';
+    const seedRequests = [
+      { id: 'seed-001', number: '#001', name: 'Jana Nováková', city: 'Praha', memberLabel: 'Členka 8 měsíců', points: 42, title: 'Oprava auta do práce', story: 'Pracuji jako zdravotní sestra a auto je moje jediné spojení se zaměstnáním. Rozbila se převodovka a oprava stojí 5 000 Kč. Bez auta přijdu o práci.', target: 5000, raised: 3200, status: 'active' },
+      { id: 'seed-002', number: '#002', name: 'Petr Svoboda', city: 'Brno', memberLabel: 'Člen 5 měsíců', points: 28, title: 'Operace pro psa Bobíka', story: 'Můj pes Bobík potřebuje akutní operaci. Veterinář potvrzuje, že bez zákroku do týdne je situace vážná. Všechny rezervy už jsem vložil do léčby.', target: 2500, raised: 1800, status: 'active' },
+      { id: 'seed-003', number: '#003', name: 'Marie Veselá', city: 'Ostrava', memberLabel: 'Členka 11 měsíců', points: 67, title: 'Pomůcky pro dvě děti do školy', story: 'Jsem samoživitelka se dvěma dětmi. Nastupují do nové školy a potřebují pomůcky, uniformy i notebook. Každá koruna pomůže udržet děti ve škole bez výpadku.', target: 8000, raised: 4500, status: 'active' },
+      { id: 'seed-004', number: '#004', name: 'Tomáš Dvořák', city: 'Plzeň', memberLabel: 'Člen 3 měsíce', points: 15, title: 'Měsíční jízdné do nové práce', story: 'Přišel jsem o práci před měsícem. Novou mám za městem, ale než dostanu první výplatu, nemám na jízdenky. Prosím o pomoc s překlenutím prvního měsíce.', target: 3000, raised: 0, status: 'voting', yes: 45, no: 12 },
+      { id: 'seed-005', number: '#005', name: 'Lucie Horáková', city: 'Liberec', memberLabel: 'Členka 14 měsíců', points: 89, title: 'Nová pračka pro samoživitelku', story: 'Jsem samoživitelka, pračka se rozbila a oprava je dražší než nová. Komunita moji situaci schválila a teď čekám na další losování.', target: 7000, raised: 0, status: 'approved', yes: 74, no: 26 },
+      { id: 'seed-006', number: '#006', name: 'Karolína Marková', city: 'České Budějovice', memberLabel: 'Členka 6 měsíců', points: 31, title: 'Dočasná náhrada inzulínové pumpy', story: 'Mám diabetické dítě a inzulínová pumpa se porouchala. Pojišťovna náhradu uhradí až za tři měsíce. Potřebuji překlenout kritické období.', target: 4500, raised: 0, status: 'voting', yes: 38, no: 24 },
+      { id: 'seed-007', number: '#007', name: 'Miroslav Kříž', city: 'Olomouc', memberLabel: 'Člen 2 měsíce', points: 12, title: 'Nové nářadí pro návrat do práce', story: 'Jsem řemeslník na volné noze. Zlomil se mi hlavní pracovní nástroj a bez něj nemohu pracovat. Potřebuji rychle koupit novou brusku, abych uživil rodinu.', target: 6000, raised: 0, status: 'voting', yes: 29, no: 27 }
+    ];
+    let activeRequestFilter = 'all';
+    let currentUser = null;
 
-    <!-- FAQ -->
-    <section>
-      <div class="container">
-        <h2 class="section-title">Časté otázky</h2>
-        <div class="faq-grid">
-          <div class="faq-item"><div class="faq-question">Kdo může žádat o pomoc?</div><div class="faq-answer">Každý registrovaný člen, který už alespoň jednou pomohl.</div></div>
-          <div class="faq-item"><div class="faq-question">Jak funguje loterie?</div><div class="faq-answer">10 Kč = 1 bod. Losujeme podle bodů. Vyhrává jeden člen.</div></div>
-        </div>
-      </div>
-    </section>
-  </main>
+    const moon = document.getElementById('mainMoon');
+    const footerLunar = document.getElementById('footerLunar');
+    const requestsGrid = document.getElementById('requestsGrid');
+    const votesGrid = document.getElementById('votesGrid');
+    const dashboardGuest = document.getElementById('dashboardGuest');
+    const dashboardApp = document.getElementById('dashboardApp');
+    const profileSummary = document.getElementById('profileSummary');
+    const myRequestsList = document.getElementById('myRequestsList');
+    const myVotesList = document.getElementById('myVotesList');
+    const claimStatus = document.getElementById('claimStatus');
+    const profileForm = document.getElementById('profileForm');
+    const requestForm = document.getElementById('requestForm');
+    const claimForm = document.getElementById('claimForm');
 
-  <footer class="container">
-    <div>© 2025 SayMoonHelp · průhledná pomoc</div>
-    <div class="small-moon" id="footerMoon">🌙 lunární design</div>
-  </footer>
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return { profiles: {}, requests: [], votesByUser: {}, voteTallies: {}, claims: {}, nextRequestNumber: 8 };
+        const parsed = JSON.parse(raw);
+        return {
+          profiles: parsed.profiles || {},
+          requests: parsed.requests || [],
+          votesByUser: parsed.votesByUser || {},
+          voteTallies: parsed.voteTallies || {},
+          claims: parsed.claims || {},
+          nextRequestNumber: parsed.nextRequestNumber || 8
+        };
+      } catch (error) {
+        return { profiles: {}, requests: [], votesByUser: {}, voteTallies: {}, claims: {}, nextRequestNumber: 8 };
+      }
+    }
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyA1aSGtwkbVp8yAL_I2P-6bDITHe58ALtA",
-      authDomain: "saymoonhelp-af1e6.firebaseapp.com",
-      projectId: "saymoonhelp-af1e6",
-      storageBucket: "saymoonhelp-af1e6.firebasestorage.app",
-      messagingSenderId: "911248985825",
-      appId: "1:911248985825:web:b602feab7eb8f4dbd9b1a0"
-    };
-    firebase.initializeApp(firebaseConfig);
+    const state = loadState();
 
-    document.addEventListener('DOMContentLoaded', () => {
-      // Luna
-      const moon = document.getElementById('mainMoon');
-      const footerMoon = document.getElementById('footerMoon');
-      window.addEventListener('scroll', () => {
-        if (window.scrollY > 100) {
-          moon.classList.add('gold-moon');
-          footerMoon.classList.add('gold-moon');
-        } else {
-          moon.classList.remove('gold-moon');
-          footerMoon.classList.remove('gold-moon');
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function monthsSince(timestamp) {
+      if (!timestamp) return 'Člen nově';
+      const diff = Math.max(1, Math.round((Date.now() - timestamp) / (1000 * 60 * 60 * 24 * 30)));
+      return diff === 1 ? 'Člen 1 měsíc' : 'Člen ' + diff + ' měsíců';
+    }
+
+    function getProfile(user) {
+      return user ? state.profiles[user.uid] : null;
+    }
+
+    function ensureProfile(user, displayName) {
+      if (!user) return null;
+      const existing = state.profiles[user.uid] || {};
+      const fallbackName = displayName || user.displayName || existing.name || user.email.split('@')[0];
+      state.profiles[user.uid] = {
+        name: fallbackName,
+        city: existing.city || '',
+        about: existing.about || '',
+        points: typeof existing.points === 'number' ? existing.points : 5,
+        joinedAt: existing.joinedAt || Date.now(),
+        email: user.email,
+        updatedAt: Date.now()
+      };
+      saveState();
+      return state.profiles[user.uid];
+    }
+
+    function getAllRequests() {
+      return seedRequests.concat(state.requests).map(function(request) {
+        const tally = state.voteTallies[request.id];
+        return Object.assign({}, request, tally ? { yes: tally.yes, no: tally.no } : {});
+      });
+    }
+
+    function getVotePercentage(request) {
+      const yes = request.yes || 0;
+      const no = request.no || 0;
+      const total = yes + no;
+      return total ? Math.round((yes / total) * 100) : 0;
+    }
+
+    function getStatusLabel(status) {
+      if (status === 'active') return '<span class="card-status status-active">✅ Aktivní výběr</span>';
+      if (status === 'approved') return '<span class="card-status status-approved">🌙 Schváleno — čeká na loterii</span>';
+      if (status === 'draft') return '<span class="card-status status-draft">📝 Koncept</span>';
+      return '<span class="card-status status-voting">🗳️ Ve hlasování</span>';
+    }
+
+    function requestAction(request) {
+      if (request.status === 'active') return '<button class="btn-small" onclick="openAuthModal()">💙 Pomoci — přispět</button>';
+      if (request.status === 'approved') return '<button class="btn-small" onclick="smoothScroll(\'#my-space\')">🏆 Zobrazit stav výhry</button>';
+      return '<button class="btn-small" onclick="smoothScroll(\'#hlasovani\')">🗳️ Jít hlasovat</button>';
+    }
+
+    function renderRequests() {
+      const filtered = getAllRequests().filter(function(request) {
+        return activeRequestFilter === 'all' || request.status === activeRequestFilter;
+      });
+      if (!filtered.length) {
+        requestsGrid.innerHTML = '<div class="empty-state">V tomto filtru zatím není žádná žádost. Přihlas se a pošli první vlastní příběh komunity.</div>';
+        return;
+      }
+      requestsGrid.innerHTML = filtered.map(function(request) {
+        const cityLink = request.city ? '<a href="https://www.google.com/maps/search/' + encodeURIComponent(request.city + ', Česká republika') + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dotted rgba(58,110,165,0.5);cursor:pointer;">' + request.city + '</a>' : 'Neuvedeno';
+        const profileMeta = '📍 ' + cityLink + ' &nbsp;·&nbsp; 👤 ' + (request.memberLabel || 'Člen komunity') + ' &nbsp;·&nbsp; ⭐ ' + (request.points || 0) + ' bodů';
+        if (request.status === 'active') {
+          const progress = Math.min(100, Math.round(((request.raised || 0) / request.target) * 100));
+          return '<div class="request-card" data-status="' + request.status + '">' +
+            '<a class="request-number" href="#my-space" onclick="smoothScroll(\'my-space\')'  + '">' + request.number + '</a>' +
+            getStatusLabel(request.status) +
+            '<div class="request-name">' + request.name + '</div>' +
+            '<div class="request-title">' + request.title + '</div>' +
+            '<div class="request-meta">' + profileMeta + '</div>' +
+            '<div class="request-story">' + request.story + '</div>' +
+            '<div class="progress-bar-bg"><div class="progress-fill" style="width:' + progress + '%"></div></div>' +
+            '<div class="progress-stats"><span>' + (request.raised || 0).toLocaleString('cs-CZ') + ' Kč vybráno</span><span>cíl: ' + request.target.toLocaleString('cs-CZ') + ' Kč</span></div>' +
+            requestAction(request) +
+          '</div>';
         }
-      });
+        const percent = getVotePercentage(request);
+        const stateText = request.status === 'approved' ? 'Schváleno:' : 'Hlasování:';
+        const accent = request.status === 'approved' ? '#1e3a5f' : (percent >= 70 ? '#3a6ea5' : '#b07800');
+        const suffix = request.status === 'approved' ? ' hlasů' : (percent >= 70 ? ' ✓' : '');
+        return '<div class="request-card" data-status="' + request.status + '">' +
+          '<a class="request-number" href="#my-space" onclick="smoothScroll(\'my-space\')'  + '">' + request.number + '</a>' +
+          getStatusLabel(request.status) +
+          '<div class="request-name">' + request.name + '</div>' +
+          '<div class="request-title">' + request.title + '</div>' +
+          '<div class="request-meta">' + profileMeta + '</div>' +
+          '<div class="request-story">' + request.story + '</div>' +
+          '<div class="vote-threshold"><span>' + stateText + '</span><div class="threshold-bar"><div class="threshold-fill" style="width:' + percent + '%"></div></div><span style="font-weight:600;color:' + accent + '">' + percent + '%' + suffix + '</span></div>' +
+          requestAction(request) +
+        '</div>';
+      }).join('');
+    }
 
-      // Detail
-      document.getElementById('detailBtn').addEventListener('click', function() {
-        const detail = document.getElementById('detailText');
-        detail.style.display = detail.style.display === 'block' ? 'none' : 'block';
-        this.textContent = detail.style.display === 'block' ? '🔍 Skrýt detail' : '🔍 Jak to celé funguje?';
-      });
+    function renderVotes() {
+      const votable = getAllRequests().filter(function(request) { return request.status === 'voting'; });
+      if (!votable.length) {
+        votesGrid.innerHTML = '<div class="empty-state">Právě není žádná žádost ve hlasování. Nové žádosti se objeví hned po odeslání z profilu člena.</div>';
+        return;
+      }
+      const currentVotes = currentUser && state.votesByUser[currentUser.uid] ? state.votesByUser[currentUser.uid] : {};
+      votesGrid.innerHTML = votable.map(function(request) {
+        const percent = getVotePercentage(request);
+        const totalYes = request.yes || 0;
+        const totalNo = request.no || 0;
+        const voted = currentVotes[request.id];
+        return '<div class="vote-card">' +
+          '<a class="request-number" href="#my-space" onclick="smoothScroll(\'my-space\')">' + request.number + '</a>' +
+          '<span class="card-status status-voting">🗳️ Probíhá hlasování</span>' +
+          '<div class="request-name">' + request.name + '</div>' +
+          '<div class="request-title">' + request.title + '</div>' +
+          '<div class="request-meta">📍 ' + (request.city ? '<a href="https://www.google.com/maps/search/' + encodeURIComponent(request.city + ', Česká republika') + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dotted rgba(58,110,165,0.5)">' + request.city + '</a>' : 'Neuvedeno') + ' &nbsp;·&nbsp; <span style="color:#e04444;font-weight:600">potřebuje ' + request.target.toLocaleString('cs-CZ') + ' Kč</span> &nbsp;·&nbsp; 👤 ' + (request.memberLabel || 'Člen komunity') + '</div>' +
+          '<div class="request-story">' + request.story + '</div>' +
+          '<div class="vote-threshold" style="margin:14px 0"><div class="threshold-bar" style="height:8px"><div class="threshold-fill" style="width:' + percent + '%"></div></div></div>' +
+          '<div class="vote-numbers">👍 ' + totalYes + ' Ano &nbsp;/&nbsp; 👎 ' + totalNo + ' Ne &nbsp;·&nbsp; <strong style="color:' + (percent >= 70 ? '#3a6ea5' : '#b07800') + '">' + percent + '%</strong> pro &nbsp;<span style="color:' + (percent >= 70 ? '#3a6ea5' : '#999') + ';font-size:0.85rem">' + (percent >= 70 ? '✓ Připraveno postoupit' : 'potřeba 70%') + '</span></div>' +
+          '<div class="vote-buttons" style="margin-top:14px">' +
+            '<button class="vote-yes' + (voted === 'yes' ? ' voted' : '') + '" onclick="castVote(\'' + request.id + '\',\'yes\')">👍 Ano, pomozme</button>' +
+            '<button class="vote-no' + (voted === 'no' ? ' voted' : '') + '" onclick="castVote(\'' + request.id + '\',\'no\')">👎 Ne</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
 
-      // Oko
-      const eye = document.getElementById('togglePassword');
-      const password = document.getElementById('password');
-      const eyeLine = document.getElementById('eyeLine');
-      eye?.addEventListener('click', function() {
-        this.style.transform = 'translateY(-50%) scale(1.2)';
-        setTimeout(() => this.style.transform = 'translateY(-50%) scale(1)', 200);
-        const type = password.type === 'password' ? 'text' : 'password';
-        password.type = type;
-        eyeLine.style.display = type === 'text' ? 'none' : 'block';
-      });
+    function renderDashboard() {
+      if (!currentUser) {
+        dashboardGuest.style.display = 'block';
+        dashboardApp.style.display = 'none';
+        return;
+      }
+      dashboardGuest.style.display = 'none';
+      dashboardApp.style.display = 'block';
 
-      // Registrace
-      const modal = document.getElementById('authModal');
-      document.getElementById('showLoginBtn').addEventListener('click', () => modal.style.display = 'flex');
-      document.getElementById('closeModal').addEventListener('click', () => modal.style.display = 'none');
-      
-      let isLogin = true;
-      document.getElementById('switchAuth').addEventListener('click', (e) => {
-        e.preventDefault();
-        isLogin = !isLogin;
-        document.getElementById('authTitle').innerText = isLogin ? 'Přihlásit se' : 'Registrace';
-        document.getElementById('authAction').innerText = isLogin ? 'Přihlásit se' : 'Registrovat se';
-        e.target.innerText = isLogin ? 'Nemáte účet? Registrujte se' : 'Máte účet? Přihlaste se';
-      });
+      const profile = ensureProfile(currentUser);
+      const allRequests = getAllRequests();
+      const ownRequests = state.requests.filter(function(request) { return request.createdBy === currentUser.uid; });
+      const ownVotes = state.votesByUser[currentUser.uid] || {};
+      const votedEntries = Object.keys(ownVotes).map(function(requestId) {
+        const request = allRequests.find(function(item) { return item.id === requestId; });
+        return request ? { request: request, side: ownVotes[requestId] } : null;
+      }).filter(Boolean);
+      const approvedOwnRequest = ownRequests.find(function(request) { return request.status === 'approved'; });
+      const claim = state.claims[currentUser.uid] || { phone: '', iban: '', note: '' };
 
-      document.getElementById('authAction').addEventListener('click', function() {
-        this.classList.add('clicked');
-        setTimeout(() => this.classList.remove('clicked'), 300);
-        const email = document.getElementById('email').value;
-        const pass = password.value;
-        if (!email || !pass) return alert('Vyplň email a heslo');
-        const auth = isLogin 
-          ? firebase.auth().signInWithEmailAndPassword(email, pass)
-          : firebase.auth().createUserWithEmailAndPassword(email, pass);
-        auth.then(() => modal.style.display = 'none').catch(e => alert(e.message));
-      });
+      document.getElementById('profileName').value = profile.name || '';
+      document.getElementById('profileCity').value = profile.city || '';
+      document.getElementById('profileAbout').value = profile.about || '';
+      document.getElementById('claimPhone').value = claim.phone || '';
+      document.getElementById('claimIban').value = claim.iban || '';
+      document.getElementById('claimNote').value = claim.note || '';
 
-      firebase.auth().onAuthStateChanged(user => {
-        const info = document.getElementById('userInfo');
-        const btn = document.getElementById('showLoginBtn');
-        if (user) {
-          btn.style.display = 'none';
-          info.style.display = 'flex';
-          document.getElementById('userEmail').innerText = user.email;
-        } else {
-          btn.style.display = 'inline-block';
-          info.style.display = 'none';
-        }
-      });
+      profileSummary.innerHTML = [
+        '<div class="summary-item"><strong>' + (profile.points || 0) + '</strong><span>Body pomoci na účtu. Profil je způsobilý hlasovat a vstoupit do budoucího losování.</span></div>',
+        '<div class="summary-item"><strong>' + ownRequests.length + '</strong><span>Vlastní žádosti. Poslední žádost se po odeslání automaticky objeví v Žádostech i Hlasování.</span></div>',
+        '<div class="summary-item"><strong>' + votedEntries.length + '</strong><span>Odevzdané hlasy. Všechny tvé volby vidíš níže v osobní historii.</span></div>'
+      ].join('');
 
-      document.getElementById('logoutBtn').addEventListener('click', () => firebase.auth().signOut());
+      if (!ownRequests.length) {
+        myRequestsList.innerHTML = '<div class="empty-state">Ještě jsi neposlal žádnou žádost. Vyplň formulář „Podat novou žádost“ a objevíš se mezi ostatními členy.</div>';
+      } else {
+        myRequestsList.innerHTML = ownRequests.slice().reverse().map(function(request) {
+          const percent = getVotePercentage(request);
+          return '<div class="activity-item">' +
+            getStatusLabel(request.status) +
+            '<h4>' + request.title + '</h4>' +
+            '<p>' + request.story + '</p>' +
+            '<div class="activity-meta">' + request.number + ' · ' + request.target.toLocaleString('cs-CZ') + ' Kč · ' + percent + '% podpory komunity</div>' +
+          '</div>';
+        }).join('');
+      }
+
+      if (!votedEntries.length) {
+        myVotesList.innerHTML = '<div class="empty-state">Zatím jsi nehlasoval. Přejdi do sekce Hlasování a podpoř příběhy, které mají dostat šanci v loterii.</div>';
+      } else {
+        myVotesList.innerHTML = votedEntries.slice().reverse().map(function(entry) {
+          return '<div class="activity-item">' +
+            '<h4>' + entry.request.name + ' · ' + entry.request.title + '</h4>' +
+            '<p>Tvůj hlas: <strong style="color:' + (entry.side === 'yes' ? '#3a6ea5' : '#b07800') + '">' + (entry.side === 'yes' ? 'Ano' : 'Ne') + '</strong>. Aktuální podpora komunity je ' + getVotePercentage(entry.request) + '%.</p>' +
+            '<div class="activity-meta">' + entry.request.number + ' · ' + (entry.request.city || 'Neuvedeno') + '</div>' +
+          '</div>';
+        }).join('');
+      }
+
+      claimStatus.innerHTML = approvedOwnRequest
+        ? 'Tvoje žádost <strong>' + approvedOwnRequest.title + '</strong> je připravená pro další krok. Ulož kontaktní údaje a číslo účtu, aby bylo možné navázat předáním výhry po losování.'
+        : 'Údaje pro převzetí výhry si můžeš připravit už teď. Aktivují se ve chvíli, kdy tvoje žádost získá dost hlasů a postoupí do další fáze.';
+    }
+
+    function renderAll() {
+      renderRequests();
+      renderVotes();
+      renderDashboard();
+    }
+
+    function refreshUserHeader(profile) {
+      const info = document.getElementById('userInfo');
+      const btn = document.getElementById('showLoginBtn');
+      if (currentUser) {
+        btn.style.display = 'none';
+        info.style.display = 'flex';
+        document.getElementById('userEmail').innerText = (profile.name || currentUser.email) + ' · ' + currentUser.email;
+      } else {
+        btn.style.display = 'inline-block';
+        info.style.display = 'none';
+      }
+    }
+
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY > 100;
+      moon.classList.toggle('gold-moon', scrolled);
+      footerLunar.classList.toggle('gold', scrolled);
+      const stars = document.querySelectorAll('.logo-star');
+      stars.forEach(s => { s.style.color = scrolled ? '#ffd700' : '#3a6ea5'; });
     });
-  </script>
+
+    const detailBtn = document.getElementById('detailBtn');
+    const detailText = document.getElementById('detailText');
+    if (detailBtn) detailBtn.onclick = () => {
+      const show = detailText.style.display === 'block';
+      detailText.style.display = show ? 'none' : 'block';
+      detailBtn.textContent = show ? '🔍 Jak to celé funguje?' : '🔍 Skrýt detail';
+    };
+
+    const eye = document.getElementById('togglePassword');
+    const pass = document.getElementById('password');
+    const eyeLine = document.getElementById('eyeLine');
+    const nameField = document.getElementById('displayName');
+    if (eye) eye.onclick = () => {
+      const type = pass.type === 'password' ? 'text' : 'password';
+      pass.type = type;
+      if (eyeLine) eyeLine.style.display = type === 'text' ? 'none' : 'block';
+    };
+
+    const modal = document.getElementById('authModal');
+  window.openAuthModal = () => modal.style.display = 'flex';
+  document.getElementById('showLoginBtn').onclick = () => modal.style.display = 'flex';
+    document.getElementById('closeModal').onclick = () => modal.style.display = 'none';
+    window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
+
+    let isLogin = true;
+    const switchAuth = document.getElementById('switchAuth');
+    const authTitle = document.getElementById('authTitle');
+    const authAction = document.getElementById('authAction');
+    if (switchAuth) switchAuth.onclick = (e) => {
+      e.preventDefault();
+      isLogin = !isLogin;
+      authTitle.innerText = isLogin ? 'Přihlásit se' : 'Registrace';
+      authAction.innerText = isLogin ? 'Přihlásit se' : 'Registrovat se';
+      switchAuth.innerText = isLogin ? 'Nemáte účet? Registrujte se' : 'Máte účet? Přihlaste se';
+      nameField.style.display = isLogin ? 'none' : 'block';
+    };
+    if (authAction) authAction.onclick = () => {
+      const email = document.getElementById('email').value;
+      const pwd = pass.value;
+      const displayName = nameField.value.trim();
+      if (!email || !pwd) return alert('Vyplň email a heslo');
+      if (!isLogin && !displayName) return alert('Vyplň také své jméno pro vytvoření profilu');
+      (isLogin ? firebase.auth().signInWithEmailAndPassword(email, pwd) : firebase.auth().createUserWithEmailAndPassword(email, pwd))
+        .then(function(credential) {
+          if (!isLogin && credential.user) {
+            return credential.user.updateProfile({ displayName: displayName }).then(function() {
+              ensureProfile(credential.user, displayName);
+            });
+          }
+          return null;
+        })
+        .then(() => {
+          modal.style.display = 'none';
+          document.getElementById('email').value = '';
+          pass.value = '';
+          nameField.value = '';
+        })
+        .catch(e => alert(e.message));
+    };
+
+    firebase.auth().onAuthStateChanged(user => {
+      currentUser = user;
+      if (user) {
+        const profile = ensureProfile(user);
+        refreshUserHeader(profile);
+      } else {
+        refreshUserHeader({});
+      }
+      renderAll();
+    });
+    document.getElementById('logoutBtn').onclick = () => firebase.auth().signOut();
+
+    profileForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      if (!currentUser) return alert('Nejdřív se přihlas.');
+      const profile = ensureProfile(currentUser);
+      profile.name = document.getElementById('profileName').value.trim() || profile.name;
+      profile.city = document.getElementById('profileCity').value.trim();
+      profile.about = document.getElementById('profileAbout').value.trim();
+      state.profiles[currentUser.uid] = profile;
+      saveState();
+      refreshUserHeader(profile);
+      renderAll();
+      alert('Profil byl uložen.');
+    });
+
+    requestForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      if (!currentUser) return alert('Nejdřív se přihlas.');
+      const profile = ensureProfile(currentUser);
+      if (!profile.city || !profile.name) return alert('Nejdřív doplň jméno a město ve svém profilu.');
+      const title = document.getElementById('requestTitle').value.trim();
+      const amount = Number(document.getElementById('requestAmount').value);
+      const story = document.getElementById('requestStory').value.trim();
+      if (!title || !amount || !story) return alert('Vyplň název, částku i popis situace.');
+      const nextNumber = String(state.nextRequestNumber).padStart(3, '0');
+      const request = {
+        id: 'user-' + currentUser.uid + '-' + Date.now(),
+        number: '#' + nextNumber,
+        name: profile.name,
+        city: profile.city,
+        memberLabel: monthsSince(profile.joinedAt),
+        points: profile.points,
+        title: title,
+        story: story,
+        target: amount,
+        raised: 0,
+        status: 'voting',
+        yes: 0,
+        no: 0,
+        createdBy: currentUser.uid,
+        createdAt: Date.now()
+      };
+      state.requests.push(request);
+      state.voteTallies[request.id] = { yes: 0, no: 0 };
+      state.nextRequestNumber += 1;
+      saveState();
+      requestForm.reset();
+      activeRequestFilter = 'all';
+      document.querySelectorAll('.tab-btn').forEach(function(button, index) {
+        button.classList.toggle('active', index === 0);
+      });
+      renderAll();
+      smoothScroll('#zadosti');
+      alert('Žádost byla odeslána a je vidět mezi ostatními.');
+    });
+
+    claimForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      if (!currentUser) return alert('Nejdřív se přihlas.');
+      state.claims[currentUser.uid] = {
+        phone: document.getElementById('claimPhone').value.trim(),
+        iban: document.getElementById('claimIban').value.trim(),
+        note: document.getElementById('claimNote').value.trim(),
+        updatedAt: Date.now()
+      };
+      saveState();
+      renderDashboard();
+      alert('Údaje pro převzetí výhry byly uloženy.');
+    });
+
+    window.castVote = function(requestId, side) {
+      if (!currentUser) {
+        openAuthModal();
+        return;
+      }
+      const profile = ensureProfile(currentUser);
+      if ((profile.points || 0) < 1) {
+        alert('Pro hlasování potřebuješ alespoň 1 bod pomoci.');
+        return;
+      }
+      state.votesByUser[currentUser.uid] = state.votesByUser[currentUser.uid] || {};
+      if (state.votesByUser[currentUser.uid][requestId]) {
+        alert('Pro tuto žádost už jsi hlasoval(a).');
+        return;
+      }
+      const request = getAllRequests().find(function(item) { return item.id === requestId; });
+      if (!request) return;
+      const tally = state.voteTallies[requestId] || { yes: request.yes || 0, no: request.no || 0 };
+      if (side === 'yes') tally.yes += 1; else tally.no += 1;
+      state.voteTallies[requestId] = tally;
+      state.votesByUser[currentUser.uid][requestId] = side;
+      const total = tally.yes + tally.no;
+      const percent = total ? Math.round((tally.yes / total) * 100) : 0;
+      const ownRequest = state.requests.find(function(item) { return item.id === requestId; });
+      if (ownRequest && total >= 5 && percent >= 70) ownRequest.status = 'approved';
+      saveState();
+      renderAll();
+    };
+
+    window.filterCards = function(status, btn) {
+      activeRequestFilter = status;
+      document.querySelectorAll('.tab-btn').forEach(function(button) { button.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+      renderRequests();
+    };
+
+    window.smoothScroll = function(id) {
+      var el = document.querySelector(id);
+      if (el) el.scrollIntoView({behavior: 'smooth'});
+    };
+
+    renderAll();
+  });
+</script>
+<script>
+  (function() {
+    const canvas = document.getElementById('constellation-canvas');
+    const ctx = canvas.getContext('2d');
+    const NUM_STARS = 55;
+    const MAX_DIST = 160;
+    let stars = [];
+
+    function resize() {
+      const hero = canvas.parentElement;
+      canvas.width = hero.offsetWidth;
+      canvas.height = hero.offsetHeight;
+    }
+
+    function randomStar() {
+      return {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 1.8 + 0.8
+      };
+    }
+
+    function init() {
+      resize();
+      stars = Array.from({length: NUM_STARS}, randomStar);
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Draw lines
+      for (let i = 0; i < stars.length; i++) {
+        for (let j = i + 1; j < stars.length; j++) {
+          const dx = stars[i].x - stars[j].x;
+          const dy = stars[i].y - stars[j].y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < MAX_DIST) {
+            ctx.beginPath();
+            ctx.moveTo(stars[i].x, stars[i].y);
+            ctx.lineTo(stars[j].x, stars[j].y);
+            ctx.strokeStyle = `rgba(58,110,165,${(1 - dist/MAX_DIST) * 0.25})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+      // Draw stars
+      for (const s of stars) {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(58,110,165,0.7)';
+        ctx.fill();
+      }
+    }
+
+    function update() {
+      for (const s of stars) {
+        s.x += s.vx;
+        s.y += s.vy;
+        if (s.x < 0 || s.x > canvas.width) s.vx *= -1;
+        if (s.y < 0 || s.y > canvas.height) s.vy *= -1;
+      }
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('resize', () => { resize(); });
+    init();
+    loop();
+  })();
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var sections = ['how-it-works', 'zadosti', 'hlasovani', 'my-space'];
+    var navLinks = document.querySelectorAll('.nav-link');
+    window.addEventListener('scroll', function() {
+      var scrollY = window.scrollY + 140;
+      sections.forEach(function(id) {
+        var el = document.getElementById(id);
+        var link = document.querySelector('.nav-link[href="#' + id + '"]');
+        if (!el || !link) return;
+        if (scrollY >= el.offsetTop && scrollY < el.offsetTop + el.offsetHeight) {
+          navLinks.forEach(function(item) { item.classList.remove('nav-active'); });
+          link.classList.add('nav-active');
+        }
+      });
+    });
+  });
+</script>
 </body>
 </html>
-
